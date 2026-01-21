@@ -494,25 +494,28 @@ export function BlacklistChecker() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-5 sm:px-6 sm:py-6">
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-20 w-20 items-center justify-center">
-            <Image
-              src="/logo1.png"
-              alt="Chikocorp TRON Security"
-              width={100}
-              height={100}
-              className="h-20 w-20 object-contain rounded-xl"
-              priority
-            />
-            <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
-          </div>
-          <div className="text-center">
-            <div className="text-sm font-semibold tracking-tight">USDT Checker</div>
-            <div className="text-[11px] text-muted-foreground">TRON Security by Chikocorp</div>
-          </div>
+      <header className="relative z-10 mx-auto grid w-full max-w-4xl grid-cols-3 items-center px-4 py-5 sm:px-6 sm:py-6">
+        {/* Left: Logo */}
+        <div className="relative flex h-20 w-20 items-center justify-center">
+          <Image
+            src="/logo1.png"
+            alt="Chikocorp TRON Security"
+            width={100}
+            height={100}
+            className="h-20 w-20 object-contain rounded-xl"
+            priority
+          />
+          <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
         </div>
-        <ThemeToggle />
+        {/* Center: Text */}
+        <div className="text-center">
+          <div className="text-2xl font-semibold tracking-tight">USDT Checker</div>
+          <div className="text-xs text-muted-foreground">TRON Security by Chikocorp</div>
+        </div>
+        {/* Right: Theme Toggle */}
+        <div className="flex justify-end">
+          <ThemeToggle />
+        </div>
       </header>
 
       <main className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 sm:px-6">
