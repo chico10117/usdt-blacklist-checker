@@ -14,7 +14,7 @@ import {
   Loader2,
   ShieldAlert,
   ShieldCheck,
-  Sparkles,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -539,7 +539,7 @@ export function BlacklistChecker() {
             className="mt-6 flex flex-wrap items-center justify-center gap-2"
           >
             <TrustBadge icon={ShieldCheck}>{m.noKeysBadge}</TrustBadge>
-            <TrustBadge icon={Sparkles}>{m.noTrackingBadge}</TrustBadge>
+            <TrustBadge icon={EyeOff}>{m.noTrackingBadge}</TrustBadge>
           </motion.div>
         </section>
 
