@@ -507,7 +507,7 @@ export function BlacklistChecker() {
             />
             <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
           </div>
-          <div>
+          <div className="text-center">
             <div className="text-sm font-semibold tracking-tight">USDT Checker</div>
             <div className="text-[11px] text-muted-foreground">TRON Security by Chikocorp</div>
           </div>
