@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -11,7 +12,6 @@ import {
   ExternalLink,
   Info,
   Loader2,
-  Shield,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
@@ -496,13 +496,20 @@ export function BlacklistChecker() {
       {/* Header */}
       <header className="relative z-10 mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-5 sm:px-6 sm:py-6">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/20">
-            <Shield className="h-5 w-5" />
+          <div className="relative flex h-20 w-20 items-center justify-center">
+            <Image
+              src="/logo1.png"
+              alt="Chikocorp TRON Security"
+              width={100}
+              height={100}
+              className="h-20 w-20 object-contain rounded-xl"
+              priority
+            />
             <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
           </div>
           <div>
             <div className="text-sm font-semibold tracking-tight">USDT Checker</div>
-            <div className="text-[11px] text-muted-foreground">Verify TRON addresses</div>
+            <div className="text-[11px] text-muted-foreground">TRON Security by Chikocorp</div>
           </div>
         </div>
         <ThemeToggle />
@@ -958,8 +965,14 @@ export function BlacklistChecker() {
         {/* Footer */}
         <footer className="mx-auto mt-16 max-w-2xl border-t border-border/60 pt-8">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50">
-              <Shield className="h-5 w-5 text-muted-foreground" />
+            <div className="flex h-12 w-12 items-center justify-center">
+              <Image
+                src="/logo1.png"
+                alt="Chikocorp"
+                width={48}
+                height={48}
+                className="h-12 w-12 object-contain opacity-60"
+              />
             </div>
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
