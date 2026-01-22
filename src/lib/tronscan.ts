@@ -25,7 +25,7 @@ export async function fetchTronScanJson(url: string, timeoutMs = 8_000): Promise
     try {
       const res = await fetch(url, {
         method: "GET",
-        headers: { accept: "application/json" },
+        headers: { accept: "application/json", "user-agent": "usdt_blacklisted_web/1.0" },
         signal: controller.signal,
         cache: "no-store",
       });
@@ -33,6 +33,42 @@ export async function fetchTronScanJson(url: string, timeoutMs = 8_000): Promise
       return await res.json();
     } finally {
       clearTimeout(timeout);
+    }
+  });
+}
+
+const TronScanAccountTagResponseSchema = z
+  .object({
+    publicTag: z.string().optional(),
+    blueTag: z.string().optional(),
+    greyTag: z.string().optional(),
+    redTag: z.string().optional(),
+  })
+  .passthrough();
+
+export type TronScanAccountTag = z.infer<typeof TronScanAccountTagResponseSchema>;
+
+export type TronScanAccountTagResult =
+  | { ok: true; tag: TronScanAccountTag; evidenceUrl: string }
+  | { ok: false; error: string };
+
+export async function fetchTronScanAccountTag(address: string): Promise<TronScanAccountTagResult> {
+  const cacheKey = sha256Key(["tronscan_account_tag", address]);
+  return await getOrSetCache(cacheKey, 6 * 60 * 60 * 1000, async () => {
+    const evidenceUrl = `https://apilist.tronscanapi.com/api/account/tag?address=${encodeURIComponent(address)}`;
+    try {
+      const raw = await fetchTronScanJson(evidenceUrl, 8_000);
+      const parsed = TronScanAccountTagResponseSchema.safeParse(raw);
+      if (!parsed.success) return { ok: false, error: "Unexpected TronScan account tag response." };
+      return { ok: true, tag: parsed.data, evidenceUrl };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.name === "AbortError"
+            ? "TronScan timed out."
+            : error.message
+          : "Unknown TronScan error.";
+      return { ok: false, error: message };
     }
   });
 }

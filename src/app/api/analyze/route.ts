@@ -5,10 +5,11 @@ import { readUsdtBlacklistStatusOnChain } from "@/lib/tron";
 import { checkTronScanUsdtBlacklist } from "@/lib/tronscan";
 import { checkOfacSanctions } from "@/lib/sanctions";
 import { computeConfidencePercent, computeRiskScore, computeUsdtVolumeStats } from "@/lib/aml";
-import { fetchUsdtTrc20Transfers } from "@/lib/tronscan";
+import { fetchTronScanAccountTag, fetchUsdtTrc20Transfers } from "@/lib/tronscan";
 import { computeTopInboundCounterparties } from "@/lib/exposure";
 import { computeFlowHeuristics } from "@/lib/heuristics";
 import { getOrSetCache, sha256Key } from "@/lib/cache";
+import { classifyEntityFromTagsAndTransfers } from "@/lib/entity";
 
 export const runtime = "nodejs";
 
@@ -33,6 +34,27 @@ type AnalyzeResponse = {
     tronscan: CheckResult;
     onchain: CheckResult;
     sanctions: ReturnType<typeof checkOfacSanctions>;
+    entity:
+      | {
+          ok: true;
+          kind: "exchange" | "particular" | "unknown";
+          label: string;
+          confidence: number; // 0..1
+          reasons: string[];
+          subjectTag?: { publicTag?: string; blueTag?: string; greyTag?: string; redTag?: string };
+          outbound?: {
+            totalOutboundAmount: string;
+            exchangeTaggedShare: number;
+            top: Array<{
+              address: string;
+              outboundAmount: string;
+              outboundTxCount: number;
+              publicTag?: string;
+              isExchangeTagged: boolean;
+            }>;
+          };
+        }
+      | { ok: false; error: string };
     volume: { ok: true; stats: ReturnType<typeof computeUsdtVolumeStats>; notices: string[] } | { ok: false; error: string; locked?: boolean };
     exposure1hop:
       | {
@@ -145,6 +167,7 @@ export async function POST(request: Request) {
           tronscan: { ok: false, blacklisted: false, error: "Rate limited." },
           onchain: { ok: false, blacklisted: false, error: "Rate limited." },
           sanctions: { ok: false, matched: false, error: "Rate limited." },
+          entity: { ok: false, error: "Rate limited." },
           volume: { ok: false, error: "Rate limited." },
           exposure1hop: { ok: false, error: "Rate limited." },
           tracing2hop: { ok: false, error: "Rate limited." },
@@ -194,6 +217,7 @@ export async function POST(request: Request) {
           tronscan: { ok: false, blacklisted: false, error: message },
           onchain: { ok: false, blacklisted: false, error: message },
           sanctions: { ok: false, matched: false, error: message },
+          entity: { ok: false, error: message },
           volume: { ok: false, error: message },
           exposure1hop: { ok: false, error: message },
           tracing2hop: { ok: false, error: message },
@@ -271,6 +295,86 @@ export async function POST(request: Request) {
       maxPages: authenticated ? 20 : 10,
       timeoutMs: 8_000,
     });
+
+    const subjectTagRes = await fetchTronScanAccountTag(address);
+
+    let entity: AnalyzeResponse["checks"]["entity"] = { ok: false, error: "Entity check failed." };
+    if (transfers.ok) {
+      const byTo = new Map<string, { amount: bigint; count: number }>();
+      for (const t of transfers.transfers) {
+        if (t.from !== address) continue;
+        const existing = byTo.get(t.to) ?? { amount: BigInt(0), count: 0 };
+        existing.amount += t.amountBaseUnits;
+        existing.count += 1;
+        byTo.set(t.to, existing);
+      }
+      const topOutbound = [...byTo.entries()]
+        .map(([to, v]) => ({ to, ...v }))
+        .sort((a, b) => (a.amount === b.amount ? b.count - a.count : b.amount > a.amount ? 1 : -1))
+        .slice(0, 10)
+        .map((x) => x.to);
+
+      const destTagPairs = await mapLimit(topOutbound, 5, async (to) => {
+        const res = await fetchTronScanAccountTag(to);
+        return { to, res };
+      });
+      const destTags = new Map(destTagPairs.map((p) => [p.to, (p.res.ok ? p.res.tag : undefined)]));
+      const classified = classifyEntityFromTagsAndTransfers({
+        address,
+        nowMs: transfers.window.toTsMs,
+        lookbackDays: 90,
+        subjectTag: subjectTagRes.ok ? subjectTagRes.tag : undefined,
+        outboundTransfers: transfers.transfers,
+        outboundDestTags: destTags,
+        topOutboundN: 10,
+      });
+
+      entity = {
+        ok: true,
+        kind: classified.kind,
+        label: classified.label,
+        confidence: classified.confidence,
+        reasons: classified.reasons,
+        subjectTag: classified.subjectTag
+          ? { ...classified.subjectTag }
+          : undefined,
+        outbound: classified.outbound
+          ? {
+              totalOutboundAmount: classified.outbound.totalOutboundAmount,
+              exchangeTaggedShare: classified.outbound.exchangeTaggedShare,
+              top: classified.outbound.top.map((o) => ({
+                address: o.address,
+                outboundAmount: o.outboundAmount,
+                outboundTxCount: o.outboundTxCount,
+                publicTag: o.publicTag,
+                isExchangeTagged: o.isExchangeTagged,
+              })),
+            }
+          : undefined,
+      };
+    } else if (subjectTagRes.ok) {
+      const classified = classifyEntityFromTagsAndTransfers({
+        address,
+        nowMs: Date.now(),
+        lookbackDays: 90,
+        subjectTag: subjectTagRes.tag,
+        outboundTransfers: [],
+        outboundDestTags: new Map(),
+        topOutboundN: 10,
+      });
+      entity = {
+        ok: true,
+        kind: classified.kind,
+        label: classified.label,
+        confidence: classified.confidence,
+        reasons: classified.reasons,
+        subjectTag: classified.subjectTag
+          ? { ...classified.subjectTag }
+          : undefined,
+      };
+    } else {
+      entity = { ok: false, error: transfers.error };
+    }
 
     if (authenticated) {
       if (transfers.ok) {
@@ -424,7 +528,7 @@ export async function POST(request: Request) {
       address,
       isValid: true,
       access: { authenticated },
-      checks: { tronscan, onchain, sanctions, volume, exposure1hop, tracing2hop, heuristics },
+      checks: { tronscan, onchain, sanctions, entity, volume, exposure1hop, tracing2hop, heuristics },
       consensus,
       risk,
       timestamps: { checkedAtIso },

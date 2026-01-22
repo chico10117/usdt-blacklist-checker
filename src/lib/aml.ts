@@ -4,13 +4,18 @@ import { normalizeTronAddress } from "@/lib/validators";
 const USDT_DECIMALS = BigInt(6);
 const USDT_BASE = BigInt(10) ** USDT_DECIMALS;
 
+function addThousandSeparators(whole: string): string {
+  return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function formatUsdtFromBaseUnits(amountBaseUnits: bigint): string {
   const negative = amountBaseUnits < BigInt(0);
   const n = negative ? -amountBaseUnits : amountBaseUnits;
   const whole = n / USDT_BASE;
   const frac = n % USDT_BASE;
   const fracStr = frac.toString().padStart(Number(USDT_DECIMALS), "0").replace(/0+$/, "");
-  const out = fracStr.length ? `${whole.toString()}.${fracStr}` : whole.toString();
+  const wholeStr = addThousandSeparators(whole.toString());
+  const out = fracStr.length ? `${wholeStr}.${fracStr}` : wholeStr;
   return negative ? `-${out}` : out;
 }
 

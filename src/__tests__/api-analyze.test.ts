@@ -5,9 +5,11 @@ vi.mock("@clerk/nextjs/server", () => ({ auth }));
 
 const checkTronScanUsdtBlacklist = vi.fn();
 const fetchUsdtTrc20Transfers = vi.fn();
+const fetchTronScanAccountTag = vi.fn();
 vi.mock("@/lib/tronscan", () => ({
   checkTronScanUsdtBlacklist,
   fetchUsdtTrc20Transfers,
+  fetchTronScanAccountTag,
 }));
 
 const readUsdtBlacklistStatusOnChain = vi.fn();
@@ -74,6 +76,12 @@ beforeEach(() => {
     window: { fromTsMs: Date.parse("2025-10-23T00:00:00.000Z"), toTsMs: Date.parse("2026-01-22T00:00:00.000Z") },
     notices: [],
   });
+
+  fetchTronScanAccountTag.mockResolvedValue({
+    ok: true,
+    tag: { publicTag: "" },
+    evidenceUrl: "mock",
+  });
 });
 
 describe("/api/analyze", () => {
@@ -83,6 +91,7 @@ describe("/api/analyze", () => {
     expect(json.address).toBe(VALID_ADDRESS);
     expect(json.risk?.score).toBeTypeOf("number");
     expect(json.checks?.sanctions?.ok).toBe(true);
+    expect(json.checks?.entity?.ok).toBe(true);
     expect(json.access?.authenticated).toBe(false);
     expect(json.checks?.volume?.ok).toBe(false);
     expect(json.checks?.volume?.locked).toBe(true);
@@ -103,6 +112,7 @@ describe("/api/analyze", () => {
     expect(json.checks?.volume?.ok).toBe(true);
     expect(json.checks?.tracing2hop?.ok).toBe(true);
     expect(json.checks?.heuristics?.ok).toBe(true);
+    expect(json.checks?.entity?.ok).toBe(true);
     expect(json.risk?.score).toBe(5);
   });
 });

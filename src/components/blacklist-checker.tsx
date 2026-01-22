@@ -66,6 +66,21 @@ type ApiResponse = {
       matches?: Array<{ address: string; sources: Array<{ url: string; name?: string; context?: string }> }>;
       dataset?: { generatedAtIso: string; sourceUrls: string[]; addressCount: number };
     };
+    entity?:
+      | {
+          ok: true;
+          kind: "exchange" | "particular" | "unknown";
+          label: string;
+          confidence: number; // 0..1
+          reasons: string[];
+          subjectTag?: { publicTag?: string };
+          outbound?: {
+            totalOutboundAmount: string;
+            exchangeTaggedShare: number;
+            top: Array<{ address: string; outboundAmount: string; outboundTxCount: number; publicTag?: string; isExchangeTagged: boolean }>;
+          };
+        }
+      | { ok: false; error: string };
     volume?:
       | {
           ok: true;
@@ -1036,6 +1051,21 @@ export function BlacklistChecker() {
                           </Badge>
                         )}
 
+                        {load.data.checks?.entity?.ok && (
+                          <Badge
+                            variant={
+                              load.data.checks.entity.kind === "exchange"
+                                ? "secondary"
+                                : load.data.checks.entity.kind === "particular"
+                                  ? "outline"
+                                  : "outline"
+                            }
+                            className="gap-1"
+                          >
+                            {load.data.checks.entity.kind === "exchange" ? "Exchange" : load.data.checks.entity.kind === "particular" ? "Particular" : "Unlabeled"}
+                          </Badge>
+                        )}
+
                         {load.data.checks?.sanctions?.ok && (
                           <Badge
                             variant={load.data.checks.sanctions.matched ? "danger" : "success"}
@@ -1070,6 +1100,72 @@ export function BlacklistChecker() {
                         href={tronscanAddressUrl(load.data.address)}
                         mono
                       />
+
+                      {load.data.checks?.entity?.ok && (
+                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                              Entity tag (best-effort)
+                            </div>
+                            <Badge variant="outline">
+                              Confidence {Math.round(load.data.checks.entity.confidence * 100)}%
+                            </Badge>
+                          </div>
+                          <div className="mt-2 text-sm text-foreground">{load.data.checks.entity.label}</div>
+                          {load.data.checks.entity.subjectTag?.publicTag && (
+                            <div className="mt-2 text-sm text-muted-foreground">
+                              TronScan tag:{" "}
+                              <a
+                                href={tronscanAddressUrl(load.data.address)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
+                              >
+                                {load.data.checks.entity.subjectTag.publicTag}
+                              </a>
+                            </div>
+                          )}
+                          {load.data.checks.entity.outbound && (
+                            <div className="mt-3 text-sm text-muted-foreground">
+                              Observed outbound: {load.data.checks.entity.outbound.totalOutboundAmount} USDT · To exchange-tagged:{" "}
+                              {Math.round(load.data.checks.entity.outbound.exchangeTaggedShare * 100)}%
+                            </div>
+                          )}
+                          {load.data.checks.entity.outbound && load.data.checks.entity.outbound.top.some((t) => t.isExchangeTagged) && (
+                            <div className="mt-3 space-y-2">
+                              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                Top outbound exchange destinations
+                              </div>
+                              {load.data.checks.entity.outbound.top
+                                .filter((t) => t.isExchangeTagged)
+                                .slice(0, 3)
+                                .map((t) => (
+                                  <div key={t.address} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background/60 px-3 py-2">
+                                    <div className="min-w-0">
+                                      <a
+                                        href={tronscanAddressUrl(t.address)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-mono text-[13px] text-foreground underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
+                                      >
+                                        {truncateAddress(t.address)}
+                                      </a>
+                                      {t.publicTag && <div className="mt-0.5 text-xs text-muted-foreground">{t.publicTag}</div>}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                      {t.outboundAmount} USDT ({t.outboundTxCount})
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                          {load.data.checks.entity.reasons?.length > 0 && (
+                            <div className="mt-3 text-xs text-muted-foreground">
+                              {load.data.checks.entity.reasons.join(" ")}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {load.data.checks?.volume && load.data.checks.volume.ok && (
                         <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">

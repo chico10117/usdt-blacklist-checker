@@ -1,4 +1,5 @@
 import type { NormalizedUsdtTransfer } from "@/lib/tronscan";
+import { formatUsdtFromBaseUnits } from "@/lib/aml";
 import { normalizeTronAddress } from "@/lib/validators";
 
 export type InboundCounterparty = {
@@ -16,19 +17,6 @@ export type InboundCounterpartySet = {
   totalInboundTxCount: number;
   top: InboundCounterparty[];
 };
-
-const USDT_DECIMALS = BigInt(6);
-const USDT_BASE = BigInt(10) ** USDT_DECIMALS;
-
-function formatUsdtFromBaseUnits(amountBaseUnits: bigint): string {
-  const negative = amountBaseUnits < BigInt(0);
-  const n = negative ? -amountBaseUnits : amountBaseUnits;
-  const whole = n / USDT_BASE;
-  const frac = n % USDT_BASE;
-  const fracStr = frac.toString().padStart(Number(USDT_DECIMALS), "0").replace(/0+$/, "");
-  const out = fracStr.length ? `${whole.toString()}.${fracStr}` : whole.toString();
-  return negative ? `-${out}` : out;
-}
 
 export function computeTopInboundCounterparties(
   transfers: NormalizedUsdtTransfer[],

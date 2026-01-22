@@ -56,6 +56,7 @@ The checks below are designed to be explainable, evidence-backed, and weighted t
 1) **Address reputation / entity tags**
    - Pull public labels/tags where available (e.g., exchange hot wallet, service, contract).
    - Show evidence source and tag confidence (when available).
+   - For unlabeled wallets, infer “exchange deposit wallet” when **most outbound** goes to **exchange-tagged** hot wallets (best-effort).
 
 2) **USDT volume & velocity**
    - Compute inflow/outflow totals for **7/30/90 days** (or best-effort window if API limits).
@@ -320,6 +321,11 @@ Proxy metrics (MVP):
 - [x] Add caching layer for upstream calls and computed results (keyed by address + window).
 - [x] Add tests for each new exposure/trace heuristic (unit tests + `/api/analyze` smoke assertions).
 
+### P1.1 — Entity flag (exchange vs particular)
+- [x] Add a best-effort “Entity” flag in the UI (`Exchange` vs `Particular` vs `Unlabeled`) based on:
+  - TronScan public tags when present
+  - outbound-to-exchange-hot-wallet routing when tags are missing
+
 ### P2 — Opt-in report saving (privacy-first)
 - [ ] Choose DB + ORM (e.g., Postgres + Prisma/Drizzle) and add migrations.
 - [ ] Store user settings: `loggingEnabled` (default false).
@@ -345,6 +351,7 @@ Proxy metrics (MVP):
   - 2-hop sampled tracing + flow heuristics gated behind auth.
   - Risk score includes exposure + heuristics signals when available.
   - Confidence is returned as **0–100** and reflects missing/locked/partial inputs.
+- UI shows a best-effort `Entity` classification (Exchange/Particular/Unlabeled) using TronScan public tags and outbound-to-exchange routing heuristics.
 - Added an in-memory TTL cache (hashed keys) for TronScan calls and computed `/api/analyze` results (best-effort UX + rate control).
 - OFAC dataset updates are automated via `pnpm ofac:update`.
 - Clerk UI/middleware are enabled when Clerk env keys are set; otherwise they are safely disabled so builds work without Clerk configured.

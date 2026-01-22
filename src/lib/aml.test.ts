@@ -7,6 +7,10 @@ describe("formatUsdtFromBaseUnits", () => {
     expect(formatUsdtFromBaseUnits(BigInt("1000000"))).toBe("1");
     expect(formatUsdtFromBaseUnits(BigInt("1234500"))).toBe("1.2345");
   });
+
+  it("adds thousand separators for large values", () => {
+    expect(formatUsdtFromBaseUnits(BigInt("453062133100"))).toBe("453,062.1331");
+  });
 });
 
 describe("computeUsdtVolumeStats", () => {
