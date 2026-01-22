@@ -59,10 +59,25 @@ beforeEach(() => {
     matches: [],
     dataset: { generatedAtIso: "2026-01-01T00:00:00.000Z", sourceUrls: [], addressCount: 0 },
   });
+
+  fetchUsdtTrc20Transfers.mockResolvedValue({
+    ok: true,
+    transfers: [
+      {
+        txHash: "tx_in_1",
+        timestampMs: Date.parse("2026-01-21T12:00:00.000Z"),
+        from: "TAfrom1111111111111111111111111111111111",
+        to: VALID_ADDRESS,
+        amountBaseUnits: BigInt("10000000"), // 10 USDT
+      },
+    ],
+    window: { fromTsMs: Date.parse("2025-10-23T00:00:00.000Z"), toTsMs: Date.parse("2026-01-22T00:00:00.000Z") },
+    notices: [],
+  });
 });
 
 describe("/api/analyze", () => {
-  it("returns free checks and locks volume when unauthenticated", async () => {
+  it("returns free checks + 1-hop exposure, and locks advanced checks when unauthenticated", async () => {
     const { res, json } = await callAnalyze({ address: VALID_ADDRESS });
     expect(res.status).toBe(200);
     expect(json.address).toBe(VALID_ADDRESS);
@@ -71,7 +86,10 @@ describe("/api/analyze", () => {
     expect(json.access?.authenticated).toBe(false);
     expect(json.checks?.volume?.ok).toBe(false);
     expect(json.checks?.volume?.locked).toBe(true);
-    expect(fetchUsdtTrc20Transfers).not.toHaveBeenCalled();
+    expect(json.checks?.exposure1hop?.ok).toBe(true);
+    expect(json.checks?.tracing2hop?.locked).toBe(true);
+    expect(json.checks?.heuristics?.locked).toBe(true);
+    expect(fetchUsdtTrc20Transfers).toHaveBeenCalled();
   });
 
   it("unlocks volume when authenticated and Clerk keys present", async () => {
@@ -79,26 +97,12 @@ describe("/api/analyze", () => {
     process.env.CLERK_SECRET_KEY = "sk_test_123";
     auth.mockResolvedValue({ userId: "user_123" });
 
-    fetchUsdtTrc20Transfers.mockResolvedValue({
-      ok: true,
-      transfers: [
-        {
-          txHash: "tx1",
-          timestampMs: Date.parse("2026-01-21T12:00:00.000Z"),
-          from: "TAfrom1111111111111111111111111111111111",
-          to: VALID_ADDRESS,
-          amountBaseUnits: BigInt("10000000"), // 10 USDT
-        },
-      ],
-      window: { fromTsMs: Date.parse("2025-10-23T00:00:00.000Z"), toTsMs: Date.parse("2026-01-22T00:00:00.000Z") },
-      notices: [],
-    });
-
     const { res, json } = await callAnalyze({ address: VALID_ADDRESS });
     expect(res.status).toBe(200);
     expect(json.access?.authenticated).toBe(true);
     expect(json.checks?.volume?.ok).toBe(true);
+    expect(json.checks?.tracing2hop?.ok).toBe(true);
+    expect(json.checks?.heuristics?.ok).toBe(true);
     expect(json.risk?.score).toBe(5);
   });
 });
-

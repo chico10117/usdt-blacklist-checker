@@ -142,7 +142,7 @@ export type ScoreItem = { key: string; label: string; points: number; evidence?:
 export type RiskScore = {
   score: number; // 0..100
   tier: RiskTier;
-  confidence: number; // 0..1
+  confidence: number; // 0..100 (how complete/credible this score is)
   breakdown: ScoreItem[];
 };
 
@@ -158,20 +158,48 @@ function tierFor(score: number): RiskTier {
   return "low";
 }
 
+export type ConfidenceInput = {
+  lockedChecks: Array<"volume" | "exposure1hop" | "tracing2hop" | "heuristics">;
+  failedChecks: Array<"tronscan" | "onchain" | "sanctions" | "transfers">;
+  partialSignals: Array<"pagination_limited" | "window_limited">;
+};
+
+export function computeConfidencePercent(input: ConfidenceInput): number {
+  let confidence = 100;
+
+  // Upstream failures: reduce confidence more than gating, since this is supposed to represent "quality" too.
+  for (const key of input.failedChecks) {
+    confidence -= key === "transfers" ? 25 : 15;
+  }
+
+  // Gating/locked: user is explicitly not seeing a full report.
+  confidence -= input.lockedChecks.length * 10;
+
+  // Partial signals from best-effort pagination/window limits.
+  confidence -= input.partialSignals.length * 8;
+
+  return clamp(confidence, 0, 100);
+}
+
 export function computeRiskScore(input: {
   blacklist: { status: "blacklisted" | "not_blacklisted" | "inconclusive"; anyMethodBlacklisted: boolean };
   sanctionsMatched: boolean;
+  confidencePercent: number;
   volume?: VolumeStats;
   volumeAvailable: boolean;
-  volumeNotices?: string[];
+  exposure1hop?: {
+    anyCounterpartySanctioned: boolean;
+    anyCounterpartyBlacklisted: boolean;
+    flaggedVolumeShare?: number; // 0..1 of observed inbound volume
+    topCounterpartyShare?: number; // 0..1 of observed inbound volume
+    observedInboundTxCount?: number;
+    observedInboundTotalBaseUnits?: string;
+  };
+  tracing2hop?: { anyFlagged: boolean };
+  heuristics?: { findings: Array<{ key: string }> };
 }): RiskScore {
   const breakdown: ScoreItem[] = [];
-
-  const confidence = clamp(
-    input.volumeAvailable ? (input.volumeNotices?.length ? 0.85 : 0.95) : 0.6,
-    0,
-    1,
-  );
+  const confidence = clamp(Math.round(input.confidencePercent), 0, 100);
 
   if (input.sanctionsMatched) {
     return {
@@ -223,6 +251,46 @@ export function computeRiskScore(input: {
     score += inboundScore + txScore;
   }
 
-  score = clamp(Math.round(score * confidence), 0, 100);
+  if (input.exposure1hop) {
+    const exposure = input.exposure1hop;
+    if (exposure.anyCounterpartySanctioned) {
+      const points = exposure.flaggedVolumeShare !== undefined && exposure.flaggedVolumeShare >= 0.1 ? 30 : 20;
+      breakdown.push({ key: "exposure_sanctions_1hop", label: "Direct exposure to OFAC-sanctioned address(es) (1-hop)", points });
+      score += points;
+    }
+    if (exposure.anyCounterpartyBlacklisted) {
+      breakdown.push({ key: "exposure_blacklist_1hop", label: "Direct exposure to USDT-blacklisted address(es) (1-hop)", points: 25 });
+      score += 25;
+    }
+    const inboundTxCount = exposure.observedInboundTxCount ?? 0;
+    const inboundTotal = exposure.observedInboundTotalBaseUnits ? BigInt(exposure.observedInboundTotalBaseUnits) : BigInt(0);
+    const enoughSignal = inboundTxCount >= 20 || inboundTotal >= BigInt("1000000000"); // 1000 USDT
+    if (enoughSignal && exposure.topCounterpartyShare !== undefined && exposure.topCounterpartyShare >= 0.8) {
+      breakdown.push({ key: "in_concentration", label: "Highly concentrated inbound flow (top counterparty)", points: 8 });
+      score += 8;
+    }
+  }
+
+  if (input.tracing2hop?.anyFlagged) {
+    breakdown.push({ key: "exposure_2hop", label: "2-hop proximity to flagged sources (sampled)", points: 10 });
+    score += 10;
+  }
+
+  if (input.heuristics?.findings?.length) {
+    for (const f of input.heuristics.findings) {
+      if (f.key === "fast_in_fast_out") {
+        breakdown.push({ key: "heur_fast", label: "Fast-in / fast-out behavior", points: 15 });
+        score += 15;
+      } else if (f.key === "peel_like") {
+        breakdown.push({ key: "heur_peel", label: "Peel-chain-like outflow burst", points: 10 });
+        score += 10;
+      } else if (f.key === "structuring_like") {
+        breakdown.push({ key: "heur_structuring", label: "Structuring-like inbound deposits", points: 8 });
+        score += 8;
+      }
+    }
+  }
+
+  score = clamp(Math.round(score), 0, 100);
   return { score, tier: tierFor(score), confidence, breakdown };
 }

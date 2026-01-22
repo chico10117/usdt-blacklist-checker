@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { USDT_TRC20_CONTRACT } from "@/lib/tron";
+import { getOrSetCache, sha256Key } from "@/lib/cache";
 
 export type TronScanEvidence = {
   contractAddress: string;
@@ -18,19 +19,22 @@ function withFetchTimeout(timeoutMs: number) {
 }
 
 export async function fetchTronScanJson(url: string, timeoutMs = 8_000): Promise<unknown> {
-  const { controller, timeout } = withFetchTimeout(timeoutMs);
-  try {
-    const res = await fetch(url, {
-      method: "GET",
-      headers: { accept: "application/json" },
-      signal: controller.signal,
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error(`Upstream returned ${res.status}`);
-    return await res.json();
-  } finally {
-    clearTimeout(timeout);
-  }
+  const cacheKey = sha256Key(["tronscan_json", url]);
+  return await getOrSetCache(cacheKey, 30_000, async () => {
+    const { controller, timeout } = withFetchTimeout(timeoutMs);
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { accept: "application/json" },
+        signal: controller.signal,
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`Upstream returned ${res.status}`);
+      return await res.json();
+    } finally {
+      clearTimeout(timeout);
+    }
+  });
 }
 
 const TronScanRowSchema = z.object({
@@ -47,57 +51,60 @@ const TronScanBlacklistResponseSchema = z.object({
 });
 
 export async function checkTronScanUsdtBlacklist(address: string): Promise<TronScanBlacklistResult> {
-  const url = `https://apilist.tronscanapi.com/api/stableCoin/blackList?blackAddress=${encodeURIComponent(
-    address,
-  )}`;
-  try {
-    const raw = await fetchTronScanJson(url, 8_000);
-    const parsed = TronScanBlacklistResponseSchema.safeParse(raw);
-    if (!parsed.success) return { ok: false, blacklisted: false, error: "Unexpected TronScan response." };
+  const cacheKey = sha256Key(["tronscan_blacklist", address]);
+  return await getOrSetCache(cacheKey, 60_000, async () => {
+    const url = `https://apilist.tronscanapi.com/api/stableCoin/blackList?blackAddress=${encodeURIComponent(
+      address,
+    )}`;
+    try {
+      const raw = await fetchTronScanJson(url, 8_000);
+      const parsed = TronScanBlacklistResponseSchema.safeParse(raw);
+      if (!parsed.success) return { ok: false, blacklisted: false, error: "Unexpected TronScan response." };
 
-    const rows = parsed.data.data ?? [];
-    const total = parsed.data.total ?? rows.length;
+      const rows = parsed.data.data ?? [];
+      const total = parsed.data.total ?? rows.length;
 
-    const usdtRows = rows.filter((row) => {
-      const token = (row.tokenName ?? "").toUpperCase();
-      const contract = (row.contractAddress ?? "").trim();
-      return token.includes("USDT") || contract === USDT_TRC20_CONTRACT;
-    });
+      const usdtRows = rows.filter((row) => {
+        const token = (row.tokenName ?? "").toUpperCase();
+        const contract = (row.contractAddress ?? "").trim();
+        return token.includes("USDT") || contract === USDT_TRC20_CONTRACT;
+      });
 
-    const blacklisted = total > 0 && usdtRows.length > 0;
-    const best =
-      usdtRows
-        .map((row) => ({
-          ...row,
-          timeNum: typeof row.time === "string" ? Number(row.time) : row.time,
-        }))
-        .sort((a, b) => (b.timeNum ?? 0) - (a.timeNum ?? 0))[0] ?? null;
+      const blacklisted = total > 0 && usdtRows.length > 0;
+      const best =
+        usdtRows
+          .map((row) => ({
+            ...row,
+            timeNum: typeof row.time === "string" ? Number(row.time) : row.time,
+          }))
+          .sort((a, b) => (b.timeNum ?? 0) - (a.timeNum ?? 0))[0] ?? null;
 
-    const timestampIso =
-      best?.timeNum && Number.isFinite(best.timeNum)
-        ? new Date(best.timeNum * 1000).toISOString()
-        : undefined;
+      const timestampIso =
+        best?.timeNum && Number.isFinite(best.timeNum)
+          ? new Date(best.timeNum * 1000).toISOString()
+          : undefined;
 
-    return {
-      ok: true,
-      blacklisted,
-      evidence: blacklisted
-        ? {
-            contractAddress: best?.contractAddress || USDT_TRC20_CONTRACT,
-            txHash: best?.transHash,
-            timestampIso,
-          }
-        : { contractAddress: USDT_TRC20_CONTRACT },
-    };
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.name === "AbortError"
-          ? "TronScan timed out."
-          : error.message
-        : "Unknown TronScan error.";
-    return { ok: false, blacklisted: false, error: message };
-  }
+      return {
+        ok: true,
+        blacklisted,
+        evidence: blacklisted
+          ? {
+              contractAddress: best?.contractAddress || USDT_TRC20_CONTRACT,
+              txHash: best?.transHash,
+              timestampIso,
+            }
+          : { contractAddress: USDT_TRC20_CONTRACT },
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.name === "AbortError"
+            ? "TronScan timed out."
+            : error.message
+          : "Unknown TronScan error.";
+      return { ok: false, blacklisted: false, error: message };
+    }
+  });
 }
 
 const TronScanTokenInfoSchema = z
@@ -153,6 +160,14 @@ export async function fetchUsdtTrc20Transfers(
     timeoutMs?: number;
   },
 ): Promise<TransfersFetchResult> {
+  const cacheKey = sha256Key([
+    "tronscan_usdt_transfers",
+    address,
+    options?.lookbackDays ?? 90,
+    options?.pageSize ?? 50,
+    options?.maxPages ?? 20,
+  ]);
+  return await getOrSetCache(cacheKey, 30_000, async () => {
   const lookbackDays = options?.lookbackDays ?? 90;
   const pageSize = Math.min(Math.max(options?.pageSize ?? 50, 10), 100);
   const maxPages = Math.min(Math.max(options?.maxPages ?? 20, 1), 200);
@@ -214,4 +229,5 @@ export async function fetchUsdtTrc20Transfers(
         : "Unknown TronScan error.";
     return { ok: false, transfers: [], error: message };
   }
+  });
 }

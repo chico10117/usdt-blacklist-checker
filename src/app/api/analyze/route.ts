@@ -4,8 +4,11 @@ import { CheckRequestSchema } from "@/lib/validators";
 import { readUsdtBlacklistStatusOnChain } from "@/lib/tron";
 import { checkTronScanUsdtBlacklist } from "@/lib/tronscan";
 import { checkOfacSanctions } from "@/lib/sanctions";
-import { computeRiskScore, computeUsdtVolumeStats } from "@/lib/aml";
+import { computeConfidencePercent, computeRiskScore, computeUsdtVolumeStats } from "@/lib/aml";
 import { fetchUsdtTrc20Transfers } from "@/lib/tronscan";
+import { computeTopInboundCounterparties } from "@/lib/exposure";
+import { computeFlowHeuristics } from "@/lib/heuristics";
+import { getOrSetCache, sha256Key } from "@/lib/cache";
 
 export const runtime = "nodejs";
 
@@ -31,6 +34,45 @@ type AnalyzeResponse = {
     onchain: CheckResult;
     sanctions: ReturnType<typeof checkOfacSanctions>;
     volume: { ok: true; stats: ReturnType<typeof computeUsdtVolumeStats>; notices: string[] } | { ok: false; error: string; locked?: boolean };
+    exposure1hop:
+      | {
+          ok: true;
+          window: { lookbackDays: number };
+          inbound: ReturnType<typeof computeTopInboundCounterparties>;
+          counterparties: Array<{
+            address: string;
+            inboundAmount: string;
+            inboundAmountBaseUnits: string;
+            inboundTxCount: number;
+            lastSeenIso: string;
+            sampleTxHash?: string;
+            flags: { sanctioned: boolean; usdtBlacklisted: boolean };
+          }>;
+          summary: {
+            anyCounterpartySanctioned: boolean;
+            anyCounterpartyBlacklisted: boolean;
+            flaggedInboundShare: number; // 0..1 (observed)
+            topCounterpartyShare: number; // 0..1 (observed)
+            flaggedCounterpartyCount: number;
+          };
+          notices: string[];
+        }
+      | { ok: false; error: string; locked?: boolean };
+    tracing2hop:
+      | {
+          ok: true;
+          window: { lookbackDays: number; topN: number; sampleK: number };
+          anyFlagged: boolean;
+          paths: Array<{
+            viaCounterparty: string;
+            sources: Array<{ address: string; flags: { sanctioned: boolean; usdtBlacklisted: boolean } }>;
+          }>;
+          notices: string[];
+        }
+      | { ok: false; error: string; locked?: boolean };
+    heuristics:
+      | ReturnType<typeof computeFlowHeuristics>
+      | { ok: false; error: string; locked?: boolean };
   };
   consensus: {
     status: "blacklisted" | "not_blacklisted" | "inconclusive";
@@ -73,6 +115,23 @@ function computeConsensus(tronscan: CheckResult, onchain: CheckResult) {
   return { status: "inconclusive" as const, match: false };
 }
 
+async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T, index: number) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+
+  async function worker() {
+    while (next < items.length) {
+      const i = next;
+      next += 1;
+      out[i] = await fn(items[i]!, i);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () => worker());
+  await Promise.all(workers);
+  return out;
+}
+
 export async function POST(request: Request) {
   const ip = getClientIp(request);
   const limited = isRateLimited(ip);
@@ -87,6 +146,9 @@ export async function POST(request: Request) {
           onchain: { ok: false, blacklisted: false, error: "Rate limited." },
           sanctions: { ok: false, matched: false, error: "Rate limited." },
           volume: { ok: false, error: "Rate limited." },
+          exposure1hop: { ok: false, error: "Rate limited." },
+          tracing2hop: { ok: false, error: "Rate limited." },
+          heuristics: { ok: false, error: "Rate limited." },
         },
         consensus: { status: "inconclusive", match: false },
         risk: { score: 0, tier: "low", confidence: 0, breakdown: [] },
@@ -133,6 +195,9 @@ export async function POST(request: Request) {
           onchain: { ok: false, blacklisted: false, error: message },
           sanctions: { ok: false, matched: false, error: message },
           volume: { ok: false, error: message },
+          exposure1hop: { ok: false, error: message },
+          tracing2hop: { ok: false, error: message },
+          heuristics: { ok: false, error: message },
         },
         consensus: { status: "inconclusive", match: false },
         risk: { score: 0, tier: "low", confidence: 0, breakdown: [] },
@@ -144,7 +209,6 @@ export async function POST(request: Request) {
   }
 
   const address = parsed.data.address;
-  const checkedAtIso = new Date().toISOString();
 
   let authenticated = false;
   if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY) {
@@ -156,81 +220,217 @@ export async function POST(request: Request) {
     }
   }
 
-  const [tronscanSettled, onchainSettled] = await Promise.allSettled([
-    checkTronScanUsdtBlacklist(address),
-    readUsdtBlacklistStatusOnChain(address, { timeoutMs: 8_000 }),
-  ]);
+  const analysisCacheKey = sha256Key(["api_analyze", address, authenticated ? "auth" : "anon"]);
+  const response = await getOrSetCache<AnalyzeResponse>(analysisCacheKey, 20_000, async () => {
+    const checkedAtIso = new Date().toISOString();
 
-  const tronscan: CheckResult =
-    tronscanSettled.status === "fulfilled"
-      ? tronscanSettled.value
-      : { ok: false, blacklisted: false, error: "TronScan check failed." };
+    const [tronscanSettled, onchainSettled] = await Promise.allSettled([
+      checkTronScanUsdtBlacklist(address),
+      readUsdtBlacklistStatusOnChain(address, { timeoutMs: 8_000 }),
+    ]);
 
-  const onchain: CheckResult =
-    onchainSettled.status === "fulfilled"
-      ? onchainSettled.value.ok
-        ? {
-            ok: true,
-            blacklisted: onchainSettled.value.blacklisted,
-            evidence: {
-              contractAddress: onchainSettled.value.evidence.contractAddress,
-              method: onchainSettled.value.evidence.method,
-              raw: onchainSettled.value.evidence.raw,
-              fullHost: onchainSettled.value.evidence.fullHost,
-            },
-          }
-        : { ok: false, blacklisted: false, error: onchainSettled.value.error }
-      : { ok: false, blacklisted: false, error: "On-chain check failed." };
+    const tronscan: CheckResult =
+      tronscanSettled.status === "fulfilled"
+        ? tronscanSettled.value
+        : { ok: false, blacklisted: false, error: "TronScan check failed." };
 
-  const consensus = computeConsensus(tronscan, onchain);
-  const sanctions = checkOfacSanctions(address);
+    const onchain: CheckResult =
+      onchainSettled.status === "fulfilled"
+        ? onchainSettled.value.ok
+          ? {
+              ok: true,
+              blacklisted: onchainSettled.value.blacklisted,
+              evidence: {
+                contractAddress: onchainSettled.value.evidence.contractAddress,
+                method: onchainSettled.value.evidence.method,
+                raw: onchainSettled.value.evidence.raw,
+                fullHost: onchainSettled.value.evidence.fullHost,
+              },
+            }
+          : { ok: false, blacklisted: false, error: onchainSettled.value.error }
+        : { ok: false, blacklisted: false, error: "On-chain check failed." };
 
-  const notices: string[] = [
-    "Never share your seed phrase or private keys. This tool only needs a public address.",
-    "We don’t store addresses or run analytics by default.",
-  ];
+    const consensus = computeConsensus(tronscan, onchain);
+    const sanctions = checkOfacSanctions(address);
 
-  if (!authenticated) notices.push("Sign in to unlock additional AML checks (volume context, tracing, and more).");
-  if (!tronscan.ok || !onchain.ok) notices.push("One or more blacklist verification methods failed. Results may be incomplete.");
-  if (!sanctions.ok) notices.push("Sanctions screen failed to run.");
+    const notices: string[] = [
+      "Never share your seed phrase or private keys. This tool only needs a public address.",
+      "We don’t store addresses or run analytics by default.",
+    ];
 
-  let volume: AnalyzeResponse["checks"]["volume"] = { ok: false, error: "Sign in required.", locked: true };
-  let volumeAvailable = false;
-  let volumeNotices: string[] | undefined;
+    if (!authenticated) notices.push("Sign in to unlock additional AML checks (volume context, tracing, and more).");
+    if (!tronscan.ok || !onchain.ok) notices.push("One or more blacklist verification methods failed. Results may be incomplete.");
+    if (!sanctions.ok) notices.push("Sanctions screen failed to run.");
 
-  if (authenticated) {
-    const transfers = await fetchUsdtTrc20Transfers(address, { lookbackDays: 90, pageSize: 50, maxPages: 20, timeoutMs: 8_000 });
-    if (transfers.ok) {
-      const stats = computeUsdtVolumeStats(transfers.transfers, address, transfers.window.toTsMs);
-      volume = { ok: true, stats, notices: transfers.notices };
-      volumeAvailable = true;
-      volumeNotices = transfers.notices;
-    } else {
-      volume = { ok: false, error: transfers.error };
-      notices.push("USDT transfer history could not be fetched.");
+    let volume: AnalyzeResponse["checks"]["volume"] = { ok: false, error: "Sign in required.", locked: true };
+    let volumeAvailable = false;
+
+    const transfers = await fetchUsdtTrc20Transfers(address, {
+      lookbackDays: 90,
+      pageSize: 50,
+      maxPages: authenticated ? 20 : 10,
+      timeoutMs: 8_000,
+    });
+
+    if (authenticated) {
+      if (transfers.ok) {
+        const stats = computeUsdtVolumeStats(transfers.transfers, address, transfers.window.toTsMs);
+        volume = { ok: true, stats, notices: transfers.notices };
+        volumeAvailable = true;
+      } else {
+        volume = { ok: false, error: transfers.error };
+        notices.push("USDT transfer history could not be fetched.");
+      }
     }
-  }
 
-  const anyMethodBlacklisted = (tronscan.ok && tronscan.blacklisted) || (onchain.ok && onchain.blacklisted);
+    let exposure1hop: AnalyzeResponse["checks"]["exposure1hop"] = { ok: false, error: "Unavailable." };
+    if (transfers.ok) {
+      const inbound = computeTopInboundCounterparties(transfers.transfers, address, { lookbackDays: 90, topN: 10, nowMs: transfers.window.toTsMs });
+      const toCheck = inbound.top.map((c) => c.address);
 
-  const risk = computeRiskScore({
-    blacklist: { status: consensus.status, anyMethodBlacklisted },
-    sanctionsMatched: sanctions.ok && sanctions.matched,
-    volume: volume.ok ? volume.stats : undefined,
-    volumeAvailable,
-    volumeNotices,
+      const checked = await mapLimit(toCheck, 5, async (counterparty) => {
+        const sanctionsRes = checkOfacSanctions(counterparty);
+        const blackRes = await checkTronScanUsdtBlacklist(counterparty);
+        return {
+          address: counterparty,
+          sanctioned: sanctionsRes.ok && sanctionsRes.matched,
+          usdtBlacklisted: blackRes.ok && blackRes.blacklisted,
+        };
+      });
+
+      const byAddress = new Map(checked.map((c) => [c.address, c]));
+      const counterparties = inbound.top.map((c) => {
+        const flags = byAddress.get(c.address) ?? { sanctioned: false, usdtBlacklisted: false };
+        return {
+          ...c,
+          flags: { sanctioned: flags.sanctioned, usdtBlacklisted: flags.usdtBlacklisted },
+        };
+      });
+
+      const totalInbound = BigInt(inbound.totalInboundBaseUnits || "0");
+      const flaggedInbound = counterparties.reduce(
+        (acc, c) => (c.flags.sanctioned || c.flags.usdtBlacklisted ? acc + BigInt(c.inboundAmountBaseUnits) : acc),
+        BigInt(0),
+      );
+      const topCounterpartyShare =
+        counterparties.length > 0 && totalInbound > BigInt(0)
+          ? Number(BigInt(counterparties[0]!.inboundAmountBaseUnits) * BigInt(10_000) / totalInbound) / 10_000
+          : 0;
+      const flaggedInboundShare =
+        totalInbound > BigInt(0) ? Number(flaggedInbound * BigInt(10_000) / totalInbound) / 10_000 : 0;
+
+      const anyCounterpartySanctioned = counterparties.some((c) => c.flags.sanctioned);
+      const anyCounterpartyBlacklisted = counterparties.some((c) => c.flags.usdtBlacklisted);
+      const flaggedCounterpartyCount = counterparties.filter((c) => c.flags.sanctioned || c.flags.usdtBlacklisted).length;
+
+      const exposureNotices = [...transfers.notices];
+      if (totalInbound === BigInt(0)) exposureNotices.push("No inbound USDT transfers found in the analyzed window.");
+      if (transfers.notices.length) exposureNotices.push("Exposure is computed from a best-effort sample of transfers.");
+
+      exposure1hop = {
+        ok: true,
+        window: { lookbackDays: 90 },
+        inbound,
+        counterparties,
+        summary: {
+          anyCounterpartySanctioned,
+          anyCounterpartyBlacklisted,
+          flaggedInboundShare,
+          topCounterpartyShare,
+          flaggedCounterpartyCount,
+        },
+        notices: exposureNotices,
+      };
+    } else {
+      exposure1hop = { ok: false, error: transfers.error };
+    }
+
+    let tracing2hop: AnalyzeResponse["checks"]["tracing2hop"] = { ok: false, error: "Sign in required.", locked: true };
+    if (authenticated && transfers.ok) {
+      const inbound = computeTopInboundCounterparties(transfers.transfers, address, { lookbackDays: 90, topN: 10, nowMs: transfers.window.toTsMs });
+      const via = inbound.top.map((c) => c.address);
+      const topN = 10;
+      const sampleK = 5;
+
+      const paths = await mapLimit(via.slice(0, topN), 2, async (viaCounterparty) => {
+        const viaTransfers = await fetchUsdtTrc20Transfers(viaCounterparty, { lookbackDays: 90, pageSize: 50, maxPages: 5, timeoutMs: 8_000 });
+        if (!viaTransfers.ok) return { viaCounterparty, sources: [] as Array<{ address: string; flags: { sanctioned: boolean; usdtBlacklisted: boolean } }> };
+        const sources = computeTopInboundCounterparties(viaTransfers.transfers, viaCounterparty, { lookbackDays: 90, topN: sampleK, nowMs: viaTransfers.window.toTsMs }).top;
+
+        const checkedSources = await mapLimit(sources.map((s) => s.address), 5, async (sourceAddr) => {
+          const s1 = checkOfacSanctions(sourceAddr);
+          const b1 = await checkTronScanUsdtBlacklist(sourceAddr);
+          return { address: sourceAddr, flags: { sanctioned: s1.ok && s1.matched, usdtBlacklisted: b1.ok && b1.blacklisted } };
+        });
+
+        return { viaCounterparty, sources: checkedSources.filter((s) => s.flags.sanctioned || s.flags.usdtBlacklisted) };
+      });
+
+      const anyFlagged = paths.some((p) => p.sources.some((s) => s.flags.sanctioned || s.flags.usdtBlacklisted));
+      tracing2hop = {
+        ok: true,
+        window: { lookbackDays: 90, topN, sampleK },
+        anyFlagged,
+        paths: paths.slice(0, topN),
+        notices: ["2-hop tracing is sampled and best-effort; it may miss relevant exposure."],
+      };
+    }
+
+    let heuristics: AnalyzeResponse["checks"]["heuristics"] = { ok: false, error: "Sign in required.", locked: true };
+    if (authenticated && transfers.ok) {
+      heuristics = computeFlowHeuristics(transfers.transfers, address, { lookbackDays: 90, nowMs: transfers.window.toTsMs });
+    }
+
+    const anyMethodBlacklisted = (tronscan.ok && tronscan.blacklisted) || (onchain.ok && onchain.blacklisted);
+
+    const lockedChecks: Array<"volume" | "exposure1hop" | "tracing2hop" | "heuristics"> = [];
+    if (!authenticated) {
+      lockedChecks.push("volume", "tracing2hop", "heuristics");
+    }
+
+    const failedChecks: Array<"tronscan" | "onchain" | "sanctions" | "transfers"> = [];
+    if (!tronscan.ok) failedChecks.push("tronscan");
+    if (!onchain.ok) failedChecks.push("onchain");
+    if (!sanctions.ok) failedChecks.push("sanctions");
+    if (!transfers.ok) failedChecks.push("transfers");
+
+    const partialSignals: Array<"pagination_limited" | "window_limited"> = [];
+    if (transfers.ok && transfers.notices.some((n) => n.toLowerCase().includes("pagination"))) partialSignals.push("pagination_limited");
+
+    const confidencePercent = computeConfidencePercent({ lockedChecks, failedChecks, partialSignals });
+
+    const risk = computeRiskScore({
+      blacklist: { status: consensus.status, anyMethodBlacklisted },
+      sanctionsMatched: sanctions.ok && sanctions.matched,
+      confidencePercent,
+      volume: volume.ok ? volume.stats : undefined,
+      volumeAvailable,
+      exposure1hop:
+        exposure1hop.ok
+          ? {
+              anyCounterpartySanctioned: exposure1hop.summary.anyCounterpartySanctioned,
+              anyCounterpartyBlacklisted: exposure1hop.summary.anyCounterpartyBlacklisted,
+              flaggedVolumeShare: exposure1hop.summary.flaggedInboundShare,
+              topCounterpartyShare: exposure1hop.summary.topCounterpartyShare,
+              observedInboundTxCount: exposure1hop.inbound.totalInboundTxCount,
+              observedInboundTotalBaseUnits: exposure1hop.inbound.totalInboundBaseUnits,
+            }
+          : undefined,
+      tracing2hop: tracing2hop.ok ? { anyFlagged: tracing2hop.anyFlagged } : undefined,
+      heuristics: heuristics.ok ? { findings: heuristics.findings } : undefined,
+    });
+
+    return {
+      address,
+      isValid: true,
+      access: { authenticated },
+      checks: { tronscan, onchain, sanctions, volume, exposure1hop, tracing2hop, heuristics },
+      consensus,
+      risk,
+      timestamps: { checkedAtIso },
+      notices,
+    };
   });
-
-  const response: AnalyzeResponse = {
-    address,
-    isValid: true,
-    access: { authenticated },
-    checks: { tronscan, onchain, sanctions, volume },
-    consensus,
-    risk,
-    timestamps: { checkedAtIso },
-    notices,
-  };
 
   return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
 }

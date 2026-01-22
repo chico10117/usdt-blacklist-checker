@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeRiskScore, computeUsdtVolumeStats, formatUsdtFromBaseUnits } from "@/lib/aml";
+import { computeConfidencePercent, computeRiskScore, computeUsdtVolumeStats, formatUsdtFromBaseUnits } from "@/lib/aml";
 
 describe("formatUsdtFromBaseUnits", () => {
   it("formats whole and fractional amounts", () => {
@@ -73,6 +73,7 @@ describe("computeRiskScore", () => {
     const risk = computeRiskScore({
       blacklist: { status: "not_blacklisted", anyMethodBlacklisted: false },
       sanctionsMatched: true,
+      confidencePercent: 90,
       volumeAvailable: false,
     });
     expect(risk.score).toBe(100);
@@ -83,6 +84,7 @@ describe("computeRiskScore", () => {
     const risk = computeRiskScore({
       blacklist: { status: "blacklisted", anyMethodBlacklisted: true },
       sanctionsMatched: false,
+      confidencePercent: 90,
       volumeAvailable: false,
     });
     expect(risk.score).toBe(100);
@@ -93,6 +95,7 @@ describe("computeRiskScore", () => {
     const risk = computeRiskScore({
       blacklist: { status: "inconclusive", anyMethodBlacklisted: true },
       sanctionsMatched: false,
+      confidencePercent: 90,
       volumeAvailable: false,
     });
     expect(risk.score).toBeGreaterThanOrEqual(90);
@@ -100,3 +103,14 @@ describe("computeRiskScore", () => {
   });
 });
 
+describe("computeConfidencePercent", () => {
+  it("reduces confidence for locked and failed checks", () => {
+    const confidence = computeConfidencePercent({
+      lockedChecks: ["volume", "heuristics"],
+      failedChecks: ["tronscan"],
+      partialSignals: ["pagination_limited"],
+    });
+    expect(confidence).toBeLessThan(100);
+    expect(confidence).toBeGreaterThanOrEqual(0);
+  });
+});

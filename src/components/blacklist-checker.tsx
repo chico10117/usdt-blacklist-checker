@@ -81,6 +81,45 @@ type ApiResponse = {
           notices: string[];
         }
       | { ok: false; error: string; locked?: boolean };
+    exposure1hop?:
+      | {
+          ok: true;
+          window: { lookbackDays: number };
+          inbound: { totalInboundAmount: string; totalInboundTxCount: number };
+          counterparties: Array<{
+            address: string;
+            inboundAmount: string;
+            inboundTxCount: number;
+            lastSeenIso: string;
+            sampleTxHash?: string;
+            flags: { sanctioned: boolean; usdtBlacklisted: boolean };
+          }>;
+          summary: {
+            anyCounterpartySanctioned: boolean;
+            anyCounterpartyBlacklisted: boolean;
+            flaggedInboundShare: number;
+            topCounterpartyShare: number;
+            flaggedCounterpartyCount: number;
+          };
+          notices: string[];
+        }
+      | { ok: false; error: string; locked?: boolean };
+    tracing2hop?:
+      | {
+          ok: true;
+          anyFlagged: boolean;
+          window: { lookbackDays: number; topN: number; sampleK: number };
+          paths: Array<{ viaCounterparty: string; sources: Array<{ address: string; flags: { sanctioned: boolean; usdtBlacklisted: boolean } }> }>;
+          notices: string[];
+        }
+      | { ok: false; error: string; locked?: boolean };
+    heuristics?:
+      | {
+          ok: true;
+          findings: Array<{ key: string; label: string; severity: "info" | "warning" | "danger" }>;
+          parameters: Record<string, unknown>;
+        }
+      | { ok: false; error: string; locked?: boolean };
   };
   consensus: {
     status: "blacklisted" | "not_blacklisted" | "inconclusive";
@@ -89,7 +128,7 @@ type ApiResponse = {
   risk?: {
     score: number;
     tier: "low" | "guarded" | "elevated" | "high" | "severe";
-    confidence: number;
+    confidence: number; // 0..100
     breakdown: Array<{ key: string; label: string; points: number; evidence?: string[] }>;
   };
   timestamps: { checkedAtIso: string };
@@ -991,6 +1030,12 @@ export function BlacklistChecker() {
                           </Badge>
                         )}
 
+                        {typeof load.data.risk?.confidence === "number" && (
+                          <Badge variant="outline" className="gap-1">
+                            Confidence {Math.round(load.data.risk.confidence)}/100
+                          </Badge>
+                        )}
+
                         {load.data.checks?.sanctions?.ok && (
                           <Badge
                             variant={load.data.checks.sanctions.matched ? "danger" : "success"}
@@ -1095,6 +1140,177 @@ export function BlacklistChecker() {
                             Volume context is locked. Sign in to unlock additional AML checks.
                           </div>
                         )}
+
+                      {load.data.checks?.exposure1hop && load.data.checks.exposure1hop.ok && (
+                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                              Direct exposure (1-hop, inbound)
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={load.data.checks.exposure1hop.summary.flaggedCounterpartyCount > 0 ? "warning" : "success"}>
+                                Flagged: {load.data.checks.exposure1hop.summary.flaggedCounterpartyCount}/10
+                              </Badge>
+                              <Badge variant="outline">
+                                Window: {load.data.checks.exposure1hop.window.lookbackDays}d
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="mt-2 text-sm text-muted-foreground">
+                            Observed inbound: {load.data.checks.exposure1hop.inbound.totalInboundAmount} USDT ({load.data.checks.exposure1hop.inbound.totalInboundTxCount} tx)
+                          </div>
+
+                          <div className="mt-3 space-y-2">
+                            {load.data.checks.exposure1hop.counterparties.slice(0, 10).map((c) => (
+                              <div key={c.address} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background/60 px-3 py-2">
+                                <div className="flex min-w-0 items-center gap-2">
+                                  <a
+                                    href={tronscanAddressUrl(c.address)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="truncate font-mono text-[13px] text-foreground underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
+                                  >
+                                    {truncateAddress(c.address)}
+                                  </a>
+                                  {c.flags.usdtBlacklisted && <Badge variant="danger">USDT blacklisted</Badge>}
+                                  {c.flags.sanctioned && <Badge variant="danger">OFAC</Badge>}
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <span>{c.inboundAmount} USDT</span>
+                                  <span className="text-muted-foreground/60">·</span>
+                                  <span>{c.inboundTxCount} tx</span>
+                                  {c.sampleTxHash && (
+                                    <>
+                                      <span className="text-muted-foreground/60">·</span>
+                                      <a
+                                        href={tronscanTxUrl(c.sampleTxHash)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-1 underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
+                                      >
+                                        tx
+                                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                                      </a>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {load.data.checks.exposure1hop.notices?.length > 0 && (
+                            <div className="mt-3 text-xs text-muted-foreground">
+                              {load.data.checks.exposure1hop.notices.join(" ")}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {load.data.checks?.exposure1hop &&
+                        typeof load.data.checks.exposure1hop === "object" &&
+                        "ok" in load.data.checks.exposure1hop &&
+                        (load.data.checks.exposure1hop as { ok: boolean }).ok === false && (
+                          <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                            Exposure check unavailable: {(load.data.checks.exposure1hop as { error: string }).error}
+                          </div>
+                        )}
+
+                      {load.data.checks?.tracing2hop &&
+                        typeof load.data.checks.tracing2hop === "object" &&
+                        "ok" in load.data.checks.tracing2hop &&
+                        (load.data.checks.tracing2hop as { ok: boolean }).ok === false &&
+                        (load.data.checks.tracing2hop as { locked?: boolean }).locked && (
+                          <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                            2-hop tracing is locked. Sign in to unlock advanced AML checks.
+                          </div>
+                        )}
+
+                      {load.data.checks?.tracing2hop && load.data.checks.tracing2hop.ok && (
+                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                              2-hop tracing (sampled)
+                            </div>
+                            <Badge variant={load.data.checks.tracing2hop.anyFlagged ? "warning" : "success"}>
+                              {load.data.checks.tracing2hop.anyFlagged ? "Flagged proximity detected" : "No flagged proximity detected"}
+                            </Badge>
+                          </div>
+
+                          {load.data.checks.tracing2hop.anyFlagged && (
+                            <div className="mt-3 space-y-2">
+                              {load.data.checks.tracing2hop.paths
+                                .filter((p) => p.sources.length > 0)
+                                .slice(0, 5)
+                                .map((p) => (
+                                  <div key={p.viaCounterparty} className="rounded-lg bg-background/60 px-3 py-2">
+                                    <div className="text-xs font-medium text-muted-foreground">
+                                      via{" "}
+                                      <a
+                                        href={tronscanAddressUrl(p.viaCounterparty)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-mono underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
+                                      >
+                                        {truncateAddress(p.viaCounterparty)}
+                                      </a>
+                                    </div>
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                      {p.sources.slice(0, 5).map((s) => (
+                                        <Badge key={s.address} variant="outline">
+                                          {truncateAddress(s.address)}{s.flags.usdtBlacklisted ? " · USDT" : ""}{s.flags.sanctioned ? " · OFAC" : ""}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+
+                          {load.data.checks.tracing2hop.notices?.length > 0 && (
+                            <div className="mt-3 text-xs text-muted-foreground">
+                              {load.data.checks.tracing2hop.notices.join(" ")}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {load.data.checks?.heuristics &&
+                        typeof load.data.checks.heuristics === "object" &&
+                        "ok" in load.data.checks.heuristics &&
+                        (load.data.checks.heuristics as { ok: boolean }).ok === false &&
+                        (load.data.checks.heuristics as { locked?: boolean }).locked && (
+                          <div className="mt-2 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                            Flow heuristics are locked. Sign in to unlock advanced AML checks.
+                          </div>
+                        )}
+
+                      {load.data.checks?.heuristics && load.data.checks.heuristics.ok && (
+                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                              Flow heuristics (best-effort)
+                            </div>
+                            <Badge variant={load.data.checks.heuristics.findings.length ? "warning" : "success"}>
+                              Findings: {load.data.checks.heuristics.findings.length}
+                            </Badge>
+                          </div>
+                          {load.data.checks.heuristics.findings.length > 0 ? (
+                            <ul className="mt-3 space-y-2 text-sm">
+                              {load.data.checks.heuristics.findings.map((f, i) => (
+                                <li key={`${f.key}-${i}`} className="flex items-start justify-between gap-2 rounded-lg bg-background/60 px-3 py-2">
+                                  <span className="text-foreground">{f.label}</span>
+                                  <Badge variant={f.severity === "danger" ? "danger" : f.severity === "warning" ? "warning" : "secondary"}>
+                                    {f.severity}
+                                  </Badge>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <div className="mt-3 text-sm text-muted-foreground">No suspicious flow patterns detected in the sampled window.</div>
+                          )}
+                        </div>
+                      )}
 
                       {load.data.notices?.length > 0 && (
                         <div className="mt-4 rounded-lg bg-muted/50 p-3">
