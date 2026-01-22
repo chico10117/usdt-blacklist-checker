@@ -7,6 +7,8 @@ Production-ready, mobile-first web app to check whether a public TRON address is
 
 This app never asks for or stores seed phrases/private keys. It only needs a public address.
 
+It also includes an initial **sanctions screen (OFAC, TRON addresses)** and a new analysis endpoint (`/api/analyze`) that returns a **0–100 risk score**. Additional AML checks (like volume context) are gated behind authentication (Clerk).
+
 ## Getting Started
 
 Install dependencies:
@@ -28,6 +30,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `POST /api/check`
   - Body: `{ "address": "T..." }`
   - Returns combined results, evidence (when available), consensus, and notices.
+- `POST /api/analyze`
+  - Body: `{ "address": "T..." }`
+  - Returns blacklist results + OFAC sanctions screen (free) and a risk score. Some AML checks are available only when signed in.
 
 ## Environment variables
 
@@ -36,12 +41,26 @@ Create a `.env.local` (optional):
 ```bash
 TRONGRID_API_KEY= # optional, improves TronGrid reliability
 NEXT_PUBLIC_SITE_URL=https://usdt.chikocorp.com # used for metadataBase / OG tags
+
+# Clerk (required to enable sign-in)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+```
+
+## OFAC dataset updates
+
+The sanctions matcher uses a locally cached dataset at `src/data/ofac-tron-addresses.json`.
+
+Update it:
+
+```bash
+pnpm ofac:update
 ```
 
 ## Privacy & security notes
 
 - No address logging is implemented in the API route (no `console.log` / request logging in handler).
-- No analytics are included. If you add analytics later, hash addresses client-side before sending.
+- Vercel Analytics can be enabled/disabled independently; do not send raw addresses to analytics.
 - Rate limiting is applied to `/api/check` (best-effort in-memory, 30 requests/min per IP).
 - External calls use timeouts and return partial results when possible.
 

@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -53,13 +54,42 @@ type CheckResult =
 type ApiResponse = {
   address: string;
   isValid: boolean;
+  access?: { authenticated: boolean };
   checks: {
     tronscan: CheckResult;
     onchain: CheckResult;
+    sanctions?: {
+      ok: boolean;
+      matched: boolean;
+      error?: string;
+      matches?: Array<{ address: string; sources: Array<{ url: string; name?: string; context?: string }> }>;
+      dataset?: { generatedAtIso: string; sourceUrls: string[]; addressCount: number };
+    };
+    volume?:
+      | {
+          ok: true;
+          stats: {
+            windows: {
+              d7: { inbound: { amount: string; txCount: number }; outbound: { amount: string; txCount: number } };
+              d30: { inbound: { amount: string; txCount: number }; outbound: { amount: string; txCount: number } };
+              d90: { inbound: { amount: string; txCount: number }; outbound: { amount: string; txCount: number } };
+            };
+            largestInbound?: { amount: string; txHash: string; from: string; timestampIso: string };
+            largestOutbound?: { amount: string; txHash: string; to: string; timestampIso: string };
+          };
+          notices: string[];
+        }
+      | { ok: false; error: string; locked?: boolean };
   };
   consensus: {
     status: "blacklisted" | "not_blacklisted" | "inconclusive";
     match: boolean;
+  };
+  risk?: {
+    score: number;
+    tier: "low" | "guarded" | "elevated" | "high" | "severe";
+    confidence: number;
+    breakdown: Array<{ key: string; label: string; points: number; evidence?: string[] }>;
   };
   timestamps: { checkedAtIso: string };
   notices: string[];
@@ -400,6 +430,7 @@ function ScamWarningAlert() {
 
 export function BlacklistChecker() {
   const m = getMessages("en");
+  const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   const [address, setAddress] = React.useState("");
   const [validation, setValidation] = React.useState<ReturnType<typeof validateTronAddress> | null>(null);
@@ -422,13 +453,15 @@ export function BlacklistChecker() {
     const consensus = v.consensus as Record<string, unknown> | undefined;
     const timestamps = v.timestamps as Record<string, unknown> | undefined;
     const checks = v.checks as Record<string, unknown> | undefined;
+    const risk = v.risk as Record<string, unknown> | undefined;
     return (
       typeof v.address === "string" &&
       typeof v.isValid === "boolean" &&
       typeof consensus?.status === "string" &&
       typeof consensus?.match === "boolean" &&
       typeof timestamps?.checkedAtIso === "string" &&
-      typeof checks === "object"
+      typeof checks === "object" &&
+      typeof risk?.score === "number"
     );
   }
 
@@ -439,7 +472,7 @@ export function BlacklistChecker() {
 
     setLoad({ state: "loading" });
     try {
-      const res = await fetch("/api/check", {
+      const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ address: v.normalized }),
@@ -509,11 +542,25 @@ export function BlacklistChecker() {
         </div>
         {/* Center: Text */}
         <div className="text-center">
-          <div className="text-2xl font-semibold tracking-tight">USDT Checker</div>
+          <div className="text-2xl font-semibold tracking-tight">Tron wallet blacklist checker</div>
           <div className="text-xs text-muted-foreground">TRON Security by Chikocorp</div>
         </div>
         {/* Right: Theme Toggle */}
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          {clerkEnabled && (
+            <>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button type="button" variant="outline" size="sm">
+                    Sign in
+                  </Button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </>
+          )}
           <ThemeToggle />
         </div>
       </header>
@@ -818,6 +865,44 @@ export function BlacklistChecker() {
                             Partial / mismatch
                           </Badge>
                         )}
+
+                        {typeof load.data.risk?.score === "number" && (
+                          <Badge
+                            variant={
+                              load.data.risk.tier === "low"
+                                ? "success"
+                                : load.data.risk.tier === "guarded"
+                                  ? "secondary"
+                                  : load.data.risk.tier === "elevated"
+                                    ? "warning"
+                                    : "danger"
+                            }
+                            className="gap-1"
+                          >
+                            Risk {load.data.risk.score}/100
+                          </Badge>
+                        )}
+
+                        {load.data.checks?.sanctions?.ok && (
+                          <Badge
+                            variant={load.data.checks.sanctions.matched ? "danger" : "success"}
+                            className="gap-1"
+                          >
+                            {load.data.checks.sanctions.matched ? "OFAC match" : "No OFAC match"}
+                          </Badge>
+                        )}
+
+                        {!load.data.checks?.sanctions?.ok && (
+                          <Badge variant="warning" className="gap-1">
+                            Sanctions screen unavailable
+                          </Badge>
+                        )}
+
+                        {load.data.access?.authenticated === false && (
+                          <Badge variant="outline" className="gap-1">
+                            Free (limited)
+                          </Badge>
+                        )}
                         <Badge variant="outline" className="ml-auto">
                           {formatDateTime(load.data.timestamps.checkedAtIso)}
                         </Badge>
@@ -832,6 +917,76 @@ export function BlacklistChecker() {
                         href={tronscanAddressUrl(load.data.address)}
                         mono
                       />
+
+                      {load.data.checks?.volume && load.data.checks.volume.ok && (
+                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                          <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            USDT volume (best-effort)
+                          </div>
+                          <div className="mt-2 grid gap-3 sm:grid-cols-3">
+                            <div className="rounded-lg bg-background/60 p-3">
+                              <div className="text-xs font-medium text-muted-foreground">7 days</div>
+                              <div className="mt-1 text-sm text-foreground">
+                                In: {load.data.checks.volume.stats.windows.d7.inbound.amount} ({load.data.checks.volume.stats.windows.d7.inbound.txCount})
+                              </div>
+                              <div className="text-sm text-foreground">
+                                Out: {load.data.checks.volume.stats.windows.d7.outbound.amount} ({load.data.checks.volume.stats.windows.d7.outbound.txCount})
+                              </div>
+                            </div>
+                            <div className="rounded-lg bg-background/60 p-3">
+                              <div className="text-xs font-medium text-muted-foreground">30 days</div>
+                              <div className="mt-1 text-sm text-foreground">
+                                In: {load.data.checks.volume.stats.windows.d30.inbound.amount} ({load.data.checks.volume.stats.windows.d30.inbound.txCount})
+                              </div>
+                              <div className="text-sm text-foreground">
+                                Out: {load.data.checks.volume.stats.windows.d30.outbound.amount} ({load.data.checks.volume.stats.windows.d30.outbound.txCount})
+                              </div>
+                            </div>
+                            <div className="rounded-lg bg-background/60 p-3">
+                              <div className="text-xs font-medium text-muted-foreground">90 days</div>
+                              <div className="mt-1 text-sm text-foreground">
+                                In: {load.data.checks.volume.stats.windows.d90.inbound.amount} ({load.data.checks.volume.stats.windows.d90.inbound.txCount})
+                              </div>
+                              <div className="text-sm text-foreground">
+                                Out: {load.data.checks.volume.stats.windows.d90.outbound.amount} ({load.data.checks.volume.stats.windows.d90.outbound.txCount})
+                              </div>
+                            </div>
+                          </div>
+                          {(load.data.checks.volume.stats.largestInbound || load.data.checks.volume.stats.largestOutbound) && (
+                            <div className="mt-3 space-y-2">
+                              {load.data.checks.volume.stats.largestInbound && (
+                                <DataRow
+                                  label="Largest inbound"
+                                  value={`${load.data.checks.volume.stats.largestInbound.amount} USDT`}
+                                  href={tronscanTxUrl(load.data.checks.volume.stats.largestInbound.txHash)}
+                                />
+                              )}
+                              {load.data.checks.volume.stats.largestOutbound && (
+                                <DataRow
+                                  label="Largest outbound"
+                                  value={`${load.data.checks.volume.stats.largestOutbound.amount} USDT`}
+                                  href={tronscanTxUrl(load.data.checks.volume.stats.largestOutbound.txHash)}
+                                />
+                              )}
+                            </div>
+                          )}
+                          {load.data.checks.volume.notices?.length > 0 && (
+                            <div className="mt-3 text-xs text-muted-foreground">
+                              {load.data.checks.volume.notices.join(" ")}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {load.data.checks?.volume &&
+                        typeof load.data.checks.volume === "object" &&
+                        "ok" in load.data.checks.volume &&
+                        (load.data.checks.volume as { ok: boolean }).ok === false &&
+                        (load.data.checks.volume as { locked?: boolean }).locked && (
+                          <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                            Volume context is locked. Sign in to unlock additional AML checks.
+                          </div>
+                        )}
 
                       {load.data.notices?.length > 0 && (
                         <div className="mt-4 rounded-lg bg-muted/50 p-3">

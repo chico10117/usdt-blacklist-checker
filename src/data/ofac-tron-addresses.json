@@ -1,0 +1,1105 @@
+{
+  "generatedAtIso": "2026-01-22T01:06:47.559Z",
+  "sources": [
+    {
+      "name": "OFAC SDN XML",
+      "url": "https://ofac.treasury.gov/sanctions-lists/sdn.xml",
+      "error": "Fetch failed 404 for https://ofac.treasury.gov/sanctions-lists/sdn.xml"
+    },
+    {
+      "name": "OFAC SDN XML (legacy)",
+      "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+      "sha256": "abdd41b02a210999bd017c187e6350154dbe5a389b39876ec2301b10f7e26289",
+      "lengthBytes": 27900819
+    },
+    {
+      "name": "OFAC Additions CSV",
+      "url": "https://www.treasury.gov/ofac/downloads/add.csv",
+      "sha256": "f6b354b403e746eb14c9693161bd05a1a2283acdefaab899a9aeee6a488bd094",
+      "lengthBytes": 1634314
+    }
+  ],
+  "addressCount": 108,
+  "addresses": [
+    {
+      "address": "TA3941uFAvmVibSkQ6fMJXxmaSNovX86mz",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TA3941uFAvmVibSkQ6fMJXxmaSNovX86mz</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TA39q3p75XRSWYAEaSF7dANtyksoa3sLge",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TA39q3p75XRSWYAEaSF7dANtyksoa3sLge</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TAoLw5yD5XUoHWeBZRSZ1ExK9HMv2CiPvP",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TAoLw5yD5XUoHWeBZRSZ1ExK9HMv2CiPvP</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TAYhjpL8pPs8T84FSM329nffQpc6jD8GBM",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TAYhjpL8pPs8T84FSM329nffQpc6jD8GBM</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TBATDh41qMQ1yeVYecneEvhpfayYmkAQWS",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TBATDh41qMQ1yeVYecneEvhpfayYmkAQWS</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TBcLqqqyZjNj1ptuXFgj5H768NhNU5nDyn",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TBcLqqqyZjNj1ptuXFgj5H768NhNU5nDyn</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TBHTJqAy4DhHhmT3dNceJYNRz4SdLofLre",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TBHTJqAy4DhHhmT3dNceJYNRz4SdLofLre</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TBwghbQMsBC5xcUxE7ZpYXhfDMXZAfiFv6",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TBwghbQMsBC5xcUxE7ZpYXhfDMXZAfiFv6</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TBWRDpQsW1ZVPGGaBAwVLNb7iqmVBuM1nj",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TBWRDpQsW1ZVPGGaBAwVLNb7iqmVBuM1nj</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TBYRhsZR7Mdn9ezpGVLwZiNVnGm8wZGLAD",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TBYRhsZR7Mdn9ezpGVLwZiNVnGm8wZGLAD</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TBZefVsyQpzzxc2WSCLbZBECvxVdzGqdtC",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TBZefVsyQpzzxc2WSCLbZBECvxVdzGqdtC</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TC4VsFHJdZ66BdwobZxkudVZBVmQZgCP65",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TC4VsFHJdZ66BdwobZxkudVZBVmQZgCP65</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TC5UNu3LGrjjVCuLNDdVgjm4oL5cQAyFRZ",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TC5UNu3LGrjjVCuLNDdVgjm4oL5cQAyFRZ</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TC8axQvzJEVR3NKN6mZnJtGy7537GEmh38",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TC8axQvzJEVR3NKN6mZnJtGy7537GEmh38</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TCA7AfTSuDmgYk2VaezfPuZF4Z4X8wxwcQ",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TCA7AfTSuDmgYk2VaezfPuZF4Z4X8wxwcQ</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TCFD8N3vM5b4Gr5f1kkajQsodRVNyyAq1d",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TCFD8N3vM5b4Gr5f1kkajQsodRVNyyAq1d</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TCu5onCzXuqxjvVzdB2tR4FLuF66d4yRqf",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TCu5onCzXuqxjvVzdB2tR4FLuF66d4yRqf</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TDdbRFoBTEmE3qiR69Y6rKRSG1hoF65QaE",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TDdbRFoBTEmE3qiR69Y6rKRSG1hoF65QaE</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TDFtJtyLPgN3oWUoHh23oJox3T5V5nR11K",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TDFtJtyLPgN3oWUoHh23oJox3T5V5nR11K</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TDNKsLvsY2iSznyghddXz7ZDRc4X3191Z8",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TDNKsLvsY2iSznyghddXz7ZDRc4X3191Z8</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TDprk9jeYPVm6khkBp1u7fwuyJcEJFrPWD",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TDprk9jeYPVm6khkBp1u7fwuyJcEJFrPWD</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TDwN1Eq62bqvVhfGAjdRRJjE46jsi5KNMV",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TDwN1Eq62bqvVhfGAjdRRJjE46jsi5KNMV</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TE3mCcPULjPUE7ykX7RArDPAhyahoy3d2j",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TE3mCcPULjPUE7ykX7RArDPAhyahoy3d2j</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TEAqwfMhXLaomXhZ8KeMhx3njGmQEDnsUR",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TEAqwfMhXLaomXhZ8KeMhx3njGmQEDnsUR</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TEcuHDQthTmULe8fFLUccBPpjfXaTmJuuD",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TEcuHDQthTmULe8fFLUccBPpjfXaTmJuuD</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TEFph7dZoUN5233cGEzF6XFwRpjPF8fQDS",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TEFph7dZoUN5233cGEzF6XFwRpjPF8fQDS</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TF4J8Gp7zbS8NA3HLuxsLdx7Ebzr6weCGn",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TF4J8Gp7zbS8NA3HLuxsLdx7Ebzr6weCGn</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TFdHux43bs21qRsygv5WQWfgtbQeT6nXey",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TFdHux43bs21qRsygv5WQWfgtbQeT6nXey</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TFdTr9C3BqQrzKBXqSxJfAZFTh8UwBAfSg",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TFdTr9C3BqQrzKBXqSxJfAZFTh8UwBAfSg</idNumber> </id> </idList> <ad"
+        }
+      ]
+    },
+    {
+      "address": "TFFvv7NAWmbcVfA7QN81mMvUC25TWj1WJx",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TFFvv7NAWmbcVfA7QN81mMvUC25TWj1WJx</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TFrH3dcpnR3tADrAcfyJwiK4brsgf3B7PG",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TFrH3dcpnR3tADrAcfyJwiK4brsgf3B7PG</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TFurWgnyNMq9bhLrLoT9FGnrLfAL2BtR5R",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TFurWgnyNMq9bhLrLoT9FGnrLfAL2BtR5R</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TFwjPScaJRCbSWVAywE1S1WgaUgSnyYUbD",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TFwjPScaJRCbSWVAywE1S1WgaUgSnyYUbD</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGckaiamj5NzaYx6Qp6Zu7kahuHArzUo99",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TGckaiamj5NzaYx6Qp6Zu7kahuHArzUo99</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TGDaYNWFXi9HJ7NacfETF15vhUH7eRhKzt",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGDaYNWFXi9HJ7NacfETF15vhUH7eRhKzt</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGdpkwNVFjw2DnbHBCFKLvCygPVPz9w4iM",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGdpkwNVFjw2DnbHBCFKLvCygPVPz9w4iM</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGJVc32ig2u8tQsYMLE7KXHT5NDQroaVNU",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGJVc32ig2u8tQsYMLE7KXHT5NDQroaVNU</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGKgLatirRpTugS6wgCUKerjLbzWKXAVqx",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGKgLatirRpTugS6wgCUKerjLbzWKXAVqx</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGMFaAXH15oaW8MpcNHLid6NbMKWaaNPdC",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGMFaAXH15oaW8MpcNHLid6NbMKWaaNPdC</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGpNzk9noyvCCdnFPuSg5cqptPs16LjXZq",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGpNzk9noyvCCdnFPuSg5cqptPs16LjXZq</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGRZZsD8gxahF5oE6C7K8LLRHqQzoPa5bX",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGRZZsD8gxahF5oE6C7K8LLRHqQzoPa5bX</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TGUPpmW2bAnMCLe5ih2CFisfCHk4gTFDsx",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TGUPpmW2bAnMCLe5ih2CFisfCHk4gTFDsx</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TH96tFMn8KGiYSLiwcV3E2UiaJc8jmcbz3",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TH96tFMn8KGiYSLiwcV3E2UiaJc8jmcbz3</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "THEQTsqPhRDDfgcfBW5npH5Lr9PZhpthrf",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>THEQTsqPhRDDfgcfBW5npH5Lr9PZhpthrf</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "THh5woR8qfmDsNknQ3agPYzQSiRtMnKsTh",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>THh5woR8qfmDsNknQ3agPYzQSiRtMnKsTh</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "THHb5iMAbZgQYY19h6uY66y5xt6e11gcZC",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>THHb5iMAbZgQYY19h6uY66y5xt6e11gcZC</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "THob8vRrpDybXeqZDj8ukQhMjJVJ5nCbTW",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>THob8vRrpDybXeqZDj8ukQhMjJVJ5nCbTW</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "THUqqeevBQS3EYordDJKwp8DLFknesnfCD",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>THUqqeevBQS3EYordDJKwp8DLFknesnfCD</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TJ812KESWjzJZGEWBPFCu74Js5zQS7jN5A",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TJ812KESWjzJZGEWBPFCu74Js5zQS7jN5A</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TJBg9SxwiUUoqJGk18vK9avxkuV8GrKMK7",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TJBg9SxwiUUoqJGk18vK9avxkuV8GrKMK7</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TJkBr9TZ1xBeJoF7RNWqyEMbYqVJ6fXXHR",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TJkBr9TZ1xBeJoF7RNWqyEMbYqVJ6fXXHR</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TL1k1U6SHohxBqb68kCodxHc9y2LXoDSep",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TL1k1U6SHohxBqb68kCodxHc9y2LXoDSep</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TLM3zA3EWycoDX4ZX4gKze7sgfbdkntTum",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TLM3zA3EWycoDX4ZX4gKze7sgfbdkntTum</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TLNRT524dzL5FF1nJHDhYEMFpeWjLjRbz1",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TLNRT524dzL5FF1nJHDhYEMFpeWjLjRbz1</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TLRMHPjLGXsVpD9RVzSfat6zDiVDrd4b4w",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TLRMHPjLGXsVpD9RVzSfat6zDiVDrd4b4w</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TM6Kix9wH8cYQ4rLpFifsQ4ddH3rPX3f8p",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TM6Kix9wH8cYQ4rLpFifsQ4ddH3rPX3f8p</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TMECKT19hfumcK3KqQKbhxkn1ohyeR58xu",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TMECKT19hfumcK3KqQKbhxkn1ohyeR58xu</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TMGLqRQ4twjW8wJhVH1mQR7nUThpGHUsN3",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TMGLqRQ4twjW8wJhVH1mQR7nUThpGHUsN3</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TMgnRWb9xFMtktny9Lzty21QYLLQD93ft6",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TMgnRWb9xFMtktny9Lzty21QYLLQD93ft6</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TMiSGhXXVsvJzqwGbwAsGiFxWg2eALZoM5",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TMiSGhXXVsvJzqwGbwAsGiFxWg2eALZoM5</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TMStbg5fgb4uTV7fK1gEYF9hKAzP3siPsG",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TMStbg5fgb4uTV7fK1gEYF9hKAzP3siPsG</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TMuCgBejD5RsNANZdjGtaM3YyKGNgDoy7N",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TMuCgBejD5RsNANZdjGtaM3YyKGNgDoy7N</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TNDjh6WGLYyWmkh8vfu42bXVHUqFNQ3rDq",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TNDjh6WGLYyWmkh8vfu42bXVHUqFNQ3rDq</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TNmRfnSUXZoWWzxcDDbf95eGQYXt1mJDt8",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TNmRfnSUXZoWWzxcDDbf95eGQYXt1mJDt8</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TNZxGWCwvsHr6JxQxzoeDXV597Yf7Zb7nV",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TNZxGWCwvsHr6JxQxzoeDXV597Yf7Zb7nV</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TPcUZYthDfxNsHQnZZGBM1BDNBeNSjfPZE",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TPcUZYthDfxNsHQnZZGBM1BDNBeNSjfPZE</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TPF9UQhqpV18BPWg5xo6MeB3h8t4iEg9gP",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TPF9UQhqpV18BPWg5xo6MeB3h8t4iEg9gP</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TPJ1JNX98MJpHueBJeF5SVSg85z8mYg1P1",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TPJ1JNX98MJpHueBJeF5SVSg85z8mYg1P1</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TPo3JyryRcQ3uhBWexeYhtkpMitsUwY4uB",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TPo3JyryRcQ3uhBWexeYhtkpMitsUwY4uB</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TPPR7e8hGC57dexrE2jy1f94wtuGyVP6Dp",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TPPR7e8hGC57dexrE2jy1f94wtuGyVP6Dp</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TQ5H49Wz3K57zNHmuXVp6uLzFwitxviABs",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TQ5H49Wz3K57zNHmuXVp6uLzFwitxviABs</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TQ5mpZPbQMSq2s1vSM3RJgiB1AsTsiTpFZ",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TQ5mpZPbQMSq2s1vSM3RJgiB1AsTsiTpFZ</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TQKQ4ntejdYYJpuYkFz8oCSDoXW6RKRDdY",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TQKQ4ntejdYYJpuYkFz8oCSDoXW6RKRDdY</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TQthYM5nLqwAEr6DScC8tRtw29ncEB53mK",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TQthYM5nLqwAEr6DScC8tRtw29ncEB53mK</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TR18rEj7gWjKBJLYrowyfnvjWLTTsXGngK",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TR18rEj7gWjKBJLYrowyfnvjWLTTsXGngK</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TRakpsE1mZjCUMNPyozR4BW2ZtJsF7ZWFN",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TRakpsE1mZjCUMNPyozR4BW2ZtJsF7ZWFN</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TRBACioxdrdsYEZHvJWiUDZcMdBPpEe5Ub",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TRBACioxdrdsYEZHvJWiUDZcMdBPpEe5Ub</idNumber> </id> </idList> <ad"
+        }
+      ]
+    },
+    {
+      "address": "TRkGqvaobVp4XDNmSceRo5hDcJYDTFmYjd",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TRkGqvaobVp4XDNmSceRo5hDcJYDTFmYjd</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TSxAAo67VTDgKT537EVXxdogkJtk9c6ojz",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TSxAAo67VTDgKT537EVXxdogkJtk9c6ojz</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TTAHMdqoom4f2VTWniroPWQHcTRZ4caoH4",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TTAHMdqoom4f2VTWniroPWQHcTRZ4caoH4</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TTct1DezYvriNWU7Wi3mygLoskkaw61mra",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TTct1DezYvriNWU7Wi3mygLoskkaw61mra</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TTgcTTNbNuFdbrhvbjMZVrdU5KALyzDaPw",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TTgcTTNbNuFdbrhvbjMZVrdU5KALyzDaPw</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TTKnV2S1295UrPr7N67Tp9ykNL7xX2Z4Uj",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TTKnV2S1295UrPr7N67Tp9ykNL7xX2Z4Uj</idNumber> </id> </idList> <ad"
+        }
+      ]
+    },
+    {
+      "address": "TTUDyVhhpCC1xJoPmWzdjLAzeoPwbSABdr",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TTUDyVhhpCC1xJoPmWzdjLAzeoPwbSABdr</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TTUqoT6EAmiM1xLvwVwxhjvjaoEUGtKDdZ",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TTUqoT6EAmiM1xLvwVwxhjvjaoEUGtKDdZ</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TTzMs5AR66jr9mQMkWfCHVwd3AiLLYPepQ",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TTzMs5AR66jr9mQMkWfCHVwd3AiLLYPepQ</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TU4tDFRvcKhAZ1jdihojmBWZqvJhQCnJ4F",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TU4tDFRvcKhAZ1jdihojmBWZqvJhQCnJ4F</idNumber> </id> </idList> <ad"
+        }
+      ]
+    },
+    {
+      "address": "TUCsTq7TofTCJRRoHk6RvhMoS2mJLm5Yzq",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - XBT</idType> <idNumber>TUCsTq7TofTCJRRoHk6RvhMoS2mJLm5Yzq</idNumber> </id> </idList> <ad"
+        }
+      ]
+    },
+    {
+      "address": "TUKsuPVb8kgJVFp5x528KC5HisUVdzxami",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TUKsuPVb8kgJVFp5x528KC5HisUVdzxami</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TV5ZTpKDszLTF6XcMnPongS33pwBgF91by",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TV5ZTpKDszLTF6XcMnPongS33pwBgF91by</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TVacWx7F5wgMgn49L5frDf9KLgdYy8nPHL",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TVacWx7F5wgMgn49L5frDf9KLgdYy8nPHL</idNumber> </id> </idList> <ad"
+        }
+      ]
+    },
+    {
+      "address": "TVDsEFm19zLV8HeXdt6G75rLroxnp6uqpV",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TVDsEFm19zLV8HeXdt6G75rLroxnp6uqpV</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TVn4q7L4fKEPbygi7UHq1CKfZxtbeuMV5q",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TVn4q7L4fKEPbygi7UHq1CKfZxtbeuMV5q</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TVNyvx2astt2AB1Us67ENjfMZeEXZeiuu6",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TVNyvx2astt2AB1Us67ENjfMZeEXZeiuu6</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TVu2SiQrWSnfwk8quAeDxfiaLy6FHzYkMA",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TVu2SiQrWSnfwk8quAeDxfiaLy6FHzYkMA</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TVyiDQ25H6Rx6PcNV1WyjGasGSa8ehj1Uv",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TVyiDQ25H6Rx6PcNV1WyjGasGSa8ehj1Uv</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TW3RgbhYkFEFnmRJ9mE9b83T9XYSMkjwuD",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TW3RgbhYkFEFnmRJ9mE9b83T9XYSMkjwuD</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TWBAPzpPiZarfVsY2BLXeaLhNHurn4wkWG",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TWBAPzpPiZarfVsY2BLXeaLhNHurn4wkWG</idNumber> </id> </idList> <ak"
+        }
+      ]
+    },
+    {
+      "address": "TWwv8FQiES3yHGig7y3zJWYuPaZfSV3vmY",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TWwv8FQiES3yHGig7y3zJWYuPaZfSV3vmY</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TX5GV4DyfxNB3rPkzZJhmqZ1efVmL4rEqG",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TX5GV4DyfxNB3rPkzZJhmqZ1efVmL4rEqG</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TXc4kRiMEcdXRxWpSKkD5qKaARExN4uxPq",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TXc4kRiMEcdXRxWpSKkD5qKaARExN4uxPq</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TXEaKf4rT3rMoD3Vuqnuhwr6vLq6BL5t33",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TXEaKf4rT3rMoD3Vuqnuhwr6vLq6BL5t33</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TXEsK1sEsKjZ1xtHitnyAAoqw3WLdYdRNW",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TXEsK1sEsKjZ1xtHitnyAAoqw3WLdYdRNW</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TXFUYHVJMDyKikutvCG6qNgTUS5pxtZhHs",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TXFUYHVJMDyKikutvCG6qNgTUS5pxtZhHs</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TYD6a4PAAfAgegEdDf9oZUnW4DFmS8jeFT",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TYD6a4PAAfAgegEdDf9oZUnW4DFmS8jeFT</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TYDUutYN4YLKUPeT7TG27Yyqw6kNVLq9QZ",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "rency Address - TRX</idType> <idNumber>TYDUutYN4YLKUPeT7TG27Yyqw6kNVLq9QZ</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TYK29mbyvVxLaLUKdFSTRADMwoxaVbVZQg",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TYK29mbyvVxLaLUKdFSTRADMwoxaVbVZQg</idNumber> </id> <id> <u"
+        }
+      ]
+    },
+    {
+      "address": "TYxwUhoLPF7AgfG9GaXFEp8CQi8K8KG1m3",
+      "sources": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.xml",
+          "name": "OFAC SDN XML (legacy)",
+          "context": "ency Address - USDT</idType> <idNumber>TYxwUhoLPF7AgfG9GaXFEp8CQi8K8KG1m3</idNumber> </id> </idList> <ak"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { CheckRequestSchema } from "@/lib/validators";
 import { readUsdtBlacklistStatusOnChain } from "@/lib/tron";
 import { checkTronScanUsdtBlacklist } from "@/lib/tronscan";
+import { checkOfacSanctions } from "@/lib/sanctions";
+import { computeRiskScore, computeUsdtVolumeStats } from "@/lib/aml";
+import { fetchUsdtTrc20Transfers } from "@/lib/tronscan";
 
 export const runtime = "nodejs";
 
@@ -18,17 +22,21 @@ type CheckResult =
   | { ok: true; blacklisted: boolean; evidence?: Evidence }
   | { ok: false; blacklisted: false; error: string };
 
-type ApiResponse = {
+type AnalyzeResponse = {
   address: string;
   isValid: boolean;
+  access: { authenticated: boolean };
   checks: {
     tronscan: CheckResult;
     onchain: CheckResult;
+    sanctions: ReturnType<typeof checkOfacSanctions>;
+    volume: { ok: true; stats: ReturnType<typeof computeUsdtVolumeStats>; notices: string[] } | { ok: false; error: string; locked?: boolean };
   };
   consensus: {
     status: "blacklisted" | "not_blacklisted" | "inconclusive";
     match: boolean;
   };
+  risk: ReturnType<typeof computeRiskScore>;
   timestamps: { checkedAtIso: string };
   notices: string[];
 };
@@ -56,10 +64,6 @@ function isRateLimited(ip: string): { limited: boolean; retryAfterSeconds: numbe
   return { limited: true, retryAfterSeconds: Math.ceil((existing.resetAt - now) / 1000) };
 }
 
-async function checkTronScan(address: string): Promise<CheckResult> {
-  return checkTronScanUsdtBlacklist(address);
-}
-
 function computeConsensus(tronscan: CheckResult, onchain: CheckResult) {
   if (tronscan.ok && onchain.ok) {
     const match = tronscan.blacklisted === onchain.blacklisted;
@@ -77,14 +81,18 @@ export async function POST(request: Request) {
       {
         address: "",
         isValid: false,
+        access: { authenticated: false },
         checks: {
           tronscan: { ok: false, blacklisted: false, error: "Rate limited." },
           onchain: { ok: false, blacklisted: false, error: "Rate limited." },
+          sanctions: { ok: false, matched: false, error: "Rate limited." },
+          volume: { ok: false, error: "Rate limited." },
         },
         consensus: { status: "inconclusive", match: false },
+        risk: { score: 0, tier: "low", confidence: 0, breakdown: [] },
         timestamps: { checkedAtIso: new Date().toISOString() },
         notices: ["Too many requests. Please wait and try again."],
-      } satisfies ApiResponse,
+      } satisfies AnalyzeResponse,
       {
         status: 429,
         headers: {
@@ -119,14 +127,18 @@ export async function POST(request: Request) {
       {
         address: "",
         isValid: false,
+        access: { authenticated: false },
         checks: {
           tronscan: { ok: false, blacklisted: false, error: message },
           onchain: { ok: false, blacklisted: false, error: message },
+          sanctions: { ok: false, matched: false, error: message },
+          volume: { ok: false, error: message },
         },
         consensus: { status: "inconclusive", match: false },
+        risk: { score: 0, tier: "low", confidence: 0, breakdown: [] },
         timestamps: { checkedAtIso: new Date().toISOString() },
         notices: ["Provide a valid public TRON address (starts with “T”)."],
-      } satisfies ApiResponse,
+      } satisfies AnalyzeResponse,
       { status: 400, headers: { "Cache-Control": "no-store" } },
     );
   }
@@ -134,8 +146,18 @@ export async function POST(request: Request) {
   const address = parsed.data.address;
   const checkedAtIso = new Date().toISOString();
 
+  let authenticated = false;
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY) {
+    try {
+      const { userId } = await auth();
+      authenticated = Boolean(userId);
+    } catch {
+      authenticated = false;
+    }
+  }
+
   const [tronscanSettled, onchainSettled] = await Promise.allSettled([
-    checkTronScan(address),
+    checkTronScanUsdtBlacklist(address),
     readUsdtBlacklistStatusOnChain(address, { timeoutMs: 8_000 }),
   ]);
 
@@ -161,27 +183,54 @@ export async function POST(request: Request) {
       : { ok: false, blacklisted: false, error: "On-chain check failed." };
 
   const consensus = computeConsensus(tronscan, onchain);
+  const sanctions = checkOfacSanctions(address);
+
   const notices: string[] = [
     "Never share your seed phrase or private keys. This tool only needs a public address.",
     "We don’t store addresses or run analytics by default.",
   ];
 
-  if (!tronscan.ok || !onchain.ok) {
-    notices.push("One or more verification methods failed. Results may be incomplete.");
+  if (!authenticated) notices.push("Sign in to unlock additional AML checks (volume context, tracing, and more).");
+  if (!tronscan.ok || !onchain.ok) notices.push("One or more blacklist verification methods failed. Results may be incomplete.");
+  if (!sanctions.ok) notices.push("Sanctions screen failed to run.");
+
+  let volume: AnalyzeResponse["checks"]["volume"] = { ok: false, error: "Sign in required.", locked: true };
+  let volumeAvailable = false;
+  let volumeNotices: string[] | undefined;
+
+  if (authenticated) {
+    const transfers = await fetchUsdtTrc20Transfers(address, { lookbackDays: 90, pageSize: 50, maxPages: 20, timeoutMs: 8_000 });
+    if (transfers.ok) {
+      const stats = computeUsdtVolumeStats(transfers.transfers, address, transfers.window.toTsMs);
+      volume = { ok: true, stats, notices: transfers.notices };
+      volumeAvailable = true;
+      volumeNotices = transfers.notices;
+    } else {
+      volume = { ok: false, error: transfers.error };
+      notices.push("USDT transfer history could not be fetched.");
+    }
   }
 
-  const response: ApiResponse = {
+  const anyMethodBlacklisted = (tronscan.ok && tronscan.blacklisted) || (onchain.ok && onchain.blacklisted);
+
+  const risk = computeRiskScore({
+    blacklist: { status: consensus.status, anyMethodBlacklisted },
+    sanctionsMatched: sanctions.ok && sanctions.matched,
+    volume: volume.ok ? volume.stats : undefined,
+    volumeAvailable,
+    volumeNotices,
+  });
+
+  const response: AnalyzeResponse = {
     address,
     isValid: true,
-    checks: { tronscan, onchain },
+    access: { authenticated },
+    checks: { tronscan, onchain, sanctions, volume },
     consensus,
+    risk,
     timestamps: { checkedAtIso },
     notices,
   };
 
-  const bothFailed = !tronscan.ok && !onchain.ok;
-  return NextResponse.json(response, {
-    status: bothFailed ? 502 : 200,
-    headers: { "Cache-Control": "no-store" },
-  });
+  return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
 }
