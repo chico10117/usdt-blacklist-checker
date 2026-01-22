@@ -582,6 +582,7 @@ export function BlacklistChecker() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "content-type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ address: v.normalized }),
       });
 
@@ -638,7 +639,7 @@ export function BlacklistChecker() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 mx-auto grid w-full max-w-4xl grid-cols-3 items-center px-4 py-5 sm:px-6 sm:py-6">
+      <header className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-3 items-center px-4 py-5 sm:px-6 sm:py-6">
         {/* Left: Logo */}
         <div className="relative flex h-20 w-20 items-center justify-center">
           <Image
@@ -676,7 +677,7 @@ export function BlacklistChecker() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto w-full max-w-4xl px-4 pb-16 sm:px-6">
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
         {clerkEnabled && (
           <SignedIn>
             <SignedInAutoRerun
@@ -910,7 +911,7 @@ export function BlacklistChecker() {
         )}
 
         {/* Results Section */}
-        <section className="mx-auto mt-8 max-w-2xl">
+        <section className="mx-auto mt-8 max-w-5xl">
           <AnimatePresence mode="wait">
             {/* Loading State */}
             {load.state === "loading" && (
@@ -1101,8 +1102,10 @@ export function BlacklistChecker() {
                         mono
                       />
 
+                      {/* Desktop 2-column grid for entity and volume */}
+                      <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {load.data.checks?.entity?.ok && (
-                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                               Entity tag (best-effort)
@@ -1168,7 +1171,7 @@ export function BlacklistChecker() {
                       )}
 
                       {load.data.checks?.volume && load.data.checks.volume.ok && (
-                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
                           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                             USDT volume (best-effort)
                           </div>
@@ -1232,13 +1235,17 @@ export function BlacklistChecker() {
                         "ok" in load.data.checks.volume &&
                         (load.data.checks.volume as { ok: boolean }).ok === false &&
                         (load.data.checks.volume as { locked?: boolean }).locked && (
-                          <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground lg:col-span-2">
                             Volume context is locked. Sign in to unlock additional AML checks.
                           </div>
                         )}
+                      </div>
+                      {/* End of entity/volume 2-column grid */}
 
+                      {/* Desktop 2-column grid for exposure and tracing */}
+                      <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {load.data.checks?.exposure1hop && load.data.checks.exposure1hop.ok && (
-                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                               Direct exposure (1-hop, inbound)
@@ -1307,7 +1314,7 @@ export function BlacklistChecker() {
                         typeof load.data.checks.exposure1hop === "object" &&
                         "ok" in load.data.checks.exposure1hop &&
                         (load.data.checks.exposure1hop as { ok: boolean }).ok === false && (
-                          <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
                             Exposure check unavailable: {(load.data.checks.exposure1hop as { error: string }).error}
                           </div>
                         )}
@@ -1317,13 +1324,13 @@ export function BlacklistChecker() {
                         "ok" in load.data.checks.tracing2hop &&
                         (load.data.checks.tracing2hop as { ok: boolean }).ok === false &&
                         (load.data.checks.tracing2hop as { locked?: boolean }).locked && (
-                          <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
                             2-hop tracing is locked. Sign in to unlock advanced AML checks.
                           </div>
                         )}
 
                       {load.data.checks?.tracing2hop && load.data.checks.tracing2hop.ok && (
-                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                               2-hop tracing (sampled)
@@ -1376,13 +1383,13 @@ export function BlacklistChecker() {
                         "ok" in load.data.checks.heuristics &&
                         (load.data.checks.heuristics as { ok: boolean }).ok === false &&
                         (load.data.checks.heuristics as { locked?: boolean }).locked && (
-                          <div className="mt-2 rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
                             Flow heuristics are locked. Sign in to unlock advanced AML checks.
                           </div>
                         )}
 
                       {load.data.checks?.heuristics && load.data.checks.heuristics.ok && (
-                        <div className="mt-4 rounded-lg border border-border/60 bg-muted/40 p-3">
+                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                               Flow heuristics (best-effort)
@@ -1407,6 +1414,8 @@ export function BlacklistChecker() {
                           )}
                         </div>
                       )}
+                      </div>
+                      {/* End of exposure/tracing/heuristics 2-column grid */}
 
                       {load.data.notices?.length > 0 && (
                         <div className="mt-4 rounded-lg bg-muted/50 p-3">
@@ -1541,7 +1550,7 @@ export function BlacklistChecker() {
         </section>
 
         {/* Footer */}
-        <footer className="mx-auto mt-16 max-w-2xl border-t border-border/60 pt-8">
+        <footer className="mx-auto mt-16 max-w-4xl border-t border-border/60 pt-8">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex h-12 w-12 items-center justify-center">
               <Image
