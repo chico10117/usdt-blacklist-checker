@@ -40,6 +40,8 @@ Today’s app checks whether an address is **directly blacklisted** for USDT on 
 ### Authenticated (Clerk)
 - Can run the full AML suite and see the full risk score breakdown.
 - Can optionally **save results** to history if the user enables logging.
+- After sign-in, automatically re-runs analysis for the currently entered address to immediately reveal unlocked checks.
+- Shows an account-level privacy toggle for “save screening history” (initially stored as a local preference; server-side history comes later with DB/credits).
 - Future: credits, billing, team/workspace features.
 
 ## AML checks (public-data first)

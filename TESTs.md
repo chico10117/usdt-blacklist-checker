@@ -66,9 +66,9 @@ pnpm dev
 
 Then:
 - Check an address on the homepage: verifies UI + `/api/analyze`.
+- Sign in: the page should automatically re-run analysis and unlock gated checks (e.g., volume context).
 - Call the APIs directly:
   - `curl -sS -X POST http://localhost:3000/api/check -H 'content-type: application/json' -H 'user-agent: curl' -d '{"address":"T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"}' | jq`
   - `curl -sS -X POST http://localhost:3000/api/analyze -H 'content-type: application/json' -H 'user-agent: curl' -d '{"address":"T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"}' | jq`
 
 To test gated checks, configure Clerk keys in `.env.local` (see `.env.example`) and sign in.
-
