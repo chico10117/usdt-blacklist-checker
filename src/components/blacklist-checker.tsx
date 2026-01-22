@@ -1253,7 +1253,7 @@ export function BlacklistChecker() {
               Created by{" "}
               <a
                 className="font-medium text-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:decoration-primary"
-                href="https://chikocorp.com"
+                href="https://www.instagram.com/chikocryptocr/"
                 target="_blank"
                 rel="noreferrer"
               >
