@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 05:48:31 | run=20260123-044356-6274 | iter=4 | mode=build | story=US-004 | duration=1085s | status=success
 - 2026-01-23 05:30:23 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=1105s | status=success
 - 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
 - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
@@ -47,3 +48,10 @@
 [2026-01-23 05:47:18] Adjusted US-004 progress entry to reflect API-only implementation
 [2026-01-23 05:47:39] Final verification after UI revert: running pnpm lint/test/build
 [2026-01-23 05:47:58] Final verification PASS (lint/test/build) after UI revert
+[2026-01-23 05:48:31] ITERATION 4 end (duration=1085s)
+[2026-01-23 05:48:33] ITERATION 5 start (mode=build story=US-005)
+[2026-01-23 05:48:45] US-005 start: settings screen with privacy toggle
+[2026-01-23 05:55:18] US-005: implemented /settings route UI and wired to /api/user-settings; updated home account card to link to Settings
+[2026-01-23 05:56:09] US-005: quality gates passed (pnpm lint/test/build)
+[2026-01-23 05:59:21] US-005: browser verification passed for /settings (mocked /api/user-settings); screenshot saved to dev-browser/tmp/us-005-settings.png
+[2026-01-23 06:00:00] US-005: re-ran pnpm lint/test/build after final UI tweaks (PASS)
