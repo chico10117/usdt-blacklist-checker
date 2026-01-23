@@ -5,6 +5,39 @@ Started: Fri Jan 23 04:25:26 WET 2026
 - (add reusable patterns here)
 
 ---
+
+## [2026-01-23 06:03] - US-005: [P2] Add Settings screen with privacy toggle and copy
+Thread:
+Run: 20260123-044356-6274 (iteration 5)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-5.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-5.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: cfb06ec feat(settings): add /settings privacy toggle
+- Post-commit status: clean
+- Verification:
+  - Command: pnpm lint -> PASS
+  - Command: pnpm test -> PASS
+  - Command: pnpm build -> PASS
+- Files changed:
+  - src/app/(dashboard)/layout.tsx
+  - src/app/(dashboard)/settings/page.tsx
+  - src/app/(dashboard)/settings/settings-client.tsx
+  - src/components/blacklist-checker.tsx
+  - .ralph/activity.log
+  - .ralph/errors.log
+  - .ralph/progress.md
+  - .ralph/runs/run-20260123-044356-6274-iter-5.log
+  - .ralph/.tmp/prompt-20260123-044356-6274-5.md
+  - .ralph/.tmp/story-20260123-044356-6274-5.json
+  - .ralph/.tmp/story-20260123-044356-6274-5.md
+- What was implemented
+  - Added `/settings` page (dashboard layout) with a default-off toggle for `Save screening history` that reads/writes `loggingEnabled` via `/api/user-settings`.
+  - Included privacy copy clarifying what is stored when enabled vs disabled, plus explicit loading/saving/success/error UI states and a negative-case error that reverts the toggle.
+  - Browser-verified UI toggle behavior using dev-browser (mocked API) and captured screenshot at `/Users/chiko/.codex/skills/dev-browser/tmp/us-005-settings.png`.
+- **Learnings for future iterations:**
+  - For UI verification without real auth/DB, Playwright route interception can validate persistence UX (toggle + reload + failure revert) without touching the network.
+---
 ## [2026-01-23 05:40] - US-004: [P2] Add API: user settings (loggingEnabled) with safe defaults
 Thread:
 Run: 20260123-044356-6274 (iteration 4)
