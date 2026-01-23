@@ -249,9 +249,18 @@ export async function POST(request: Request) {
   const response = await getOrSetCache<AnalyzeResponse>(analysisCacheKey, 20_000, async () => {
     const checkedAtIso = new Date().toISOString();
 
-    const [tronscanSettled, onchainSettled] = await Promise.allSettled([
+    // Run all independent fetches in parallel for maximum performance
+    const [tronscanSettled, onchainSettled, balanceSettled, transfersSettled, subjectTagSettled] = await Promise.allSettled([
       checkTronScanUsdtBlacklist(address),
       readUsdtBlacklistStatusOnChain(address, { timeoutMs: 8_000 }),
+      fetchUsdtBalance(address),
+      fetchUsdtTrc20Transfers(address, {
+        lookbackDays: 90,
+        pageSize: 50,
+        maxPages: authenticated ? 20 : 10,
+        timeoutMs: 8_000,
+      }),
+      fetchTronScanAccountTag(address),
     ]);
 
     const tronscan: CheckResult =
@@ -275,18 +284,20 @@ export async function POST(request: Request) {
           : { ok: false, blacklisted: false, error: onchainSettled.value.error }
         : { ok: false, blacklisted: false, error: "On-chain check failed." };
 
-    const consensus = computeConsensus(tronscan, onchain);
-    const sanctions = checkOfacSanctions(address);
-
-    // Fetch USDT balance
-    const balanceRes = await fetchUsdtBalance(address);
+    const balanceRes = balanceSettled.status === "fulfilled" ? balanceSettled.value : { ok: false as const, error: "Balance fetch failed." };
     const balance: AnalyzeResponse["balance"] = balanceRes.ok
       ? { ok: true, usdt: balanceRes.balance, usdtBaseUnits: balanceRes.balanceBaseUnits }
       : { ok: false, error: balanceRes.error };
 
+    const transfers = transfersSettled.status === "fulfilled" ? transfersSettled.value : { ok: false as const, transfers: [] as const, error: "Transfers fetch failed." };
+    const subjectTagRes = subjectTagSettled.status === "fulfilled" ? subjectTagSettled.value : { ok: false as const, error: "Account tag fetch failed." };
+
+    const consensus = computeConsensus(tronscan, onchain);
+    const sanctions = checkOfacSanctions(address);
+
     const notices: string[] = [
       "Never share your seed phrase or private keys. This tool only needs a public address.",
-      "We don’t store addresses or run analytics by default.",
+      "We don't store addresses or run analytics by default.",
     ];
 
     if (!authenticated) notices.push("Sign in to unlock additional AML checks (volume context, tracing, and more).");
@@ -295,15 +306,6 @@ export async function POST(request: Request) {
 
     let volume: AnalyzeResponse["checks"]["volume"] = { ok: false, error: "Sign in required.", locked: true };
     let volumeAvailable = false;
-
-    const transfers = await fetchUsdtTrc20Transfers(address, {
-      lookbackDays: 90,
-      pageSize: 50,
-      maxPages: authenticated ? 20 : 10,
-      timeoutMs: 8_000,
-    });
-
-    const subjectTagRes = await fetchTronScanAccountTag(address);
 
     let entity: AnalyzeResponse["checks"]["entity"] = { ok: false, error: "Entity check failed." };
     if (transfers.ok) {

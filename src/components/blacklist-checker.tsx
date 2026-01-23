@@ -926,16 +926,47 @@ export function BlacklistChecker() {
             {load.state === "loading" && (
               <motion.div
                 key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
                 className="space-y-4"
               >
-                <Skeleton className="h-24 w-full rounded-2xl" />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Skeleton className="h-56 w-full rounded-2xl" />
-                  <Skeleton className="h-56 w-full rounded-2xl" />
+                {/* Main loading card - minimal design */}
+                <div className="rounded-2xl border border-border/60 bg-card/80 p-8">
+                  <div className="flex flex-col items-center justify-center gap-5">
+                    {/* Simple elegant spinner */}
+                    <div className="relative h-12 w-12">
+                      <div className="absolute inset-0 animate-spin rounded-full border-[2.5px] border-muted/40 border-t-primary" />
+                    </div>
+
+                    {/* Loading text */}
+                    <div className="text-center">
+                      <p className="text-base font-medium text-foreground">Analyzing address</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Running blacklist checks and risk analysis
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Method cards - compact */}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/80 px-5 py-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted/40 border-t-emerald-500" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">TronScan Index</p>
+                      <p className="text-xs text-muted-foreground">Querying indexed data...</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/80 px-5 py-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted/40 border-t-blue-500" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">On-chain Read</p>
+                      <p className="text-xs text-muted-foreground">Reading smart contract...</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
