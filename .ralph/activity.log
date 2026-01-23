@@ -66,3 +66,4 @@
 [2026-01-23 14:13:21] Adjusted Clerk middleware to enable with publishable key and always evaluate auth() so route handlers can see sessions
 [2026-01-23 14:18:28] Browser verification passed: Save control hidden when loggingEnabled=false; enabling setting shows Save, clicking saves and shows toast
 [2026-01-23 14:20:45] Re-ran pnpm lint/test/build after middleware move (PASS)
+[2026-01-23 14:27:29] Appended US-006 entry to .ralph/progress.md

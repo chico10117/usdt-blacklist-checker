@@ -6,6 +6,41 @@ Started: Fri Jan 23 04:25:26 WET 2026
 
 ---
 
+## [2026-01-23 14:25:20] - US-006: [P2] Add Save Report flow (UI + API) gated by loggingEnabled
+Thread:
+Run: 20260123-135210-55147 (iteration 1)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-135210-55147-iter-1.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-135210-55147-iter-1.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: 95fa31a feat(reports): add save report flow
+- Post-commit status: clean
+- Verification:
+  - Command: pnpm lint -> PASS
+  - Command: pnpm test -> PASS
+  - Command: pnpm build -> PASS
+- Files changed:
+  - src/app/api/saved-reports/route.ts
+  - src/components/blacklist-checker.tsx
+  - src/__tests__/api-saved-reports.test.ts
+  - src/middleware.ts
+  - .ralph/runs/run-20260123-135210-55147-iter-1.log
+  - .ralph/runs/run-20260123-135210-55147-iter-1.md
+  - .ralph/.tmp/prompt-20260123-135210-55147-1.md
+  - .ralph/.tmp/story-20260123-135210-55147-1.json
+  - .ralph/.tmp/story-20260123-135210-55147-1.md
+  - .ralph/activity.log
+  - .ralph/progress.md
+- What was implemented
+  - Added `POST /api/saved-reports` to save a validated analysis report for the current user, storing `reportJson` plus summary fields (riskScore/riskTier/confidence/window).
+  - Enforced that saving is allowed only when authenticated, persistence is enabled, and `loggingEnabled` is true (403 otherwise).
+  - Updated the main analysis UI to show `Save this report` only when signed in and saving is enabled, with success/error toasts and a Saved state.
+  - Added route-level tests covering auth/persistence/loggingEnabled gating and payload validation.
+- **Learnings for future iterations:**
+  - With `src/app`, the Clerk middleware must live at `src/middleware.ts` (otherwise API `auth()` can appear signed-out even when the UI shows signed in).
+  - Avoid printing `.env` into run logs; this run’s log redacts Clerk keys.
+---
+
 ## [2026-01-23 06:03] - US-005: [P2] Add Settings screen with privacy toggle and copy
 Thread:
 Run: 20260123-044356-6274 (iteration 5)
