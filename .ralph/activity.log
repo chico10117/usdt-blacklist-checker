@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
 
 ## Events
 
@@ -11,3 +12,9 @@
 [2026-01-23 04:47:54] Run quality gates: pnpm lint/test/build
 [2026-01-23 04:50:15] Update run summary and progress log for US-001
 [2026-01-23 04:50:40] Appended US-001 progress entry
+[2026-01-23 04:55:57] ITERATION 1 end (duration=721s)
+[2026-01-23 04:55:59] ITERATION 2 start (mode=build story=US-002)
+[2026-01-23 04:57:00] Start US-002: DB/ORM setup + migrations + connection safety
+[2026-01-23 05:01:44] Added Drizzle ORM + Postgres deps, drizzle config, schema, and initial migration
+[2026-01-23 05:03:33] Added DB scripts and docs for Drizzle/Postgres migrations workflow
+[2026-01-23 05:04:33] Verification complete: pnpm lint/test/build PASS (build verified without DATABASE_URL)
