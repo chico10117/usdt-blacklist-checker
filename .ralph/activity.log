@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 14:28:23 | run=20260123-135210-55147 | iter=1 | mode=build | story=US-006 | duration=2173s | status=success
 - 2026-01-23 05:48:31 | run=20260123-044356-6274 | iter=4 | mode=build | story=US-004 | duration=1085s | status=success
 - 2026-01-23 05:30:23 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=1105s | status=success
 - 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
@@ -67,3 +68,12 @@
 [2026-01-23 14:18:28] Browser verification passed: Save control hidden when loggingEnabled=false; enabling setting shows Save, clicking saves and shows toast
 [2026-01-23 14:20:45] Re-ran pnpm lint/test/build after middleware move (PASS)
 [2026-01-23 14:27:29] Appended US-006 entry to .ralph/progress.md
+[2026-01-23 14:28:23] ITERATION 1 end (duration=2173s)
+[2026-01-23 15:18:26] ITERATION 1 start (mode=build story=US-007)
+[2026-01-23 15:18:35] US-007 start: implement history list, detail view, and deletion
+[2026-01-23 15:24:15] US-007: added /history UI (list + detail) and dashboard nav link
+[2026-01-23 15:25:31] US-007: implemented saved-reports list/detail/delete APIs (GET/DELETE + /[id])
+[2026-01-23 15:28:06] US-007: verification complete (pnpm lint/test/build)
+[2026-01-23 15:52:08] US-007: browser-verified /history list, report detail, delete single + delete all (with refresh)
+[2026-01-23 15:52:29] US-007: staging and committing changes
+[2026-01-23 16:13:00] US-007: updated progress log entry

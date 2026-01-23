@@ -5,6 +5,52 @@ Started: Fri Jan 23 04:25:26 WET 2026
 - (add reusable patterns here)
 
 ---
+## [2026-01-23 16:11:08] - US-007: [P2] Add History list + report detail + deletion (single + all)
+Thread: 019beb6f-6c28-7851-bdfc-785402934107
+Run: 20260123-151826-11541 (iteration 1)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-1.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-1.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: 6730e95 feat(history): add report history and deletion
+- Post-commit status: clean
+- Verification:
+  - Command: pnpm lint -> PASS
+  - Command: pnpm test -> PASS
+  - Command: pnpm build -> PASS
+- Files changed:
+  - drizzle.config.ts
+  - src/app/(dashboard)/layout.tsx
+  - src/app/(dashboard)/history/page.tsx
+  - src/app/(dashboard)/history/history-client.tsx
+  - src/app/(dashboard)/history/[id]/page.tsx
+  - src/app/(dashboard)/history/[id]/report-detail-client.tsx
+  - src/app/api/saved-reports/route.ts
+  - src/app/api/saved-reports/[id]/route.ts
+  - src/lib/db/saved-reports.ts
+  - src/lib/db/database-url.ts
+  - src/lib/db/index.ts
+  - src/__tests__/api-saved-reports.test.ts
+  - src/__tests__/api-saved-reports-management.test.ts
+  - src/__tests__/api-saved-report-detail.test.ts
+  - .agents/tasks/prd-post-mvp.json
+  - .ralph/activity.log
+  - .ralph/errors.log
+  - .ralph/.tmp/prompt-20260123-151826-11541-1.md
+  - .ralph/.tmp/story-20260123-151826-11541-1.json
+  - .ralph/.tmp/story-20260123-151826-11541-1.md
+  - .ralph/runs/run-20260123-151826-11541-iter-1.log
+  - .ralph/runs/run-20260123-151826-11541-iter-1.md
+  - .ralph/runs/run-20260123-135210-55147-iter-1.md
+- What was implemented
+  - Added `/history` with a bounded list (latest 50) of saved reports for the signed-in user.
+  - Added report detail at `/history/[id]` rendering stored `reportJson`, plus evidence links extracted from the payload.
+  - Added per-report delete and delete-all (with confirmation) backed by new saved report APIs, returning 404 for non-owned ids.
+  - Added route-level tests for list/detail/delete and auth scoping.
+- **Learnings for future iterations:**
+  - Next.js App Router route params can be `Promise`-wrapped; keep route and page signatures aligned to avoid build-time type errors.
+  - Avoid emitting `.env` contents into run logs; redact sensitive keys/passwords if logs are persisted.
+---
 
 ## [2026-01-23 14:25:20] - US-006: [P2] Add Save Report flow (UI + API) gated by loggingEnabled
 Thread:

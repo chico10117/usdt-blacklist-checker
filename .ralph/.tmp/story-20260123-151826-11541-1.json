@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "total": 16,
+  "remaining": 10,
+  "quality_gates": [
+    "pnpm lint",
+    "pnpm test",
+    "pnpm build"
+  ],
+  "id": "US-007",
+  "title": "[P2] Add History list + report detail + deletion (single + all)"
+}
