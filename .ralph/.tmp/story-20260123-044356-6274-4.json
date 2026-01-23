@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "total": 16,
+  "remaining": 14,
+  "quality_gates": [
+    "pnpm lint",
+    "pnpm test",
+    "pnpm build"
+  ],
+  "id": "US-004",
+  "title": "[P2] Add API: user settings (loggingEnabled) with safe defaults"
+}

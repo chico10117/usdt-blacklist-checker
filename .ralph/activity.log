@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 05:30:23 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=1105s | status=success
 - 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
 - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
 - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
@@ -31,3 +32,12 @@
 [2026-01-23 05:25:15] US-003: appended progress entry
 [2026-01-23 05:26:16] US-003: wrote iter-3 run summary
 [2026-01-23 05:26:23] ITERATION 3 end (duration=802s)
+[2026-01-23 05:30:23] ITERATION 3 end (duration=1105s)
+[2026-01-23 05:30:26] ITERATION 4 start (mode=build story=US-004)
+[2026-01-23 05:30:39] Start US-004: implement settings API (loggingEnabled)
+[2026-01-23 05:33:57] Added /api/user-settings route (GET/PATCH) and made it public in middleware to allow 401 responses
+[2026-01-23 05:34:29] Wired signed-in loggingEnabled toggle to /api/user-settings (fetch on sign-in, PATCH on change)
+[2026-01-23 05:35:00] Added route-level tests for /api/user-settings auth + default + update behavior
+[2026-01-23 05:35:13] Running quality gates: pnpm lint, pnpm test, pnpm build
+[2026-01-23 05:35:48] Quality gates complete: lint/test/build PASS
+[2026-01-23 05:37:35] Committing US-004 changes
