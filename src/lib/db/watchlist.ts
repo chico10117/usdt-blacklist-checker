@@ -9,6 +9,7 @@ import { schema } from "@/lib/db";
 export type WatchlistItemCreateInput = {
   address: string;
   label?: string | null;
+  usdtBalance?: string | null;
 };
 
 export function buildGetWatchlistItemByIdQuery(db: DbClient, userId: string, itemId: string) {
@@ -61,6 +62,7 @@ export async function createWatchlistItem(db: DbClient, userId: string, input: W
       address: input.address,
       addressHash,
       label: input.label ?? null,
+      usdtBalance: input.usdtBalance ?? null,
     })
     .returning()
     .execute();

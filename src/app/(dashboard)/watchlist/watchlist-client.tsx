@@ -14,6 +14,7 @@ type WatchlistItem = {
   id: string;
   address: string;
   label: string | null;
+  usdtBalance: string | null;
   createdAt: string;
 };
 
@@ -31,6 +32,12 @@ function truncateAddress(address: string, start = 10, end = 8) {
   return `${address.slice(0, start)}...${address.slice(-end)}`;
 }
 
+function formatBalance(balance: string) {
+  const num = parseFloat(balance);
+  if (Number.isNaN(num)) return balance;
+  return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+}
+
 type LoadState =
   | { status: "loading" }
   | { status: "ready"; items: WatchlistItem[] }
@@ -44,13 +51,14 @@ export function WatchlistClient() {
   const [removingId, setRemovingId] = React.useState<string | null>(null);
   const [confirmId, setConfirmId] = React.useState<string | null>(null);
 
-  const load = React.useCallback(async () => {
+  const load = React.useCallback(async (refreshBalances = false) => {
     setState({ status: "loading" });
     setConfirmId(null);
     setRemovingId(null);
 
     try {
-      const res = await fetch("/api/watchlist?limit=200", { cache: "no-store" });
+      const url = refreshBalances ? "/api/watchlist?limit=200&refreshBalances=true" : "/api/watchlist?limit=200";
+      const res = await fetch(url, { cache: "no-store" });
       const json = (await res.json().catch(() => null)) as ListWatchlistResponse | null;
 
       if (!res.ok) {
@@ -159,7 +167,7 @@ export function WatchlistClient() {
               <Button type="submit" disabled={adding || Boolean(removingId)}>
                 {adding ? "Adding…" : "Add to watchlist"}
               </Button>
-              <Button type="button" variant="outline" onClick={() => void load()} disabled={adding || Boolean(removingId)}>
+              <Button type="button" variant="outline" onClick={() => void load(true)} disabled={adding || Boolean(removingId)}>
                 Refresh
               </Button>
             </div>
@@ -194,10 +202,21 @@ export function WatchlistClient() {
                 <div key={item.id} className="p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="font-medium text-foreground">{truncateAddress(item.address)}</div>
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        {item.label ? `${item.label} • ` : ""}
-                        {formatDateTime(item.createdAt)}
+                      {item.label && (
+                        <div className="font-semibold text-foreground">{item.label}</div>
+                      )}
+                      <div className={item.label ? "text-sm text-muted-foreground" : "font-medium text-foreground"}>
+                        {truncateAddress(item.address)}
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                        {item.usdtBalance !== null && (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="font-medium text-foreground">{formatBalance(item.usdtBalance)}</span>
+                            <span>USDT</span>
+                          </span>
+                        )}
+                        {item.usdtBalance !== null && <span>•</span>}
+                        <span>{formatDateTime(item.createdAt)}</span>
                       </div>
                       <div className="mt-2 text-xs text-muted-foreground break-all">{item.address}</div>
                     </div>

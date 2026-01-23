@@ -39,6 +39,7 @@ export const watchlistItems = pgTable(
     address: text("address").notNull(),
     addressHash: text("address_hash").notNull(),
     label: text("label"),
+    usdtBalance: text("usdt_balance"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({

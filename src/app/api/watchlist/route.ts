@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { getDb } from "@/lib/db";
+import { getDb, schema } from "@/lib/db";
 import { createWatchlistItem, listWatchlistItems, listWatchlistItemsForAddress } from "@/lib/db/watchlist";
 import { ensureUserSettingsExists } from "@/lib/db/user-settings";
 import { TronAddressSchema } from "@/lib/validators";
+import { fetchUsdtBalance } from "@/lib/tronscan";
 
 export const runtime = "nodejs";
 
@@ -42,14 +44,41 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const limitRaw = url.searchParams.get("limit");
   const limit = clampInt(limitRaw ? Number(limitRaw) : 200, 1, 200);
+  const refreshBalances = url.searchParams.get("refreshBalances") === "true";
 
   const items = await listWatchlistItems(db, userId, limit);
+
+  // If refreshBalances is requested, fetch fresh balances for all items
+  let itemsWithBalances = items;
+  if (refreshBalances && items.length > 0) {
+    const balancePromises = items.map(async (item) => {
+      const balanceRes = await fetchUsdtBalance(item.address);
+      return {
+        ...item,
+        usdtBalance: balanceRes.ok ? balanceRes.balance : item.usdtBalance,
+      };
+    });
+    itemsWithBalances = await Promise.all(balancePromises);
+
+    // Update balances in database (fire and forget)
+    for (const item of itemsWithBalances) {
+      if (item.usdtBalance !== items.find((i) => i.id === item.id)?.usdtBalance) {
+        db.update(schema.watchlistItems)
+          .set({ usdtBalance: item.usdtBalance })
+          .where(eq(schema.watchlistItems.id, item.id))
+          .execute()
+          .catch(() => {});
+      }
+    }
+  }
+
   return NextResponse.json(
     {
-      items: items.map((item) => ({
+      items: itemsWithBalances.map((item) => ({
         id: item.id,
         address: item.address,
         label: item.label,
+        usdtBalance: item.usdtBalance,
         createdAt: item.createdAt.toISOString(),
       })),
     },
@@ -101,9 +130,14 @@ export async function POST(request: Request) {
 
   await ensureUserSettingsExists(db, userId);
 
+  // Fetch USDT balance for the address
+  const balanceRes = await fetchUsdtBalance(parsed.data.address);
+  const usdtBalance = balanceRes.ok ? balanceRes.balance : null;
+
   const created = await createWatchlistItem(db, userId, {
     address: parsed.data.address,
     label: label && label.length > 0 ? label : null,
+    usdtBalance,
   });
 
   if (!created) {
@@ -116,6 +150,7 @@ export async function POST(request: Request) {
         id: created.id,
         address: created.address,
         label: created.label,
+        usdtBalance: created.usdtBalance,
         createdAt: created.createdAt.toISOString(),
       },
     },
