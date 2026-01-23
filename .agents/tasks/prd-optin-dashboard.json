@@ -1,0 +1,374 @@
+{
+  "type": "prd",
+  "title": "TRON USDT Screening — Post-MVP Roadmap",
+  "slug": "optin-dashboard",
+  "source": {
+    "primaryDoc": "PRD.md",
+    "notes": "This JSON PRD summarizes the remaining unchecked tasks (P2–P4) from PRD.md into implementable requirements and acceptance criteria. It does not implement any changes."
+  },
+  "metadata": {
+    "createdAt": "2026-01-23",
+    "owner": null,
+    "stakeholders": [
+      "Product",
+      "Engineering",
+      "Compliance/Operations"
+    ],
+    "repository": "usdt_blacklisted_web"
+  },
+  "summary": {
+    "problem": "Teams receiving TRC20 USDT can unknowingly accept funds linked to sanctions, hacks, scams, or other high-risk activity, increasing the risk of frozen funds and operational disruption.",
+    "solution": "A TRON-only single-address screening tool providing a 0–100 risk score with explainable findings and evidence links. Post-MVP work focuses on privacy-first report saving, a richer authenticated UI, and a future credits/billing packaging layer.",
+    "primaryOutcome": "Reduce USDT freeze risk via clear, evidence-backed screening."
+  },
+  "goals": [
+    "Keep blacklist check free and always available.",
+    "Support a privacy-first opt-in report history for authenticated users.",
+    "Provide a post-login dashboard with clearer visuals for balance, flows, and trends.",
+    "Lay groundwork for credits, billing, and team/workspace packaging (future)."
+  ],
+  "nonGoals": [
+    "Multi-chain support (TRON-only).",
+    "Batch screening (single address only).",
+    "Automated accept/reject decisions (findings only).",
+    "Paid AML providers in the near term.",
+    "Mandatory address logging (default must remain off)."
+  ],
+  "users": {
+    "primaryPersonas": [
+      {
+        "name": "OTC Operator",
+        "jobToBeDone": "Screen inbound USDT quickly and understand freeze-risk signals before settlement."
+      },
+      {
+        "name": "Payments Risk Analyst",
+        "jobToBeDone": "Assess counterparties and flow patterns for large merchant payments and document rationale."
+      },
+      {
+        "name": "Treasury/Compliance Lead",
+        "jobToBeDone": "Track repeated counterparties and changes in risk over time with privacy controls."
+      }
+    ]
+  },
+  "currentState": {
+    "completed": [
+      "Blacklist check (unauthenticated).",
+      "OFAC sanctions match (free unauthenticated AML check).",
+      "API: POST /api/analyze with riskScore, riskTier, confidence, scoreBreakdown and evidence.",
+      "Exposure checks (1-hop), limited 2-hop sampling and heuristics (some gated by auth).",
+      "Clerk authentication integration (feature-gated by env presence).",
+      "In-memory TTL caching for upstream calls/results.",
+      "Offline-first unit/smoke tests for scoring and API response shapes."
+    ],
+    "gaps": [
+      "No persistent user settings storage for logging opt-in.",
+      "No saved report history (server-side).",
+      "No post-login dashboard UX with dedicated pages.",
+      "No charts/visual flow views.",
+      "No credits/billing/workspace packaging."
+    ]
+  },
+  "constraints": {
+    "privacy": [
+      "Default posture is no address logging.",
+      "Avoid logging user-submitted addresses in API routes.",
+      "Only store raw addresses when explicitly opted-in; otherwise prefer keyed hashing for indexing and encryption-at-rest for any persisted sensitive data."
+    ],
+    "performance": [
+      "Bound upstream calls with timeouts (target 8s per upstream call).",
+      "Bound transfer history processing (time window and/or pagination limits).",
+      "Prefer caching to reduce repeated upstream calls."
+    ],
+    "dataSources": [
+      "TronScan public APIs",
+      "TronGrid/TronWeb (on-chain reads where needed)",
+      "OFAC digital currency address dataset cached locally"
+    ],
+    "platform": [
+      "Next.js App Router",
+      "TypeScript",
+      "Clerk auth"
+    ]
+  },
+  "requirements": {
+    "functional": [
+      "Authenticated users can enable/disable report saving via a settings toggle (default false).",
+      "If saving is enabled, user can save a screening result to history, and later view and delete it.",
+      "Post-login dashboard UI provides: Overview, History, Watchlist, Settings.",
+      "Charts/visuals are evidence-linked and time-window aware (7/30/90 days).",
+      "No new features may require the user to provide private keys/seed phrases."
+    ],
+    "securityAndCompliance": [
+      "Rate-limit and time out upstream requests.",
+      "Never include raw addresses in analytics by default; any analytics events must be address-free unless user opted in.",
+      "Provide clear disclaimers: informational only; not legal advice."
+    ]
+  },
+  "roadmap": [
+    {
+      "id": "P2",
+      "name": "Opt-in Report Saving (Privacy-first)",
+      "priority": "P2",
+      "status": "todo",
+      "epics": [
+        {
+          "id": "P2-E1",
+          "name": "Database + ORM Foundation",
+          "tasks": [
+            {
+              "id": "P2-T1",
+              "title": "Choose DB + ORM and add migrations",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "A Postgres-compatible DB provider is selected and documented.",
+                "An ORM is selected (e.g., Prisma or Drizzle) and wired into the Next.js app.",
+                "Migrations are created for user settings and saved reports tables/collections.",
+                "Local/dev workflow supports running migrations predictably."
+              ],
+              "notes": [
+                "Keep schema minimal and privacy-conscious; store the minimum necessary fields."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P2-E2",
+          "name": "User Settings: loggingEnabled",
+          "tasks": [
+            {
+              "id": "P2-T2",
+              "title": "Store per-user setting loggingEnabled (default false)",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "A per-user setting exists server-side and defaults to false for new users.",
+                "Settings can be read and updated via an authenticated API route.",
+                "UI Settings page reflects server state and allows toggling."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P2-E3",
+          "name": "Saved Reports: create, list, delete",
+          "tasks": [
+            {
+              "id": "P2-T3",
+              "title": "Add Save Report UX gated by settings; implement retention and deletion",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "When loggingEnabled is false, no save controls are shown (or they are disabled with clear copy).",
+                "When loggingEnabled is true, user can save the current analysis result to history.",
+                "History view lists saved reports with timestamp, address (as stored/represented), and key summary fields (riskTier, riskScore, confidence).",
+                "User can delete an individual report and can delete all history.",
+                "Retention policy is defined (even if 'indefinite until deleted') and reflected in UI copy."
+              ],
+              "notes": [
+                "Prefer storing a hashed address for indexing and (if raw address is stored) encrypt at rest."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P2-E4",
+          "name": "Analytics/Logging Safety",
+          "tasks": [
+            {
+              "id": "P2-T4",
+              "title": "Ensure logs/analytics do not include raw addresses unless explicitly opted-in",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Server logs do not print user-submitted addresses by default.",
+                "Any analytics events contain no raw addresses unless the user opted in to saving/logging (and this behavior is documented).",
+                "Regression tests or lint rules exist to reduce accidental address logging."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "Authenticated UX Upgrades (Dashboard + Visuals)",
+      "priority": "P3",
+      "status": "todo",
+      "epics": [
+        {
+          "id": "P3-E1",
+          "name": "Dashboard Shell",
+          "tasks": [
+            {
+              "id": "P3-T1",
+              "title": "Add post-login dashboard layout with sidebar and dedicated pages",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Authenticated users land in a dashboard layout with a vertical left sidebar.",
+                "Pages exist for Overview, History, Watchlist, Settings.",
+                "Navigation highlights active route and works without full refresh.",
+                "Unauthenticated users are redirected to sign-in for protected pages."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P3-E2",
+          "name": "Wallet Balance + Flow View",
+          "tasks": [
+            {
+              "id": "P3-T2",
+              "title": "Show current USDT balance and an inbound/outbound flow diagram for selected window",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Overview shows current USDT balance for the address (best-effort; clear when unavailable).",
+                "A flow visualization summarizes inbound vs outbound totals for the selected time window.",
+                "User can toggle window (7/30/90d) and the visuals update accordingly.",
+                "Visual elements provide drill-down links to evidence (TronScan address/tx pages)."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P3-E3",
+          "name": "Charts + Drill-down",
+          "tasks": [
+            {
+              "id": "P3-T3",
+              "title": "Add interactive charts for inbound/outbound, top counterparties, and evidence drill-down",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Charts show inbound/outbound USDT over time for selected window.",
+                "Top counterparties chart/table shows share of volume and links to counterparty addresses.",
+                "UI makes it clear which data is partial/limited (confidence and completeness messaging)."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P3-E4",
+          "name": "Report Timeline",
+          "tasks": [
+            {
+              "id": "P3-T4",
+              "title": "Add risk score/confidence trend across saved reports for the same address",
+              "status": "todo",
+              "dependencies": [
+                "P2 saved reports"
+              ],
+              "acceptanceCriteria": [
+                "For an address with multiple saved reports, UI shows a timeline of riskScore and confidence.",
+                "Timeline entries link to the saved report detail view.",
+                "If no saved history exists, timeline shows empty state with CTA to enable saving."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "Credits and Packaging (Future)",
+      "priority": "P4",
+      "status": "todo",
+      "epics": [
+        {
+          "id": "P4-E1",
+          "name": "Credit Model",
+          "tasks": [
+            {
+              "id": "P4-T1",
+              "title": "Define credit model (B2C + B2B) and usage accounting",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "A unit definition exists (e.g., per analysis, per deep trace, per saved report).",
+                "Usage accounting rules are documented, including free tier behavior.",
+                "Abuse prevention considerations are documented (rate limiting, caching, bot protection)."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P4-E2",
+          "name": "Billing Integration",
+          "tasks": [
+            {
+              "id": "P4-T2",
+              "title": "Add billing integration (provider TBD)",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Billing provider is selected and documented.",
+                "Plans/pricing map cleanly to credits and features.",
+                "Webhook handling and entitlement enforcement are defined."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P4-E3",
+          "name": "Team/Workspace",
+          "tasks": [
+            {
+              "id": "P4-T3",
+              "title": "Add team/workspace features and shared histories",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Workspace model defined (members, roles, shared history visibility).",
+                "Audit trail considerations documented (who saved/deleted what)."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "P4-E4",
+          "name": "Exports + API Access",
+          "tasks": [
+            {
+              "id": "P4-T4",
+              "title": "Add export (PDF/JSON) and/or API keys for programmatic screening",
+              "status": "todo",
+              "acceptanceCriteria": [
+                "Export formats and redaction rules are defined (especially around addresses and evidence).",
+                "API key model defined (scopes, rotation, revocation).",
+                "Rate limits per key/workspace are defined."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "openQuestions": [
+    {
+      "question": "What exactly counts as the long-term '1 free AML check'?",
+      "currentAnswer": "Sanctions only or a limited report; cookie-based enforcement suggested."
+    },
+    {
+      "question": "How far back should the default analysis window go?",
+      "currentAnswer": "90 days (bounded by API limits as needed)."
+    },
+    {
+      "question": "How should 'confidence' be represented in the UX?",
+      "currentAnswer": "A % confidence (0–100) plus partial-data warnings."
+    },
+    {
+      "question": "Should we maintain a curated known-bad list beyond sanctions + USDT blacklist?",
+      "currentAnswer": "Yes (curation strategy and update mechanism TBD)."
+    }
+  ],
+  "successCriteria": {
+    "product": [
+      "Reduced incidence of receiving frozen USDT for users (primary outcome; measured via feedback and support reports)."
+    ],
+    "proxyMetrics": [
+      "Share of analyses producing High/Severe tiers that also show clear evidence links.",
+      "User activation: sign-up completion rate after seeing locked checks.",
+      "Opt-in rate for report saving among authenticated users (should not be coerced).",
+      "Time-to-result for /api/analyze within target bounds (best-effort)."
+    ],
+    "qualityGates": [
+      "Offline-first tests for new logic and route response shapes.",
+      "Passing pnpm lint, pnpm test, pnpm build before release."
+    ]
+  },
+  "outOfScopeForThisPRD": [
+    "Implementing any of the above tasks (this file is requirements only)."
+  ]
+}

@@ -39,6 +39,9 @@ Today’s app checks whether an address is **directly blacklisted** for USDT on 
 
 ### Authenticated (Clerk)
 - Can run the full AML suite and see the full risk score breakdown.
+- Gets a richer post-login experience with a **dashboard layout** (vertical left sidebar) and dedicated views (Overview, History, Watchlist, Settings).
+- Sees visually appealing **wallet overview** widgets (current balance, inbound/outbound totals, net flow, trends) and quick drill-downs.
+- Sees an interactive **funds flow** visualization (inbound/outbound) to understand where value comes from/goes (top counterparties, time window toggles).
 - Can optionally **save results** to history if the user enables logging.
 - After sign-in, automatically re-runs analysis for the currently entered address to immediately reveal unlocked checks.
 - Shows an account-level privacy toggle for “save screening history” (initially stored as a local preference; server-side history comes later with DB/credits).
@@ -297,7 +300,8 @@ Proxy metrics (MVP):
 - M0 (today): PRD written and aligned with current app.
 - M1 (MVP): sanctions screen + Clerk gating + risk score v0 + volume stats v0. (Implemented in repo.)
 - M2: direct exposure checks + medium-depth tracing + report saving (opt-in).
-- M3: credits/billing + team/workspace + export/API access.
+- M3: authenticated dashboard UX (sidebar navigation, wallet visuals, flow diagrams) + monitoring workflows.
+- M4: credits/billing + team/workspace + export/API access.
 
 ## Task breakdown
 ### P0 — Foundations (MVP)
@@ -332,7 +336,13 @@ Proxy metrics (MVP):
 - [ ] Add “Save this report” UX gated by settings; implement per-report retention and deletion.
 - [ ] Ensure logs/analytics do not include raw addresses unless explicitly opted-in.
 
-### P3 — Credits and packaging (future)
+### P3 — Authenticated UX upgrades (dashboard + visuals)
+- [ ] Add a post-login **dashboard** layout with a vertical left sidebar and dedicated screens (Overview, History, Watchlist, Settings).
+- [ ] Add a visually appealing **wallet balance + flow** view: show current USDT balance and a clear inbound/outbound flow diagram for the selected window.
+- [ ] Add interactive charts for inbound/outbound USDT over time (7/30/90d), top counterparties, and drill-down to evidence links.
+- [ ] Add “report timeline” UX (risk score + confidence trend across saved reports for the same address).
+
+### P4 — Credits and packaging (future)
 - [ ] Define credit model (B2C + B2B) and usage accounting.
 - [ ] Add billing integration (provider TBD).
 - [ ] Add team/workspace features and shared histories.
