@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 16:18:56 | run=20260123-151826-11541 | iter=1 | mode=build | story=US-007 | duration=3629s | status=success
 - 2026-01-23 14:28:23 | run=20260123-135210-55147 | iter=1 | mode=build | story=US-006 | duration=2173s | status=success
 - 2026-01-23 05:48:31 | run=20260123-044356-6274 | iter=4 | mode=build | story=US-004 | duration=1085s | status=success
 - 2026-01-23 05:30:23 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=1105s | status=success
@@ -77,3 +78,16 @@
 [2026-01-23 15:52:08] US-007: browser-verified /history list, report detail, delete single + delete all (with refresh)
 [2026-01-23 15:52:29] US-007: staging and committing changes
 [2026-01-23 16:13:00] US-007: updated progress log entry
+[2026-01-23 16:18:55] ITERATION 1 end (duration=3629s)
+[2026-01-23 16:18:58] ITERATION 2 start (mode=build story=US-008)
+[2026-01-23 16:19:06] US-008 start: implement authenticated dashboard layout with sidebar navigation
+[2026-01-23 16:22:05] US-008: added dashboard sidebar + overview/watchlist pages
+[2026-01-23 16:22:30] US-008: protected dashboard routes via Clerk auth redirect
+[2026-01-23 16:23:09] US-008 verification: pnpm lint/test/build passed
+[2026-01-23 16:24:46] US-008: rely on existing Clerk middleware for dashboard route protection; keep UserButton gated by publishable key
+[2026-01-23 16:25:39] US-008 browser verification: starting second dev server on :3001 with Clerk disabled to inspect dashboard UI
+[2026-01-23 16:26:58] US-008 browser verification: restart dev server on :3001 using pnpm exec next dev -p 3001
+[2026-01-23 16:28:48] US-008 browser verification: starting production server on :3001 with Clerk disabled
+[2026-01-23 16:30:31] US-008 browser verification: abandoned :3001 server due to Clerk secretKey error; will verify using existing Clerk-enabled dev server/profile
+[2026-01-23 16:32:15] US-008 browser verified: dashboard sidebar nav works (/overview,/history,/watchlist,/settings), active-route styling via aria-current, and signed-out /overview redirects to /sign-in (screenshots in /Users/chiko/.codex/skills/dev-browser/tmp/)
+[2026-01-23 16:32:47] US-008 re-verification: pnpm lint/test/build passed after final tweaks
