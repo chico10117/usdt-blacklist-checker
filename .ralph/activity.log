@@ -18,3 +18,4 @@
 [2026-01-23 05:01:44] Added Drizzle ORM + Postgres deps, drizzle config, schema, and initial migration
 [2026-01-23 05:03:33] Added DB scripts and docs for Drizzle/Postgres migrations workflow
 [2026-01-23 05:04:33] Verification complete: pnpm lint/test/build PASS (build verified without DATABASE_URL)
+[2026-01-23 05:10:03] Appended US-002 progress entry
