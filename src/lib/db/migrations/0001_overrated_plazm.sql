@@ -1,0 +1,1 @@
+ALTER TABLE "watchlist_items" ADD CONSTRAINT "watchlist_items_user_id_user_settings_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user_settings"("user_id") ON DELETE cascade ON UPDATE no action;

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import {
@@ -27,7 +28,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { USDT_TRC20_CONTRACT } from "@/lib/tron";
 import { getMessages } from "@/lib/i18n";
@@ -197,26 +197,6 @@ function formatDateTime(iso?: string) {
 function truncateAddress(address: string, start = 8, end = 6) {
   if (address.length <= start + end + 3) return address;
   return `${address.slice(0, start)}...${address.slice(-end)}`;
-}
-
-const LOGGING_PREF_KEY = "usdt_blacklisted_web:loggingEnabled";
-
-function readLocalLoggingPref(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(LOGGING_PREF_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function writeLocalLoggingPref(value: boolean) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(LOGGING_PREF_KEY, value ? "true" : "false");
-  } catch {
-    // ignore
-  }
 }
 
 function SignedInAutoRerun({
@@ -526,6 +506,108 @@ function ScamWarningAlert() {
   );
 }
 
+function SaveReportControl({ report }: { report: ApiResponse }) {
+  const { isLoaded, isSignedIn } = useAuth();
+  const [settings, setSettings] = React.useState<{ loggingEnabled: boolean; persistenceAvailable: boolean } | null>(null);
+  const [saveState, setSaveState] = React.useState<
+    | { state: "idle" }
+    | { state: "saving" }
+    | { state: "saved"; id?: string }
+  >({ state: "idle" });
+
+  React.useEffect(() => {
+    setSaveState({ state: "idle" });
+  }, [report.address, report.timestamps.checkedAtIso]);
+
+  React.useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    let cancelled = false;
+
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/user-settings", { credentials: "include" });
+        const json = (await res.json().catch(() => null)) as unknown;
+        if (!res.ok || !json || typeof json !== "object") return;
+
+        const obj = json as Record<string, unknown>;
+        if (typeof obj.loggingEnabled !== "boolean" || typeof obj.persistenceAvailable !== "boolean") return;
+        if (cancelled) return;
+        setSettings({ loggingEnabled: obj.loggingEnabled, persistenceAvailable: obj.persistenceAvailable });
+      } catch {
+        // ignore
+      }
+    }
+
+    loadSettings();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn]);
+
+  if (!report.access?.authenticated) return null;
+  if (!settings?.persistenceAvailable || !settings.loggingEnabled) return null;
+
+  async function saveReport() {
+    if (saveState.state === "saving" || saveState.state === "saved") return;
+
+    setSaveState({ state: "saving" });
+    try {
+      const res = await fetch("/api/saved-reports", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ address: report.address, report }),
+      });
+
+      const json = (await res.json().catch(() => null)) as unknown;
+      if (!res.ok) {
+        const err = json && typeof json === "object" ? (json as Record<string, unknown>).error : null;
+        toast.error(typeof err === "string" ? err : `Save failed (${res.status}).`);
+        setSaveState({ state: "idle" });
+        return;
+      }
+
+      const id = json && typeof json === "object" ? (json as Record<string, unknown>).id : null;
+      toast.success("Report saved.");
+      setSaveState({ state: "saved", id: typeof id === "string" ? id : undefined });
+    } catch {
+      toast.error("Network error.");
+      setSaveState({ state: "idle" });
+    }
+  }
+
+  const saving = saveState.state === "saving";
+  const saved = saveState.state === "saved";
+
+  return (
+    <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
+      <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+        <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-foreground">Save this report</div>
+            <div className="mt-1 text-sm text-muted-foreground">Stores this analysis under your account history.</div>
+          </div>
+          <Button type="button" size="sm" onClick={saveReport} disabled={saving || saved}>
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving…
+              </>
+            ) : saved ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Saved
+              </>
+            ) : (
+              "Save"
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 /* ────────────────────────────────────────────────────────────────────────────
  * Main Component
  * ──────────────────────────────────────────────────────────────────────────── */
@@ -537,7 +619,6 @@ export function BlacklistChecker() {
   const [address, setAddress] = React.useState("");
   const [validation, setValidation] = React.useState<ReturnType<typeof validateTronAddress> | null>(null);
   const [load, setLoad] = React.useState<LoadState>({ state: "idle" });
-  const [loggingEnabled, setLoggingEnabled] = React.useState(false);
 
   React.useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -546,10 +627,6 @@ export function BlacklistChecker() {
     }, 300);
     return () => window.clearTimeout(handle);
   }, [address]);
-
-  React.useEffect(() => {
-    setLoggingEnabled(readLocalLoggingPref());
-  }, []);
 
   const normalizedAddress = validation?.normalized ?? address.trim();
   const isValid = validation?.ok ?? false;
@@ -885,25 +962,19 @@ export function BlacklistChecker() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Account</CardTitle>
                   <CardDescription>
-                    Configure privacy defaults. Saving reports is not enabled yet (DB/credits work is next).
+                    Configure privacy defaults and opt in to saving screening history.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="text-sm font-medium text-foreground">Opt-in: save screening history</div>
+                    <div className="text-sm font-medium text-foreground">Privacy &amp; history</div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      This currently stores only a local preference. No server-side address logging is performed yet.
+                      Saving screening history is off by default. Manage this in Settings.
                     </div>
                   </div>
-                  <Switch
-                    checked={loggingEnabled}
-                    onCheckedChange={(v) => {
-                      setLoggingEnabled(v);
-                      writeLocalLoggingPref(v);
-                      toast.message(v ? "Logging preference enabled (local only)" : "Logging preference disabled");
-                    }}
-                    aria-label="Enable saving screening history"
-                  />
+                  <Button type="button" variant="outline" size="sm" asChild>
+                    <Link href="/settings">Open Settings</Link>
+                  </Button>
                 </CardContent>
               </Card>
             </motion.section>
@@ -993,6 +1064,12 @@ export function BlacklistChecker() {
               >
                 {/* Status Banner */}
                 <StatusBanner data={load.data} />
+
+                {clerkEnabled && (
+                  <SignedIn>
+                    <SaveReportControl report={load.data} />
+                  </SignedIn>
+                )}
 
                 {/* Summary Card */}
                 <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>

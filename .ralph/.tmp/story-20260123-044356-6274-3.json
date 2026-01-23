@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "total": 16,
+  "remaining": 15,
+  "quality_gates": [
+    "pnpm lint",
+    "pnpm test",
+    "pnpm build"
+  ],
+  "id": "US-003",
+  "title": "[P2] Implement schema: user settings + saved reports + watchlist"
+}

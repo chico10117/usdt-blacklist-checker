@@ -1,0 +1,418 @@
+{
+  "version": 1,
+  "project": "TRON USDT Screening \u2014 Complete Remaining PRD Tasks (P2\u2013P4)",
+  "overview": "This PRD translates the remaining unchecked items in PRD.md (P2 opt-in report saving, P3 authenticated dashboard UX upgrades, and P4 credits/packaging) into small, implementable stories for the existing Next.js + Clerk codebase. Privacy-first defaults remain: no address logging unless an authenticated user explicitly opts in.",
+  "goals": [
+    "Add persistent, privacy-first opt-in report saving (history + deletion) for authenticated users.",
+    "Add a post-login dashboard shell with dedicated screens (Overview, History, Watchlist, Settings).",
+    "Add wallet visuals (balance/flows) and charts with evidence links and time-window controls.",
+    "Document and scaffold future credits/billing/workspace/export capabilities without breaking current free flows."
+  ],
+  "nonGoals": [
+    "Multi-chain support (TRON-only).",
+    "Batch screening (single address only).",
+    "Automated accept/reject recommendations (findings only).",
+    "Requiring users to provide private keys/seed phrases.",
+    "Logging or analytics that include raw addresses by default."
+  ],
+  "successMetrics": [
+    "Authenticated users can enable saving, save a report, view it in History, and delete it (single and all) with default-off privacy behavior.",
+    "Dashboard routes are accessible post-login and unauthenticated access is blocked/redirected.",
+    "Charts/visuals render without runtime errors and link to evidence (TronScan/TronGrid/TronScan pages) where applicable.",
+    "All quality gates pass."
+  ],
+  "openQuestions": [
+    "Database provider choice: Neon vs Vercel Postgres vs other Postgres (keep DATABASE_URL compatible).",
+    "ORM choice: Drizzle vs Prisma (tradeoffs for migrations, query ergonomics, and edge runtimes).",
+    "Data retention policy for saved reports (default unlimited vs TTL, and max reports per user).",
+    "Whether Watchlist is considered an explicit opt-in for storing raw addresses, or should store only hashed/encrypted forms.",
+    "What qualifies as the long-term '1 free AML check' and enforcement mechanism (cookie vs session vs rate limits).",
+    "Billing provider for P4 (Stripe vs Paddle vs other) and whether to implement credits as prepaid or subscription entitlements."
+  ],
+  "stack": {
+    "framework": "Next.js (App Router) + TypeScript",
+    "hosting": "Vercel (assumed; keep provider-agnostic where possible)",
+    "database": "Postgres (provider TBD) + ORM (TBD)",
+    "auth": "Clerk (@clerk/nextjs)"
+  },
+  "routes": [
+    {
+      "path": "/",
+      "name": "Home",
+      "purpose": "Single-address screening entry; shows free checks and gated checks CTA."
+    },
+    {
+      "path": "/sign-in",
+      "name": "Sign In",
+      "purpose": "Clerk sign-in flow."
+    },
+    {
+      "path": "/sign-up",
+      "name": "Sign Up",
+      "purpose": "Clerk sign-up flow."
+    },
+    {
+      "path": "/overview",
+      "name": "Overview",
+      "purpose": "Authenticated dashboard overview for a selected address (widgets + charts + flow view)."
+    },
+    {
+      "path": "/history",
+      "name": "History",
+      "purpose": "Authenticated saved reports list + detail navigation and deletion."
+    },
+    {
+      "path": "/watchlist",
+      "name": "Watchlist",
+      "purpose": "Authenticated list of tracked addresses for quick re-screening."
+    },
+    {
+      "path": "/settings",
+      "name": "Settings",
+      "purpose": "Authenticated privacy toggle(s), including loggingEnabled (default false)."
+    }
+  ],
+  "uiNotes": [
+    "Post-login uses a dashboard layout with a vertical left sidebar and clear active state.",
+    "All address persistence is opt-in and explained in Settings; show clear copy about what gets stored and what does not.",
+    "Avoid rendering raw addresses into analytics; keep any analytics events address-free unless user opted in (and even then, prefer hashed identifiers).",
+    "Show empty states for History/Watchlist when none exist, with CTAs to run analysis and/or enable saving."
+  ],
+  "dataModel": [
+    {
+      "entity": "UserSettings",
+      "fields": [
+        "userId (Clerk user id, PK)",
+        "loggingEnabled (boolean, default false)",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "entity": "SavedReport",
+      "fields": [
+        "id (uuid/cuid, PK)",
+        "userId (FK)",
+        "address (string; stored only if user opted in)",
+        "addressHash (string; keyed hash for indexing)",
+        "reportJson (json blob; the /api/analyze response or a normalized subset)",
+        "riskScore (number)",
+        "riskTier (string)",
+        "confidence (number)",
+        "window (e.g., 7/30/90 or actual analyzed window metadata)",
+        "createdAt"
+      ]
+    },
+    {
+      "entity": "WatchlistItem",
+      "fields": [
+        "id (uuid/cuid, PK)",
+        "userId (FK)",
+        "address (string; explicit user-provided content; storage rules defined by policy)",
+        "addressHash (string; keyed hash for indexing)",
+        "label (string, optional)",
+        "createdAt"
+      ]
+    }
+  ],
+  "importFormat": {
+    "description": "No import feature in scope for P2\u2013P3. For P4 exports, define formats later (JSON/PDF) with redaction rules.",
+    "example": {
+      "note": "TBD in P4 stories"
+    }
+  },
+  "rules": [
+    "Default posture remains no address logging and no report saving unless an authenticated user explicitly enables it.",
+    "API routes must not log user-submitted addresses; sanitize errors and logs.",
+    "All new external calls must remain testable offline via mocks; no tests should require real network access.",
+    "Story acceptance criteria must include at least one example case and one negative case."
+  ],
+  "qualityGates": [
+    "pnpm lint",
+    "pnpm test",
+    "pnpm build"
+  ],
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "[P2] Decide DB + ORM and document data retention policy",
+      "status": "done",
+      "dependsOn": [],
+      "description": "As the maintainer, I want a documented decision for database provider and ORM (plus retention/privacy policy) so that report saving can be implemented consistently and safely.",
+      "acceptanceCriteria": [
+        "Add an ADR-style doc that selects: Postgres provider approach (e.g., Neon/Vercel Postgres) and ORM choice (Drizzle or Prisma) with rationale and tradeoffs.",
+        "Define a retention policy (e.g., unlimited by default with optional caps) and explicitly state what is stored when loggingEnabled is true vs false.",
+        "Update `.env.example` with any required env vars for the chosen approach (e.g., `DATABASE_URL`, `ADDRESS_HASH_KEY` or equivalent).",
+        "Example: Doc includes a worked example of saving a report and what fields are persisted.",
+        "Negative case: Doc explicitly covers what happens when `DATABASE_URL` is missing (features disabled gracefully; app still builds)."
+      ],
+      "startedAt": "2026-01-23T04:43:56.439034+00:00",
+      "completedAt": "2026-01-23T15:02:11.015590+00:00",
+      "updatedAt": "2026-01-23T15:02:11.015590+00:00"
+    },
+    {
+      "id": "US-002",
+      "title": "[P2] Add DB/ORM setup, migrations workflow, and connection safety",
+      "status": "done",
+      "dependsOn": [
+        "US-001"
+      ],
+      "description": "As a developer, I want the repo to include DB/ORM setup and a migrations workflow so that schema changes and local development are straightforward.",
+      "acceptanceCriteria": [
+        "Add required dependencies for the selected ORM/driver with explicit `pnpm add ...` / `pnpm add -D ...` documented in the PR.",
+        "Add migration/config files (e.g., `drizzle.config.ts` + migrations folder OR `prisma/schema.prisma` + `prisma migrate`).",
+        "Add package scripts for common DB tasks (generate/migrate/push/studio as applicable).",
+        "Ensure DB initialization is server-only and does not run on the client bundle.",
+        "Example: Running the migration command against a local Postgres succeeds and creates tables.",
+        "Negative case: Running `pnpm build` without `DATABASE_URL` does not crash; DB-backed features are gated/disabled."
+      ],
+      "updatedAt": "2026-01-23T05:11:56.469415+00:00",
+      "completedAt": "2026-01-23T05:11:56.469528+00:00",
+      "startedAt": "2026-01-23T05:11:56.469530+00:00"
+    },
+    {
+      "id": "US-003",
+      "title": "[P2] Implement schema: user settings + saved reports + watchlist",
+      "status": "done",
+      "dependsOn": [
+        "US-002"
+      ],
+      "description": "As an authenticated user, I want my privacy setting and saved artifacts stored server-side so that my choices persist across devices and sessions.",
+      "acceptanceCriteria": [
+        "Create tables for `user_settings`, `saved_reports`, and `watchlist_items` per the PRD data model (adapted to the chosen ORM).",
+        "Include indexes for `userId` and `addressHash` to support listing and per-address queries.",
+        "Include a keyed-hash strategy for `addressHash` (no plain SHA256 without a secret).",
+        "Example: Two different users can save the same address without collisions (rows are scoped by userId).",
+        "Negative case: Attempting to query another user\u2019s data by id/address is blocked at the query layer (always filter by authenticated userId)."
+      ],
+      "startedAt": "2026-01-23T05:11:58.613523+00:00",
+      "completedAt": "2026-01-23T05:30:24.005680+00:00",
+      "updatedAt": "2026-01-23T05:30:24.005245+00:00"
+    },
+    {
+      "id": "US-004",
+      "title": "[P2] Add API: user settings (loggingEnabled) with safe defaults",
+      "status": "done",
+      "dependsOn": [
+        "US-003"
+      ],
+      "description": "As an authenticated user, I want to enable/disable report saving via Settings so that I can control whether my screening history is persisted.",
+      "acceptanceCriteria": [
+        "Add API route(s) to read and update `loggingEnabled` for the current Clerk user (default false if no row exists).",
+        "Ensure unauthenticated requests are rejected (401/redirect per existing patterns).",
+        "Ensure API logs do not include raw addresses and avoid logging full request bodies.",
+        "Example: Toggling `loggingEnabled` from false to true persists and is reflected on refresh.",
+        "Negative case: Unauthenticated request to update settings returns 401 and does not create DB rows."
+      ],
+      "startedAt": "2026-01-23T05:30:26.085635+00:00",
+      "completedAt": "2026-01-23T13:47:48.568202+00:00",
+      "updatedAt": "2026-01-23T13:47:48.568202+00:00"
+    },
+    {
+      "id": "US-005",
+      "title": "[P2] Add Settings screen with privacy toggle and copy",
+      "status": "done",
+      "dependsOn": [
+        "US-004"
+      ],
+      "description": "As an authenticated user, I want a Settings screen that explains and controls saving so that I can make an informed privacy choice.",
+      "acceptanceCriteria": [
+        "Add `/settings` route (dashboard context) with a clear toggle for `Save screening history` (loggingEnabled) defaulting to off.",
+        "Include concise explanatory copy describing what gets stored when enabled and what does not when disabled.",
+        "UI shows loading, success, and error states when reading/updating the setting.",
+        "Example: User enables saving, sees confirmation, and the UI reflects enabled state after reload.",
+        "Negative case: If settings API fails, UI shows an error state and does not silently flip the toggle."
+      ],
+      "updatedAt": "2026-01-23T13:47:48.568202+00:00",
+      "completedAt": "2026-01-23T13:47:48.568202+00:00",
+      "startedAt": "2026-01-23T13:47:48.568202+00:00"
+    },
+    {
+      "id": "US-006",
+      "title": "[P2] Add Save Report flow (UI + API) gated by loggingEnabled",
+      "status": "done",
+      "dependsOn": [
+        "US-005"
+      ],
+      "description": "As an authenticated user who enabled saving, I want to save a specific analysis result so that I can refer to it later.",
+      "acceptanceCriteria": [
+        "Add a server API route to create a SavedReport for the current user from a validated payload (address + report data).",
+        "Enforce: saving is allowed only when authenticated AND loggingEnabled is true.",
+        "Store `reportJson` plus summary fields (riskScore/riskTier/confidence/window) for fast listing and timeline views.",
+        "Update the main analysis UI to show a `Save this report` control only when authenticated and loggingEnabled is enabled.",
+        "Example: After running analysis, clicking Save creates a History entry and shows a success toast/state.",
+        "Negative case: If loggingEnabled is false, Save is hidden/disabled and the API returns a clear error if called directly."
+      ],
+      "updatedAt": "2026-01-23T14:28:23.479200+00:00",
+      "completedAt": "2026-01-23T14:28:23.479603+00:00",
+      "startedAt": "2026-01-23T14:28:23.479605+00:00"
+    },
+    {
+      "id": "US-007",
+      "title": "[P2] Add History list + report detail + deletion (single + all)",
+      "status": "done",
+      "dependsOn": [
+        "US-006"
+      ],
+      "description": "As an authenticated user, I want to view and manage my saved reports so that I can track screening outcomes over time while retaining control.",
+      "acceptanceCriteria": [
+        "Add `/history` route showing a paginated (or bounded) list of saved reports for the current user (newest first).",
+        "Provide per-report delete and delete-all actions with confirmation UI.",
+        "Add a report detail view (route or modal) that renders the saved reportJson with evidence links.",
+        "Example: User deletes one report and it disappears immediately and stays deleted after refresh.",
+        "Negative case: User cannot fetch or delete another user\u2019s report id; API returns 404/403 without leaking existence."
+      ],
+      "startedAt": "2026-01-23T15:18:26.271453+00:00",
+      "completedAt": "2026-01-23T16:18:56.229874+00:00",
+      "updatedAt": "2026-01-23T16:18:56.229713+00:00"
+    },
+    {
+      "id": "US-008",
+      "title": "[P3] Add authenticated dashboard layout with sidebar navigation",
+      "status": "in_progress",
+      "dependsOn": [
+        "US-007"
+      ],
+      "description": "As an authenticated user, I want a dashboard layout with dedicated pages so that navigation and data management are clear and scalable.",
+      "acceptanceCriteria": [
+        "Add a post-login dashboard layout with vertical left sidebar (Overview, History, Watchlist, Settings) and active-route styling.",
+        "Ensure unauthenticated access to dashboard routes is blocked/redirected using Clerk patterns consistent with the repo.",
+        "Keep the existing home page behavior for unauthenticated users (free checks and CTA).",
+        "Example: Signed-in user can navigate between pages without full reload (App Router navigation).",
+        "Negative case: Visiting `/overview` while signed out redirects to sign-in (or shows 401) and does not render dashboard content."
+      ],
+      "startedAt": "2026-01-23T16:18:58.336140+00:00",
+      "completedAt": null,
+      "updatedAt": "2026-01-23T16:18:58.336354+00:00"
+    },
+    {
+      "id": "US-009",
+      "title": "[P3] Add Watchlist CRUD (UI + API) for tracked addresses",
+      "status": "open",
+      "dependsOn": [
+        "US-008"
+      ],
+      "description": "As an authenticated user, I want to maintain a watchlist so that I can quickly re-screen frequently used counterparties.",
+      "acceptanceCriteria": [
+        "Add API routes to list/add/remove watchlist items for the current user.",
+        "Validate TRON address format on add; store addressHash for indexing and apply the defined storage policy for raw address fields.",
+        "Add `/watchlist` UI with add form, list rows (address + optional label), and remove action.",
+        "Example: User adds an address with label 'Merchant A' and it appears in the list and persists after refresh.",
+        "Negative case: Adding an invalid address fails with a validation message and no DB write occurs."
+      ]
+    },
+    {
+      "id": "US-010",
+      "title": "[P3] Add Overview widgets: balance + net flow + key stats",
+      "status": "open",
+      "dependsOn": [
+        "US-008"
+      ],
+      "description": "As an authenticated user, I want an overview page with key wallet widgets so that I can understand balance and flow context quickly.",
+      "acceptanceCriteria": [
+        "Add `/overview` page that can display a selected address (from input, query param, or watchlist selection) and run analysis.",
+        "Show widgets for current USDT balance (best-effort), inbound/outbound totals, net flow, and confidence indicator for the selected time window.",
+        "All stats link to evidence where applicable (e.g., TronScan address page).",
+        "Example: Selecting a watchlisted address loads overview widgets and reuses existing `/api/analyze` data.",
+        "Negative case: If upstream data is unavailable, show partial-data messaging and do not crash; confidence reflects partial inputs."
+      ]
+    },
+    {
+      "id": "US-011",
+      "title": "[P3] Add charts: inbound/outbound over time + top counterparties drilldown",
+      "status": "open",
+      "dependsOn": [
+        "US-010"
+      ],
+      "description": "As an authenticated user, I want interactive charts for flows and counterparties so that I can spot trends and concentration quickly.",
+      "acceptanceCriteria": [
+        "Add a charting approach (library or custom) and document any new deps with `pnpm add ...` in the PR.",
+        "Add time window controls (7/30/90) that refresh the displayed chart series and top counterparties table.",
+        "Top counterparties entries link to evidence (counterparty address pages and relevant tx lists if available).",
+        "Example: Switching from 7d to 30d updates chart series and top counterparty shares without stale data.",
+        "Negative case: If chart data is empty, show a clear empty state instead of rendering broken axes/NaNs."
+      ]
+    },
+    {
+      "id": "US-012",
+      "title": "[P3] Add report timeline (riskScore + confidence trend) per address",
+      "status": "open",
+      "dependsOn": [
+        "US-007",
+        "US-010"
+      ],
+      "description": "As an authenticated user, I want to see how risk score and confidence change over time for an address so that I can detect deterioration or improved data coverage.",
+      "acceptanceCriteria": [
+        "For an address with multiple saved reports, render a timeline chart/table of (createdAt, riskScore, confidence) with click-through to report detail.",
+        "Ensure the timeline query is scoped to the current user and is efficient via indexes (userId + addressHash).",
+        "Add empty state guidance when no saved reports exist for the selected address.",
+        "Example: Saving three reports across different days shows three timeline points in chronological order.",
+        "Negative case: A user cannot infer another user\u2019s saved history (no cross-user access, no ID enumeration leaks)."
+      ]
+    },
+    {
+      "id": "US-013",
+      "title": "[P4] Define credits model and usage accounting (documentation-first)",
+      "status": "open",
+      "dependsOn": [
+        "US-001"
+      ],
+      "description": "As the product owner, I want a defined credits model so that future billing and feature gating can be implemented without ambiguity.",
+      "acceptanceCriteria": [
+        "Add a short spec doc defining credit units (e.g., per analysis, per deep trace, per saved report) and what is free vs gated.",
+        "Define usage accounting rules (when a credit is consumed, idempotency, retries, refunds) and abuse prevention considerations.",
+        "Define entitlement checks at a high level (where in API routes enforcement will occur) without implementing billing yet.",
+        "Example: Spec includes a worked example of a user running analyses until credits reach zero and what UI messaging appears.",
+        "Negative case: Spec explicitly covers how to prevent accidental double-charging on retries/timeouts."
+      ]
+    },
+    {
+      "id": "US-014",
+      "title": "[P4] Select billing provider and map plans to credits/entitlements",
+      "status": "open",
+      "dependsOn": [
+        "US-013"
+      ],
+      "description": "As the maintainer, I want a billing provider decision and plan mapping so that implementation can proceed with clear requirements.",
+      "acceptanceCriteria": [
+        "Document billing provider selection criteria and the chosen provider (e.g., Stripe) with rationale.",
+        "Define plans/pricing and their entitlements (credits per period, feature gates, team/workspace availability).",
+        "Define required webhook events and the internal state transitions they cause.",
+        "Example: Doc includes an example webhook sequence for new subscription, renewal, and cancellation.",
+        "Negative case: Doc includes how to handle webhook delivery delays/out-of-order events safely."
+      ]
+    },
+    {
+      "id": "US-015",
+      "title": "[P4] Define team/workspace model and shared history rules",
+      "status": "open",
+      "dependsOn": [
+        "US-013"
+      ],
+      "description": "As a future team customer, I want shared histories and role-based access so that compliance review can be collaborative.",
+      "acceptanceCriteria": [
+        "Document workspace entities (workspace, membership, roles) and visibility rules for saved reports and watchlists.",
+        "Document audit trail requirements (who saved/deleted what, when) and retention for audit logs.",
+        "Define migration path from single-user data to workspace-scoped data (backfill strategy).",
+        "Example: Doc includes an example with an admin and a viewer and what each can see/do.",
+        "Negative case: Doc explicitly covers preventing accidental data leakage across workspaces."
+      ]
+    },
+    {
+      "id": "US-016",
+      "title": "[P4] Define export formats and API key model (documentation-first)",
+      "status": "open",
+      "dependsOn": [
+        "US-013"
+      ],
+      "description": "As a compliance operator, I want exports and/or API access defined so that screening can be integrated into workflows safely.",
+      "acceptanceCriteria": [
+        "Define export formats (PDF and/or JSON) and redaction rules, especially around addresses and evidence links.",
+        "Define API key model (scopes, rotation, revocation) and rate limits per user/workspace.",
+        "Define how exported/signed artifacts should record data completeness (confidence and upstream failures).",
+        "Example: Doc includes an example JSON export payload with required fields and redacted/hashed identifiers as appropriate.",
+        "Negative case: Doc includes explicit constraints preventing exports from leaking data for non-opted-in users."
+      ]
+    }
+  ]
+}

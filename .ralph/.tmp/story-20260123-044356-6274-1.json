@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "total": 16,
+  "remaining": 16,
+  "quality_gates": [
+    "pnpm lint",
+    "pnpm test",
+    "pnpm build"
+  ],
+  "id": "US-001",
+  "title": "[P2] Decide DB + ORM and document data retention policy"
+}

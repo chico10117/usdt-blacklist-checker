@@ -1,6 +1,103 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 16:39:48 | run=20260123-151826-11541 | iter=2 | mode=build | story=US-008 | duration=1250s | status=success
+- 2026-01-23 16:18:56 | run=20260123-151826-11541 | iter=1 | mode=build | story=US-007 | duration=3629s | status=success
+- 2026-01-23 14:28:23 | run=20260123-135210-55147 | iter=1 | mode=build | story=US-006 | duration=2173s | status=success
+- 2026-01-23 05:48:31 | run=20260123-044356-6274 | iter=4 | mode=build | story=US-004 | duration=1085s | status=success
+- 2026-01-23 05:30:23 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=1105s | status=success
+- 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
+- 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
+- 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
 
 ## Events
 
+[2026-01-23 04:43:56] ITERATION 1 start (mode=build story=US-001)
+[2026-01-23 04:45:25] Start US-001: decide DB+ORM and document retention policy
+[2026-01-23 04:46:59] Draft ADR doc for DB/ORM decision + retention policy
+[2026-01-23 04:47:41] Update .env.example for chosen DB/ORM approach
+[2026-01-23 04:47:54] Run quality gates: pnpm lint/test/build
+[2026-01-23 04:50:15] Update run summary and progress log for US-001
+[2026-01-23 04:50:40] Appended US-001 progress entry
+[2026-01-23 04:55:57] ITERATION 1 end (duration=721s)
+[2026-01-23 04:55:59] ITERATION 2 start (mode=build story=US-002)
+[2026-01-23 04:57:00] Start US-002: DB/ORM setup + migrations + connection safety
+[2026-01-23 05:01:44] Added Drizzle ORM + Postgres deps, drizzle config, schema, and initial migration
+[2026-01-23 05:03:33] Added DB scripts and docs for Drizzle/Postgres migrations workflow
+[2026-01-23 05:04:33] Verification complete: pnpm lint/test/build PASS (build verified without DATABASE_URL)
+[2026-01-23 05:10:03] Appended US-002 progress entry
+[2026-01-23 05:11:12] Wrote run summary for iter 2
+[2026-01-23 05:11:56] ITERATION 2 end (duration=957s)
+[2026-01-23 05:11:58] ITERATION 3 start (mode=build story=US-003)
+[2026-01-23 05:13:15] US-003 start: implement schema for user_settings, saved_reports, watchlist_items
+[2026-01-23 05:17:21] US-003: added address hash util and watchlist FK migration
+[2026-01-23 05:18:59] US-003: added scoped DB query helpers and unit tests for hashing/query scoping
+[2026-01-23 05:19:38] US-003: verification complete (pnpm lint/test/build)
+[2026-01-23 05:25:15] US-003: appended progress entry
+[2026-01-23 05:26:16] US-003: wrote iter-3 run summary
+[2026-01-23 05:26:23] ITERATION 3 end (duration=802s)
+[2026-01-23 05:30:23] ITERATION 3 end (duration=1105s)
+[2026-01-23 05:30:26] ITERATION 4 start (mode=build story=US-004)
+[2026-01-23 05:30:39] Start US-004: implement settings API (loggingEnabled)
+[2026-01-23 05:33:57] Added /api/user-settings route (GET/PATCH) and made it public in middleware to allow 401 responses
+[2026-01-23 05:34:29] Wired signed-in loggingEnabled toggle to /api/user-settings (fetch on sign-in, PATCH on change)
+[2026-01-23 05:35:00] Added route-level tests for /api/user-settings auth + default + update behavior
+[2026-01-23 05:35:13] Running quality gates: pnpm lint, pnpm test, pnpm build
+[2026-01-23 05:35:48] Quality gates complete: lint/test/build PASS
+[2026-01-23 05:37:35] Committing US-004 changes
+[2026-01-23 05:41:36] Updated .ralph/progress.md for US-004
+[2026-01-23 05:44:43] Fix: avoid useAuth() without ClerkProvider by moving settings sync into SignedIn component
+[2026-01-23 05:45:10] Re-ran quality gates after ClerkProvider hook fix: lint/test/build PASS
+[2026-01-23 05:47:18] Adjusted US-004 progress entry to reflect API-only implementation
+[2026-01-23 05:47:39] Final verification after UI revert: running pnpm lint/test/build
+[2026-01-23 05:47:58] Final verification PASS (lint/test/build) after UI revert
+[2026-01-23 05:48:31] ITERATION 4 end (duration=1085s)
+[2026-01-23 05:48:33] ITERATION 5 start (mode=build story=US-005)
+[2026-01-23 05:48:45] US-005 start: settings screen with privacy toggle
+[2026-01-23 05:55:18] US-005: implemented /settings route UI and wired to /api/user-settings; updated home account card to link to Settings
+[2026-01-23 05:56:09] US-005: quality gates passed (pnpm lint/test/build)
+[2026-01-23 05:59:21] US-005: browser verification passed for /settings (mocked /api/user-settings); screenshot saved to dev-browser/tmp/us-005-settings.png
+[2026-01-23 06:00:00] US-005: re-ran pnpm lint/test/build after final UI tweaks (PASS)
+[2026-01-23 06:04:31] US-005: appended progress entry
+[2026-01-23 13:52:10] ITERATION 1 start (mode=build story=US-006)
+[2026-01-23 13:52:27] Start US-006: implement save report flow gated by loggingEnabled
+[2026-01-23 13:55:35] Added /api/saved-reports route (auth + loggingEnabled gated) and updated middleware public API list
+[2026-01-23 13:56:56] Updated main analysis UI to conditionally show Save this report control (SignedIn + loggingEnabled) and call /api/saved-reports
+[2026-01-23 13:57:41] Added Vitest coverage for /api/saved-reports (auth, persistence, loggingEnabled gating, payload validation, create success)
+[2026-01-23 13:58:28] Quality gates: pnpm lint/test/build all passed
+[2026-01-23 13:59:54] Hardened /api/saved-reports: require ADDRESS_HASH_KEY for persistence; updated tests env
+[2026-01-23 14:13:21] Adjusted Clerk middleware to enable with publishable key and always evaluate auth() so route handlers can see sessions
+[2026-01-23 14:18:28] Browser verification passed: Save control hidden when loggingEnabled=false; enabling setting shows Save, clicking saves and shows toast
+[2026-01-23 14:20:45] Re-ran pnpm lint/test/build after middleware move (PASS)
+[2026-01-23 14:27:29] Appended US-006 entry to .ralph/progress.md
+[2026-01-23 14:28:23] ITERATION 1 end (duration=2173s)
+[2026-01-23 15:18:26] ITERATION 1 start (mode=build story=US-007)
+[2026-01-23 15:18:35] US-007 start: implement history list, detail view, and deletion
+[2026-01-23 15:24:15] US-007: added /history UI (list + detail) and dashboard nav link
+[2026-01-23 15:25:31] US-007: implemented saved-reports list/detail/delete APIs (GET/DELETE + /[id])
+[2026-01-23 15:28:06] US-007: verification complete (pnpm lint/test/build)
+[2026-01-23 15:52:08] US-007: browser-verified /history list, report detail, delete single + delete all (with refresh)
+[2026-01-23 15:52:29] US-007: staging and committing changes
+[2026-01-23 16:13:00] US-007: updated progress log entry
+[2026-01-23 16:18:55] ITERATION 1 end (duration=3629s)
+[2026-01-23 16:18:58] ITERATION 2 start (mode=build story=US-008)
+[2026-01-23 16:19:06] US-008 start: implement authenticated dashboard layout with sidebar navigation
+[2026-01-23 16:22:05] US-008: added dashboard sidebar + overview/watchlist pages
+[2026-01-23 16:22:30] US-008: protected dashboard routes via Clerk auth redirect
+[2026-01-23 16:23:09] US-008 verification: pnpm lint/test/build passed
+[2026-01-23 16:24:46] US-008: rely on existing Clerk middleware for dashboard route protection; keep UserButton gated by publishable key
+[2026-01-23 16:25:39] US-008 browser verification: starting second dev server on :3001 with Clerk disabled to inspect dashboard UI
+[2026-01-23 16:26:58] US-008 browser verification: restart dev server on :3001 using pnpm exec next dev -p 3001
+[2026-01-23 16:28:48] US-008 browser verification: starting production server on :3001 with Clerk disabled
+[2026-01-23 16:30:31] US-008 browser verification: abandoned :3001 server due to Clerk secretKey error; will verify using existing Clerk-enabled dev server/profile
+[2026-01-23 16:32:15] US-008 browser verified: dashboard sidebar nav works (/overview,/history,/watchlist,/settings), active-route styling via aria-current, and signed-out /overview redirects to /sign-in (screenshots in /Users/chiko/.codex/skills/dev-browser/tmp/)
+[2026-01-23 16:32:47] US-008 re-verification: pnpm lint/test/build passed after final tweaks
+[2026-01-23 16:36:39] US-008: appended progress entry
+[2026-01-23 16:39:48] ITERATION 2 end (duration=1250s)
+[2026-01-23 16:39:51] ITERATION 3 start (mode=build story=US-009)
+[2026-01-23 16:40:48] US-009 start: implementing watchlist CRUD (API + UI)
+[2026-01-23 16:45:28] US-009: added watchlist DB helpers and API routes (list/add/delete)
+[2026-01-23 16:47:11] US-009: implemented /watchlist UI with add/list/remove client flow
+[2026-01-23 16:49:06] US-009: verification passed (pnpm lint/test/build)
+[2026-01-23 17:02:14] US-009: browser verification complete for /watchlist (add persists after refresh, remove works, invalid address shows validation toast)
+[2026-01-23 17:12:34] US-009: appended progress entry
