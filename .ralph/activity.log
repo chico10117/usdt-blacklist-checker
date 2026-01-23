@@ -45,3 +45,5 @@
 [2026-01-23 05:44:43] Fix: avoid useAuth() without ClerkProvider by moving settings sync into SignedIn component
 [2026-01-23 05:45:10] Re-ran quality gates after ClerkProvider hook fix: lint/test/build PASS
 [2026-01-23 05:47:18] Adjusted US-004 progress entry to reflect API-only implementation
+[2026-01-23 05:47:39] Final verification after UI revert: running pnpm lint/test/build
+[2026-01-23 05:47:58] Final verification PASS (lint/test/build) after UI revert
