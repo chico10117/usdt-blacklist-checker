@@ -5,7 +5,7 @@ import { readUsdtBlacklistStatusOnChain } from "@/lib/tron";
 import { checkTronScanUsdtBlacklist } from "@/lib/tronscan";
 import { checkOfacSanctions } from "@/lib/sanctions";
 import { computeConfidencePercent, computeRiskScore, computeUsdtVolumeStats } from "@/lib/aml";
-import { fetchTronScanAccountTag, fetchUsdtTrc20Transfers } from "@/lib/tronscan";
+import { fetchTronScanAccountTag, fetchUsdtTrc20Transfers, fetchUsdtBalance } from "@/lib/tronscan";
 import { computeTopInboundCounterparties } from "@/lib/exposure";
 import { computeFlowHeuristics } from "@/lib/heuristics";
 import { getOrSetCache, sha256Key } from "@/lib/cache";
@@ -30,6 +30,7 @@ type AnalyzeResponse = {
   address: string;
   isValid: boolean;
   access: { authenticated: boolean };
+  balance?: { ok: true; usdt: string; usdtBaseUnits: string } | { ok: false; error: string };
   checks: {
     tronscan: CheckResult;
     onchain: CheckResult;
@@ -276,6 +277,12 @@ export async function POST(request: Request) {
 
     const consensus = computeConsensus(tronscan, onchain);
     const sanctions = checkOfacSanctions(address);
+
+    // Fetch USDT balance
+    const balanceRes = await fetchUsdtBalance(address);
+    const balance: AnalyzeResponse["balance"] = balanceRes.ok
+      ? { ok: true, usdt: balanceRes.balance, usdtBaseUnits: balanceRes.balanceBaseUnits }
+      : { ok: false, error: balanceRes.error };
 
     const notices: string[] = [
       "Never share your seed phrase or private keys. This tool only needs a public address.",
@@ -528,6 +535,7 @@ export async function POST(request: Request) {
       address,
       isValid: true,
       access: { authenticated },
+      balance,
       checks: { tronscan, onchain, sanctions, entity, volume, exposure1hop, tracing2hop, heuristics },
       consensus,
       risk,

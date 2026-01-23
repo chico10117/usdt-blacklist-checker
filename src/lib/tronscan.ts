@@ -143,6 +143,71 @@ export async function checkTronScanUsdtBlacklist(address: string): Promise<TronS
   });
 }
 
+// USDT Balance fetch - uses the main account endpoint
+const TronScanTrc20BalanceSchema = z
+  .object({
+    tokenId: z.string().optional(),
+    tokenAbbr: z.string().optional(),
+    balance: z.string().optional(),
+    tokenDecimal: z.number().optional(),
+  })
+  .passthrough();
+
+const TronScanAccountResponseSchema = z.object({
+  trc20token_balances: z.array(TronScanTrc20BalanceSchema).optional(),
+}).passthrough();
+
+export type UsdtBalanceResult =
+  | { ok: true; balance: string; balanceBaseUnits: string; decimals: number }
+  | { ok: false; error: string };
+
+export async function fetchUsdtBalance(address: string): Promise<UsdtBalanceResult> {
+  const cacheKey = sha256Key(["tronscan_usdt_balance_v2", address]);
+  return await getOrSetCache(cacheKey, 30_000, async () => {
+    const url = `https://apilist.tronscanapi.com/api/account?address=${encodeURIComponent(address)}`;
+    try {
+      const raw = await fetchTronScanJson(url, 8_000);
+      const parsed = TronScanAccountResponseSchema.safeParse(raw);
+      if (!parsed.success) return { ok: false, error: "Unexpected TronScan account response." };
+
+      const tokens = parsed.data.trc20token_balances ?? [];
+      const usdt = tokens.find(
+        (t) => t.tokenId === USDT_TRC20_CONTRACT || t.tokenAbbr?.toUpperCase() === "USDT"
+      );
+
+      if (!usdt || !usdt.balance) {
+        return { ok: true, balance: "0", balanceBaseUnits: "0", decimals: 6 };
+      }
+
+      const decimals = usdt.tokenDecimal ?? 6;
+      const balanceBaseUnits = usdt.balance;
+      
+      // Convert to human readable (USDT has 6 decimals)
+      let balance: string;
+      try {
+        const rawBal = BigInt(balanceBaseUnits);
+        const divisor = BigInt(10 ** decimals);
+        const whole = rawBal / divisor;
+        const frac = rawBal % divisor;
+        const fracStr = frac.toString().padStart(decimals, "0").replace(/0+$/, "");
+        balance = fracStr ? `${whole}.${fracStr}` : whole.toString();
+      } catch {
+        balance = "0";
+      }
+
+      return { ok: true, balance, balanceBaseUnits, decimals };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.name === "AbortError"
+            ? "TronScan timed out."
+            : error.message
+          : "Unknown TronScan error.";
+      return { ok: false, error: message };
+    }
+  });
+}
+
 const TronScanTokenInfoSchema = z
   .object({
     tokenDecimal: z.number().optional(),

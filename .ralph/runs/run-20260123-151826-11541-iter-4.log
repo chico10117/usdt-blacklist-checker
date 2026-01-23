@@ -1,0 +1,472 @@
+2026-01-23T17:16:08.901932Z ERROR codex_core::skills::loader: failed to stat skills entry /Users/chiko/.codex/skills/dev-browser/profiles/browser-data/RunningChromeVersion (symlink): No such file or directory (os error 2)
+2026-01-23T17:16:08.902199Z ERROR codex_core::skills::loader: failed to stat skills entry /Users/chiko/.codex/skills/dev-browser/profiles/browser-data/SingletonCookie (symlink): No such file or directory (os error 2)
+2026-01-23T17:16:08.902209Z ERROR codex_core::skills::loader: failed to stat skills entry /Users/chiko/.codex/skills/dev-browser/profiles/browser-data/SingletonLock (symlink): No such file or directory (os error 2)
+OpenAI Codex v0.89.0 (research preview)
+--------
+workdir: /Users/chiko/side_projects/usdt_blacklisted_web
+model: gpt-5.2
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: high
+reasoning summaries: auto
+session id: 019bebdb-2f8d-77c2-8dc6-f5acb02b2d60
+--------
+user
+# Build
+
+You are an autonomous coding agent. Your task is to complete the work for exactly one story and record the outcome.
+
+## Paths
+- PRD: /Users/chiko/side_projects/usdt_blacklisted_web/.agents/tasks/prd-post-mvp.json
+- AGENTS (optional): /Users/chiko/side_projects/usdt_blacklisted_web/AGENTS.md
+- Progress Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/progress.md
+- Guardrails: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/guardrails.md
+- Guardrails Reference: /Users/chiko/side_projects/usdt_blacklisted_web/.agents/ralph/references/GUARDRAILS.md
+- Context Reference: /Users/chiko/side_projects/usdt_blacklisted_web/.agents/ralph/references/CONTEXT_ENGINEERING.md
+- Errors Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/errors.log
+- Activity Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/activity.log
+- Activity Logger: /Users/chiko/side_projects/usdt_blacklisted_web/ralph log
+- No-commit: false
+- Repo Root: /Users/chiko/side_projects/usdt_blacklisted_web
+- Run ID: 20260123-151826-11541
+- Iteration: 4
+- Run Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-4.log
+- Run Summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-4.md
+
+## Global Quality Gates (apply to every story)
+- pnpm lint
+- pnpm test
+- pnpm build
+
+## Selected Story (Do not change scope)
+ID: US-013
+Title: [P4] Define credits model and usage accounting (documentation-first)
+
+Story details:
+### US-013: [P4] Define credits model and usage accounting (documentation-first)
+Status: in_progress
+Depends on: US-001
+
+Description:
+As the product owner, I want a defined credits model so that future billing and feature gating can be implemented without ambiguity.
+
+Acceptance Criteria:
+- [ ] Add a short spec doc defining credit units (e.g., per analysis, per deep trace, per saved report) and what is free vs gated.
+- [ ] Define usage accounting rules (when a credit is consumed, idempotency, retries, refunds) and abuse prevention considerations.
+- [ ] Define entitlement checks at a high level (where in API routes enforcement will occur) without implementing billing yet.
+- [ ] Example: Spec includes a worked example of a user running analyses until credits reach zero and what UI messaging appears.
+- [ ] Negative case: Spec explicitly covers how to prevent accidental double-charging on retries/timeouts.
+
+
+If the story details are empty or missing, STOP and report that the PRD story format could not be parsed.
+
+## Rules (Non-Negotiable)
+- Implement **only** the work required to complete the selected story.
+- Complete all tasks associated with this story (and only this story).
+- Do NOT ask the user questions.
+- Do NOT change unrelated code.
+- Do NOT assume something is unimplemented — confirm by reading code.
+- Implement completely; no placeholders or stubs.
+- If No-commit is true, do NOT commit or push changes.
+- Do NOT edit the PRD JSON (status is handled by the loop).
+- All changes made during the run must be committed (including updates to progress/logs).
+ - Before committing, perform a final **security**, **performance**, and **regression** review of your changes.
+
+## Your Task (Do this in order)
+1. Read /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/guardrails.md before any code changes.
+2. Read /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/errors.log for repeated failures to avoid.
+3. Read /Users/chiko/side_projects/usdt_blacklisted_web/.agents/tasks/prd-post-mvp.json for global context (do not edit).
+4. Fully audit and read all necessary files to understand the task end-to-end before implementing. Do not assume missing functionality.
+5. If /Users/chiko/side_projects/usdt_blacklisted_web/AGENTS.md exists, follow its build/test instructions.
+6. Implement only the tasks that belong to US-013.
+7. Run verification commands listed in the story, the global quality gates, and in /Users/chiko/side_projects/usdt_blacklisted_web/AGENTS.md (if required).
+8. If the project has a build or dev workflow, run what applies:
+   - Build step (e.g., `npm run build`) if defined.
+   - Dev server (e.g., `npm run dev`, `wrangler dev`) if it is the normal validation path.
+   - Confirm no runtime/build errors in the console.
+9. Perform a brief audit before committing:
+   - **Security:** check for obvious vulnerabilities or unsafe handling introduced by your changes.
+   - **Performance:** check for avoidable regressions (extra queries, heavy loops, unnecessary re-renders).
+   - **Regression:** verify existing behavior that could be impacted still works.
+10. If No-commit is false, commit changes using the `$commit` skill.
+    - Stage everything: `git add -A`
+    - Confirm a clean working tree after commit: `git status --porcelain` should be empty.
+    - After committing, capture the commit hash and subject using:
+      `git show -s --format="%h %s" HEAD`.
+11. Append a progress entry to /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/progress.md with run/commit/test details (format below).
+    If No-commit is true, skip committing and note it in the progress entry.
+
+## Progress Entry Format (Append Only)
+```
+## [Date/Time] - US-013: [P4] Define credits model and usage accounting (documentation-first)
+Thread: [codex exec session id if available, otherwise leave blank]
+Run: 20260123-151826-11541 (iteration 4)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-4.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-4.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: <hash> <subject> (or `none` + reason)
+- Post-commit status: `clean` or list remaining files
+- Verification:
+  - Command: <exact command> -> PASS/FAIL
+  - Command: <exact command> -> PASS/FAIL
+- Files changed:
+  - <file path>
+  - <file path>
+- What was implemented
+- **Learnings for future iterations:**
+  - Patterns discovered
+  - Gotchas encountered
+  - Useful context
+---
+```
+
+## Completion Signal
+Only output the completion signal when the **selected story** is fully complete and verified.
+When the selected story is complete, output:
+<promise>COMPLETE</promise>
+
+Otherwise, end normally without the signal.
+
+## Additional Guardrails
+- When authoring documentation, capture the why (tests + implementation intent).
+- If you learn how to run/build/test the project, update /Users/chiko/side_projects/usdt_blacklisted_web/AGENTS.md briefly (operational only).
+- Keep AGENTS operational only; progress notes belong in /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/progress.md.
+- If you hit repeated errors, log them in /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/errors.log and add a Sign to /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/guardrails.md using /Users/chiko/side_projects/usdt_blacklisted_web/.agents/ralph/references/GUARDRAILS.md as the template.
+
+## Activity Logging (Required)
+Log major actions to /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/activity.log using the helper:
+```
+/Users/chiko/side_projects/usdt_blacklisted_web/ralph log "message"
+```
+Log at least:
+- Start of work on the story
+- After major code changes
+- After tests/verification
+- After updating progress log
+
+## Browser Testing (Required for Frontend Stories)
+If the selected story changes UI, you MUST verify it in the browser:
+1. Load the `dev-browser` skill.
+2. Navigate to the relevant page.
+3. Verify the UI changes work as expected.
+4. Take a screenshot if helpful for the progress log.
+
+A frontend story is NOT complete until browser verification passes.
+
+mcp startup: no servers
+
+thinking
+**Planning the next steps**
+
+I'm getting ready to read the required files and create a specification document. I also need to run gates, commit changes, and update progress along the way. It feels like there's a solid plan forming here, but I need to start with updating the plan first! It’s all about taking one step at a time to ensure everything flows smoothly. Let's get moving!
+Plan update
+  → Review guardrails and error logs
+  • Read PRD context and existing docs
+  • Write credits model spec document
+  • Run lint, test, and build
+  • Security/perf/regression review
+  • Commit changes
+  • Update progress and activity logs
+exec
+/bin/zsh -lc "sed -n '1,200p' .ralph/guardrails.md" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 47ms:
+# Guardrails (Signs)
+
+> Lessons learned from failures. Read before acting.
+
+## Core Signs
+
+### Sign: Read Before Writing
+- **Trigger**: Before modifying any file
+- **Instruction**: Read the file first
+- **Added after**: Core principle
+
+### Sign: Test Before Commit
+- **Trigger**: Before committing changes
+- **Instruction**: Run required tests and verify outputs
+- **Added after**: Core principle
+
+---
+
+## Learned Signs
+### Sign: Never Kill Ralph Tee
+exec
+/bin/zsh -lc 'cat .ralph/errors.log || true' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 58ms:
+# Error Log
+
+> Failures and repeated issues. Use this to add guardrails.
+
+[2026-01-23 04:55:57] ITERATION 1 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-1.md
+[2026-01-23 05:11:56] ITERATION 2 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-2.md
+[2026-01-23 05:30:23] ITERATION 3 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.md
+[2026-01-23 05:48:31] ITERATION 4 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-4.md
+[2026-01-23 14:28:23] ITERATION 1 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-135210-55147-iter-1.md
+[2026-01-23 16:18:56] ITERATION 1 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-1.md
+[2026-01-23 16:39:48] ITERATION 2 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.md
+[2026-01-23 17:16:06] ITERATION 3 left uncommitted changes; review run summary at /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-3.md
+
+thinking
+I'm noticing that there are errors indicating prior iterations with uncommitted changes. I need to ensure I commit these changes and clean things up. So, I've completed step 1! Additionally, I need to start logging activities for the beginning of the story, and I'll do that using the "ralph log" command. It’s important to keep everything organized to avoid confusion down the line!
+exec
+/bin/zsh -lc './ralph log "US-013 start: define credits model + usage accounting spec"' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 93ms:
+
+Plan update
+  ✓ Review guardrails and error logs
+  → Read PRD context and existing docs
+  • Write credits model spec document
+  • Run lint, test, and build
+  • Security/perf/regression review
+  • Commit changes
+  • Update progress and activity logs
+exec
+/bin/zsh -lc 'cat .agents/tasks/prd-post-mvp.json' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 55ms:
+{
+  "version": 1,
+  "project": "TRON USDT Screening \u2014 Complete Remaining PRD Tasks (P2\u2013P4)",
+  "overview": "This PRD translates the remaining unchecked items in PRD.md (P2 opt-in report saving, P3 authenticated dashboard UX upgrades, and P4 credits/packaging) into small, implementable stories for the existing Next.js + Clerk codebase. Privacy-first defaults remain: no address logging unless an authenticated user explicitly opts in.",
+  "goals": [
+    "Add persistent, privacy-first opt-in report saving (history + deletion) for authenticated users.",
+    "Add a post-login dashboard shell with dedicated screens (Overview, History, Watchlist, Settings).",
+    "Add wallet visuals (balance/flows) and charts with evidence links and time-window controls.",
+    "Document and scaffold future credits/billing/workspace/export capabilities without breaking current free flows."
+  ],
+  "nonGoals": [
+    "Multi-chain support (TRON-only).",
+    "Batch screening (single address only).",
+    "Automated accept/reject recommendations (findings only).",
+    "Requiring users to provide private keys/seed phrases.",
+    "Logging or analytics that include raw addresses by default."
+  ],
+  "successMetrics": [
+    "Authenticated users can enable saving, save a report, view it in History, and delete it (single and all) with default-off privacy behavior.",
+    "Dashboard routes are accessible post-login and unauthenticated access is blocked/redirected.",
+exec
+/bin/zsh -lc 'ls -la' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 54ms:
+total 2920
+drwxr-xr-x@ 36 chiko  staff     1152 Jan 23 14:17 .
+drwxr-xr-x@ 11 chiko  staff      352 Jan 21 18:51 ..
+drwxr-xr-x@  4 chiko  staff      128 Jan 23 04:36 .agents
+drwxr-xr-x@  3 chiko  staff       96 Jan 21 23:12 .clerk
+-rw-r--r--@  1 chiko  staff     8196 Jan 21 19:22 .DS_Store
+-rw-r--r--@  1 chiko  staff      824 Jan 23 15:36 .env
+-rw-r--r--@  1 chiko  staff      544 Jan 23 04:47 .env.example
+drwxr-xr-x@ 12 chiko  staff      384 Jan 23 17:16 .git
+-rw-r--r--@  1 chiko  staff      567 Jan 23 05:08 .gitignore
+drwxr-xr-x@ 25 chiko  staff      800 Jan 23 16:49 .next
+drwxr-xr-x@  8 chiko  staff      256 Jan 23 17:09 .ralph
+-rw-r--r--@  1 chiko  staff     2483 Jan 23 04:02 AGENTS.md
+-rw-r--r--@  1 chiko  staff     1453 Jan 21 18:26 check-usdt-blacklist.js
+-rw-r--r--@  1 chiko  staff     3562 Jan 22 12:40 CLAUDE.md
+drwxr-xr-x@ 13 chiko  staff      416 Jan 22 01:07 coverage
+drwxr-xr-x@  4 chiko  staff      128 Jan 23 05:03 docs
+-rw-r--r--@  1 chiko  staff      329 Jan 23 15:17 drizzle.config.ts
+-rw-r--r--@  1 chiko  staff      484 Jan 22 12:25 eslint.config.mjs
+-rw-r--r--@  1 chiko  staff     1394 Jan 22 12:32 GPT.md
+exec
+/bin/zsh -lc "test -f AGENTS.md && sed -n '1,200p' AGENTS.md || echo \"AGENTS.md not found\"" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 56ms:
+# Repository Guidelines
+
+## Project Structure & Module Organization
+
+- `src/app/`: Next.js App Router pages and API routes (e.g. `src/app/api/check/route.ts`, `src/app/api/analyze/route.ts`).
+- `src/lib/`: Core screening logic (TRON/TronScan clients, sanctions screening, AML heuristics/scoring, validators). Unit tests are co-located as `*.test.ts`.
+- `src/components/`: Reusable UI components (Tailwind CSS + shadcn/ui-style components).
+- `src/data/`: Cached datasets (e.g. `src/data/ofac-tron-addresses.json`).
+- `scripts/`: Maintenance scripts (e.g. OFAC dataset fetcher).
+- `public/`: Static assets.
+
+## Build, Test, and Development Commands
+
+- `pnpm dev`: Run the local dev server at `http://localhost:3000`.
+- `pnpm build` / `pnpm start`: Production build and run.
+- `pnpm lint`: Run ESLint (Next.js core-web-vitals + TypeScript rules).
+- `pnpm test`: Run Vitest once (Node environment).
+- `pnpm test:watch`: Run tests in watch mode.
+- `pnpm test:coverage`: Generate coverage output in `coverage/`.
+- `pnpm ofac:update`: Refresh `src/data/ofac-tron-addresses.json` (requires network access).
+exec
+/bin/zsh -lc 'rg -n "credit|credits|usage accounting|entitlement" -S . || true' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 75ms:
+./PRD.md:47:- Shows an account-level privacy toggle for “save screening history” (initially stored as a local preference; server-side history comes later with DB/credits).
+./PRD.md:48:- Future: credits, billing, team/workspace features.
+./PRD.md:290:  - future credits ledger
+./PRD.md:304:- M4: credits/billing + team/workspace + export/API access.
+./PRD.md:345:### P4 — Credits and packaging (future)
+./PRD.md:346:- [ ] Define credit model (B2C + B2B) and usage accounting.
+./project_summary.md:164:- Shows an account-level privacy toggle for “save screening history” (initially stored as a local preference; server-side history comes later with DB/credits).
+./project_summary.md:165:- Future: credits, billing, team/workspace features.
+./project_summary.md:285:  - future credits ledger
+./project_summary.md:298:- M3: credits/billing + team/workspace + export/API access.
+./project_summary.md:328:### P3 — Credits and packaging (future)
+./project_summary.md:329:- [ ] Define credit model (B2C + B2B) and usage accounting.
+./project_summary.md:850:# Database (future: opt-in report saving + credits)
+./project_summary.md:2688:                    Configure privacy defaults. Saving reports is not enabled yet (DB/credits work is next).
+
+thinking
+**Reviewing project documentation**
+
+I've noticed that the docs folder exists, and the search results indicate that the PRD includes P4 credits. So, I plan to dive into the relevant section for alignment. I'll check the contents of the docs folder too, just to see if there are any existing documents that might be useful. My next step will be to read through the docs and the specific part in the PRD regarding credits. This should clarify things!
+exec
+/bin/zsh -lc 'ls -ლა docs && rg -n "Credits" -S docs PRD.md project_summary.md || true' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 59ms:
+ls: invalid option -- á
+usage: ls [-@ABCFGHILOPRSTUWXabcdefghiklmnopqrstuvwxy1%,] [--color=when] [-D format] [file ...]
+exec
+/bin/zsh -lc "sed -n '330,420p' PRD.md" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 38ms:
+  - TronScan public tags when present
+  - outbound-to-exchange-hot-wallet routing when tags are missing
+
+### P2 — Opt-in report saving (privacy-first)
+- [ ] Choose DB + ORM (e.g., Postgres + Prisma/Drizzle) and add migrations.
+- [ ] Store user settings: `loggingEnabled` (default false).
+- [ ] Add “Save this report” UX gated by settings; implement per-report retention and deletion.
+- [ ] Ensure logs/analytics do not include raw addresses unless explicitly opted-in.
+
+### P3 — Authenticated UX upgrades (dashboard + visuals)
+- [ ] Add a post-login **dashboard** layout with a vertical left sidebar and dedicated screens (Overview, History, Watchlist, Settings).
+- [ ] Add a visually appealing **wallet balance + flow** view: show current USDT balance and a clear inbound/outbound flow diagram for the selected window.
+- [ ] Add interactive charts for inbound/outbound USDT over time (7/30/90d), top counterparties, and drill-down to evidence links.
+- [ ] Add “report timeline” UX (risk score + confidence trend across saved reports for the same address).
+
+### P4 — Credits and packaging (future)
+- [ ] Define credit model (B2C + B2B) and usage accounting.
+- [ ] Add billing integration (provider TBD).
+- [ ] Add team/workspace features and shared histories.
+- [ ] Add export (PDF/JSON) and/or API keys for programmatic screening.
+exec
+/bin/zsh -lc "sed -n '820,920p' project_summary.md" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 54ms:
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+```
+
+## File: .env.example
+
+- Extension: .example
+- Language: unknown
+- Size: 356 bytes
+- Created: 2026-01-22 13:19:42
+- Modified: 2026-01-22 13:19:42
+
+### Code
+
+```unknown
+TRONGRID_API_KEY=
+
+thinking
+**Checking command syntax**
+
+It seems my first command failed due to using an invalid one, possibly something like `ls -لا` with Arabic characters. I need to rerun the command correctly. I'll take a look at the documentation for the directory to make sure I'm following the proper syntax. Let's list the files again, ensuring everything is in order this time! I want to avoid any mistakes moving forward.
+exec
+/bin/zsh -lc 'ls -la docs' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 55ms:
+total 8
+drwxr-xr-x@  4 chiko  staff   128 Jan 23 05:03 .
+drwxr-xr-x@ 36 chiko  staff  1152 Jan 23 14:17 ..
+drwxr-xr-x@  3 chiko  staff    96 Jan 23 04:47 adr
+-rw-r--r--@  1 chiko  staff  1351 Jan 23 05:03 db.md
+
+thinking
+**Organizing documentation**
+
+I see there are existing docs like adr and db.md. I think we need to add a spec document, maybe as `docs/credits.md` or `docs/credits-model.md`. I wonder if we should align with the naming convention. Since it’s documentation, I think it could simply be `credits.md`. I'd like to check the style of the existing db.md to ensure consistency before proceeding. Let's take a look!
+exec
+/bin/zsh -lc "sed -n '1,200p' docs/db.md" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 48ms:
+# Database & migrations (Postgres + Drizzle)
+
+This repo uses **Postgres** (`DATABASE_URL`) + **Drizzle ORM** (`drizzle-orm`) with **drizzle-kit** for migrations.
+
+## Dependencies
+
+Installed with:
+
+- `pnpm add -w drizzle-orm postgres server-only`
+- `pnpm add -w -D drizzle-kit`
+
+## Files
+
+- `drizzle.config.ts`: drizzle-kit config (schema + migrations output)
+- `src/lib/db/schema.ts`: Drizzle schema (tables + indexes)
+- `src/lib/db/migrations/`: generated SQL migrations + journal
+- `src/lib/db/index.ts`: server-only DB client helpers (`getDb`, `requireDb`)
+
+## Common commands
+
+exec
+/bin/zsh -lc "sed -n '1,220p' src/app/api/analyze/route.ts" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 55ms:
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { CheckRequestSchema } from "@/lib/validators";
+import { readUsdtBlacklistStatusOnChain } from "@/lib/tron";
+import { checkTronScanUsdtBlacklist } from "@/lib/tronscan";
+import { checkOfacSanctions } from "@/lib/sanctions";
+import { computeConfidencePercent, computeRiskScore, computeUsdtVolumeStats } from "@/lib/aml";
+import { fetchTronScanAccountTag, fetchUsdtTrc20Transfers } from "@/lib/tronscan";
+import { computeTopInboundCounterparties } from "@/lib/exposure";
+import { computeFlowHeuristics } from "@/lib/heuristics";
+import { getOrSetCache, sha256Key } from "@/lib/cache";
+import { classifyEntityFromTagsAndTransfers } from "@/lib/entity";
+
+export const runtime = "nodejs";
+
+type Evidence = {
+  contractAddress: string;
+  txHash?: string;
+  timestampIso?: string;
+  method?: string;
+exec
+/bin/zsh -lc "sed -n '1,220p' src/app/api/check/route.ts" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 43ms:
+import { NextResponse } from "next/server";
+import { CheckRequestSchema } from "@/lib/validators";
+import { readUsdtBlacklistStatusOnChain } from "@/lib/tron";
+import { checkTronScanUsdtBlacklist } from "@/lib/tronscan";
+
+export const runtime = "nodejs";
+
+type Evidence = {
+  contractAddress: string;
+  txHash?: string;
+  timestampIso?: string;
+  method?: string;
+  raw?: string;
+  fullHost?: string;
+};
+
+type CheckResult =
+  | { ok: true; blacklisted: boolean; evidence?: Evidence }
+  | { ok: false; blacklisted: false; error: string };
+
+exec
+/bin/zsh -lc 'ls -la src/app/api' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 56ms:
+total 0
+drwxr-xr-x@  7 chiko  staff  224 Jan 23 16:44 .
+drwxr-xr-x@ 10 chiko  staff  320 Jan 23 05:55 ..
+drwxr-xr-x@  3 chiko  staff   96 Jan 21 23:11 analyze
+drwxr-xr-x@  3 chiko  staff   96 Jan 21 18:18 check
+drwxr-xr-x@  4 chiko  staff  128 Jan 23 15:25 saved-reports
+drwxr-xr-x@  3 chiko  staff   96 Jan 23 05:33 user-settings
+drwxr-xr-x@  4 chiko  staff  128 Jan 23 16:44 watchlist
+exec
+/bin/zsh -lc "rg -n \"requireAuth|auth\\(|clerk|currentUser|userId|isSignedIn|SignedIn|SignedOut\" src/app/api -S" in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 67ms:
+src/app/api/watchlist/[id]/route.ts:3:import { auth } from "@clerk/nextjs/server";
+src/app/api/watchlist/[id]/route.ts:16:    const { userId } = await auth();
+src/app/api/watchlist/[id]/route.ts:17:    return userId ?? null;
+src/app/api/watchlist/[id]/route.ts:24:  const userId = await getAuthenticatedUserId();
+src/app/api/watchlist/[id]/route.ts:25:  if (!userId) {
+src/app/api/watchlist/[id]/route.ts:40:  const deleted = await deleteWatchlistItemById(db, userId, parsedId.data);
+src/app/api/saved-reports/[id]/route.ts:3:import { auth } from "@clerk/nextjs/server";
+src/app/api/saved-reports/[id]/route.ts:16:    const { userId } = await auth();
+src/app/api/saved-reports/[id]/route.ts:17:    return userId ?? null;
+src/app/api/saved-reports/[id]/route.ts:24:  const userId = await getAuthenticatedUserId();
+src/app/api/saved-reports/[id]/route.ts:25:  if (!userId) {
+src/app/api/saved-reports/[id]/route.ts:40:  const report = await getSavedReportById(db, userId, parsedId.data);
+src/app/api/saved-reports/[id]/route.ts:55:  const userId = await getAuthenticatedUserId();
+src/app/api/saved-reports/[id]/route.ts:56:  if (!userId) {
+src/app/api/saved-reports/[id]/route.ts:71:  const deleted = await deleteSavedReportById(db, userId, parsedId.data);
+src/app/api/user-settings/route.ts:2:import { auth } from "@clerk/nextjs/server";
+src/app/api/user-settings/route.ts:17:    const { userId } = await auth();
+src/app/api/user-settings/route.ts:18:    return userId ?? null;
+src/app/api/user-settings/route.ts:25:  const userId = await getAuthenticatedUserId();
+src/app/api/user-settings/route.ts:26:  if (!userId) {
+

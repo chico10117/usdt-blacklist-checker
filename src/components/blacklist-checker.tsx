@@ -1,10 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/nextjs";
+import { SignedIn, useAuth } from "@clerk/nextjs";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -20,7 +18,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,6 +53,7 @@ type ApiResponse = {
   address: string;
   isValid: boolean;
   access?: { authenticated: boolean };
+  balance?: { ok: true; usdt: string; usdtBaseUnits: string } | { ok: false; error: string };
   checks: {
     tronscan: CheckResult;
     onchain: CheckResult;
@@ -709,68 +707,23 @@ export function BlacklistChecker() {
     Boolean(load.data.checks?.volume && "ok" in load.data.checks.volume && load.data.checks.volume.ok === false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
-      {/* Subtle gradient orb decoration */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-[40%] left-1/2 h-[80%] w-[80%] -translate-x-1/2 rounded-full bg-gradient-to-br from-primary/5 via-transparent to-transparent blur-3xl" />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-3 items-center px-4 py-5 sm:px-6 sm:py-6">
-        {/* Left: Logo */}
-        <div className="relative flex h-20 w-20 items-center justify-center">
-          <Image
-            src="/logo1.png"
-            alt="Chikocorp TRON Security"
-            width={100}
-            height={100}
-            className="h-20 w-20 object-contain rounded-xl"
-            priority
+    <div className="space-y-8">
+      {clerkEnabled && (
+        <SignedIn>
+          <SignedInAutoRerun
+            enabled={clerkEnabled}
+            normalizedAddress={normalizedAddress}
+            shouldRerun={isValid && shouldAutoRerunAfterSignIn}
+            onRerun={(addr) => {
+              toast.message("Signed in — loading enhanced checks…");
+              runCheck(addr);
+            }}
           />
-          <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
-        </div>
-        {/* Center: Text */}
-        <div className="text-center">
-          <div className="text-2xl font-semibold tracking-tight">Tron wallet blacklist checker</div>
-          <div className="text-xs text-muted-foreground">TRON Security by Chikocorp</div>
-        </div>
-        {/* Right: Theme Toggle */}
-        <div className="flex justify-end gap-3">
-          {clerkEnabled && (
-            <>
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <Button type="button" variant="outline" size="sm">
-                    Sign in
-                  </Button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-            </>
-          )}
-          <ThemeToggle />
-        </div>
-      </header>
+        </SignedIn>
+      )}
 
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
-        {clerkEnabled && (
-          <SignedIn>
-            <SignedInAutoRerun
-              enabled={clerkEnabled}
-              normalizedAddress={normalizedAddress}
-              shouldRerun={isValid && shouldAutoRerunAfterSignIn}
-              onRerun={(addr) => {
-                toast.message("Signed in — loading enhanced checks…");
-                runCheck(addr);
-              }}
-            />
-          </SignedIn>
-        )}
-
-        {/* Hero Section */}
-        <section className="mx-auto max-w-2xl pt-4 text-center sm:pt-8">
+      {/* Hero Section */}
+      <section className="mx-auto max-w-2xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -950,37 +903,6 @@ export function BlacklistChecker() {
           </Card>
         </motion.section>
 
-        {clerkEnabled && (
-          <SignedIn>
-            <motion.section
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.18 }}
-              className="mx-auto mt-4 max-w-2xl"
-            >
-              <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Account</CardTitle>
-                  <CardDescription>
-                    Configure privacy defaults and opt in to saving screening history.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-foreground">Privacy &amp; history</div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      Saving screening history is off by default. Manage this in Settings.
-                    </div>
-                  </div>
-                  <Button type="button" variant="outline" size="sm" asChild>
-                    <Link href="/settings">Open Settings</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.section>
-          </SignedIn>
-        )}
-
         {/* Results Section */}
         <section className="mx-auto mt-8 max-w-5xl">
           <AnimatePresence mode="wait">
@@ -1064,6 +986,30 @@ export function BlacklistChecker() {
               >
                 {/* Status Banner */}
                 <StatusBanner data={load.data} />
+
+                {/* USDT Balance - Prominent Display */}
+                {load.data.balance?.ok && (
+                  <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
+                    <Card className="overflow-hidden border-border/60 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/30 dark:to-teal-950/30">
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-4">
+                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
+                              <span className="text-xl font-bold">₮</span>
+                            </div>
+                            <div>
+                              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">USDT Balance</div>
+                              <div className="mt-1 text-3xl font-bold tracking-tight text-foreground">
+                                {Number(load.data.balance.usdt).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                              </div>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="shrink-0 bg-background/60">TRC-20</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
 
                 {clerkEnabled && (
                   <SignedIn>
@@ -1626,41 +1572,23 @@ export function BlacklistChecker() {
           </AnimatePresence>
         </section>
 
-        {/* Footer */}
-        <footer className="mx-auto mt-16 max-w-4xl border-t border-border/60 pt-8">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex h-12 w-12 items-center justify-center">
-              <Image
-                src="/logo1.png"
-                alt="Chikocorp"
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain opacity-60"
-              />
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Informational only; not legal advice. Always verify with official sources.
-              </p>
-              <p className="text-sm font-medium text-foreground">
-                Never share seed phrases or private keys.
-              </p>
-            </div>
-            <Separator className="my-2 w-16 bg-border/60" />
-            <p className="text-sm text-muted-foreground">
-              Created by{" "}
-              <a
-                className="font-medium text-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:decoration-primary"
-                href="https://www.instagram.com/chikocryptocr/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Chikocorp
-              </a>
-            </p>
-          </div>
-        </footer>
-      </main>
+        {/* Footer disclaimer */}
+        <div className="mx-auto mt-12 max-w-2xl border-t border-border/60 pt-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            Informational only; not legal advice. Never share seed phrases or private keys.
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Created by{" "}
+            <a
+              className="font-medium text-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:decoration-primary"
+              href="https://www.instagram.com/chikocryptocr/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Chikocorp
+            </a>
+          </p>
+        </div>
     </div>
   );
 }
