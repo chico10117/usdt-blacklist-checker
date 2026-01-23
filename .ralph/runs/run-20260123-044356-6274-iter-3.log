@@ -25075,4 +25075,2498 @@ thinking
 
 I need to commit these changes now and account for the modified run log due to more outputs. I’ll stage everything with `git add -A` and then commit with a message that indicates it's a chore. Something like `chore: record US-003 progress` sounds appropriate, and I should include a summary of the run as well. I’ll make sure everything is properly documented in this single commit.
 exec
+/bin/zsh -lc 'git add -A' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 89ms:
+
+file update:
+diff --git a/.ralph/activity.log b/.ralph/activity.log
+index f959a8f21b3b22be80db68efad96920378290905..fff6e07f7f10b6c98f5235ec77a9f88b60980555
+--- a/.ralph/activity.log
++++ b/.ralph/activity.log
+@@ -1,6 +1,7 @@
+ # Activity Log
+ 
+ ## Run Summary
++- 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
+ - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
+ - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
+ 
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index cd8706c11bf2cb8fcf1656449856cea0be008edd..6cda47c95c4ad9b7037a9c37a8b808da4fcb89a3
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -78,3 +78,46 @@
+   - `loggingEnabled` currently exists only as a client-side localStorage key; server-side persistence remains to be implemented.
+   - API routes explicitly run in `nodejs`, so a Postgres + Drizzle approach should avoid Edge-only assumptions.
+ ---
++
++## [2026-01-23 05:24] - US-003: [P2] Implement schema: user settings + saved reports + watchlist
++Thread: 019be944-302d-71d3-8a23-91587249b79d
++Run: 20260123-044356-6274 (iteration 3)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: 6e30910 feat(db): add address hashing and scoped queries
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - ralph
++  - src/lib/db/index.ts
++  - src/lib/db/schema.ts
++  - src/lib/db/address-hash.ts
++  - src/lib/db/user-settings.ts
++  - src/lib/db/saved-reports.ts
++  - src/lib/db/watchlist.ts
++  - src/lib/db/address-hash.test.ts
++  - src/lib/db/scoped-queries.test.ts
++  - src/lib/db/migrations/0001_overrated_plazm.sql
++  - src/lib/db/migrations/meta/0001_snapshot.json
++  - src/lib/db/migrations/meta/_journal.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-044356-6274-3.md
++  - .ralph/.tmp/story-20260123-044356-6274-3.json
++  - .ralph/.tmp/story-20260123-044356-6274-3.md
++  - .ralph/runs/run-20260123-044356-6274-iter-2.md
++  - .ralph/runs/run-20260123-044356-6274-iter-3.log
++  - .agents/tasks/prd-post-mvp.json
++- What was implemented
++  - Added `ADDRESS_HASH_KEY` HMAC hashing (`addressHash`) and scoped DB query helpers that always filter by `userId`.
++  - Added a `watchlist_items.user_id -> user_settings.user_id` FK (cascade delete) and migration.
++  - Added unit tests covering keyed hashing and query scoping (negative-case cross-user access).
++- **Learnings for future iterations:**
++  - Including `userId` in the HMAC input prevents cross-user correlation even if an `addressHash` leaks.
++  - Drizzle query builders can be tested offline by inspecting `.toSQL()` output (no DB required).
++---
+diff --git a/.ralph/runs/run-20260123-044356-6274-iter-3.md b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..10ae1c5431f229a896693c5d6854f9fd808b7fa1
+--- /dev/null
++++ b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+@@ -0,0 +1,43 @@
++# Ralph Run Summary
++
++- Run ID: 20260123-044356-6274
++- Iteration: 3
++- Mode: build
++- Story: US-003: [P2] Implement schema: user settings + saved reports + watchlist
++- Started: 2026-01-23 05:11:58
++- Ended: 2026-01-23 05:25:20
++- Duration: 802s
++- Status: success
++- Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++
++## Git
++- Head (before): b95c29191c6ded926c05e02e0f0149b3bbf94c0c
++- Head (after): 6e30910a876a7c06ae5c13726637a5cce7380308
++
++### Commits
++- 6e30910 feat(db): add address hashing and scoped queries
++
++### Changed Files (commits)
++- .agents/tasks/prd-post-mvp.json
++- .ralph/.tmp/prompt-20260123-044356-6274-3.md
++- .ralph/.tmp/story-20260123-044356-6274-3.json
++- .ralph/.tmp/story-20260123-044356-6274-3.md
++- .ralph/activity.log
++- .ralph/errors.log
++- .ralph/runs/run-20260123-044356-6274-iter-2.md
++- .ralph/runs/run-20260123-044356-6274-iter-3.log
++- ralph
++- src/lib/db/address-hash.test.ts
++- src/lib/db/address-hash.ts
++- src/lib/db/index.ts
++- src/lib/db/migrations/0001_overrated_plazm.sql
++- src/lib/db/migrations/meta/0001_snapshot.json
++- src/lib/db/migrations/meta/_journal.json
++- src/lib/db/saved-reports.ts
++- src/lib/db/schema.ts
++- src/lib/db/scoped-queries.test.ts
++- src/lib/db/user-settings.ts
++- src/lib/db/watchlist.ts
++
++### Uncommitted Changes
++- none
+diff --git a/ralph b/ralph
+new file mode 100755
+index 0000000000000000000000000000000000000000..3e5e92cb879aa5e096679b380b6500632873d57a
+--- /dev/null
++++ b/ralph
+@@ -0,0 +1,15 @@
++#!/bin/bash
++set -euo pipefail
++
++ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++
++cmd="${1:-}"
++shift || true
++
++if [ "$cmd" = "log" ]; then
++  exec "$ROOT_DIR/.agents/ralph/log-activity.sh" "$@"
++fi
++
++echo "Usage: $0 log \"message\"" >&2
++exit 1
++
+diff --git a/src/lib/db/address-hash.test.ts b/src/lib/db/address-hash.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..50d88d81d2f198b075431187c50e7f2fcafbecf0
+--- /dev/null
++++ b/src/lib/db/address-hash.test.ts
+@@ -0,0 +1,39 @@
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import { computeAddressHash, normalizeAddress } from "@/lib/db/address-hash";
++
++describe("address hashing", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  it("normalizes by trimming", () => {
++    expect(normalizeAddress("  T123  ")).toBe("T123");
++  });
++
++  it("is deterministic for the same user+address", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_1", "T123");
++    expect(a).toBe(b);
++    expect(a).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it("differs across users for the same address (no collisions)", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_2", "T123");
++    expect(a).not.toBe(b);
++  });
++
++  it("requires a secret key", () => {
++    delete process.env.ADDRESS_HASH_KEY;
++    expect(() => computeAddressHash("user_1", "T123")).toThrow(/ADDRESS_HASH_KEY/);
++  });
++});
++
+diff --git a/src/lib/db/address-hash.ts b/src/lib/db/address-hash.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..30ede62398de7697d91c70d6517fd1ac87a801b7
+--- /dev/null
++++ b/src/lib/db/address-hash.ts
+@@ -0,0 +1,20 @@
++import "server-only";
++
++import { createHmac } from "crypto";
++
++function requireAddressHashKey(): string {
++  const key = process.env.ADDRESS_HASH_KEY;
++  if (!key) throw new Error("Persistence is disabled (ADDRESS_HASH_KEY not set).");
++  return key;
++}
++
++export function normalizeAddress(address: string): string {
++  return address.trim();
++}
++
++export function computeAddressHash(userId: string, address: string): string {
++  const key = requireAddressHashKey();
++  const normalizedAddress = normalizeAddress(address);
++  return createHmac("sha256", key).update(`${userId}:${normalizedAddress}`, "utf8").digest("hex");
++}
++
+diff --git a/src/lib/db/index.ts b/src/lib/db/index.ts
+index ee715a263b530b357f29a7b3f1bcb4d948d7f27b..8e738c63323d3b627d3f615365974e8f19a99f48
+--- a/src/lib/db/index.ts
++++ b/src/lib/db/index.ts
+@@ -5,7 +5,7 @@
+ 
+ import * as schema from "@/lib/db/schema";
+ 
+-type DbClient = ReturnType<typeof createDbClient>;
++export type DbClient = ReturnType<typeof createDbClient>;
+ 
+ function createDbClient(databaseUrl: string) {
+   const sql = postgres(databaseUrl, {
+@@ -34,4 +34,3 @@
+ }
+ 
+ export { schema };
+-
+diff --git a/src/lib/db/saved-reports.ts b/src/lib/db/saved-reports.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a2056569f03c40ddb096fb62f83fe413f146d7f
+--- /dev/null
++++ b/src/lib/db/saved-reports.ts
+@@ -0,0 +1,70 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type SavedReportCreateInput = {
++  address: string;
++  riskScore: number;
++  riskTier: string;
++  confidence: number;
++  window: unknown;
++  reportJson: unknown;
++};
++
++export function buildGetSavedReportByIdQuery(db: DbClient, userId: string, reportId: string) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.id, reportId)))
++    .limit(1);
++}
++
++export async function getSavedReportById(db: DbClient, userId: string, reportId: string) {
++  const rows = await buildGetSavedReportByIdQuery(db, userId, reportId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListSavedReportsQuery(db: DbClient, userId: string, limit = 50) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(eq(schema.savedReports.userId, userId))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export function buildListSavedReportsForAddressQuery(db: DbClient, userId: string, address: string, limit = 50) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.addressHash, addressHash)))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export async function createSavedReport(db: DbClient, userId: string, input: SavedReportCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.savedReports)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      riskScore: input.riskScore,
++      riskTier: input.riskTier,
++      confidence: input.confidence,
++      window: input.window,
++      reportJson: input.reportJson,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/schema.ts b/src/lib/db/schema.ts
+index 21248fa093a1421b9f5e6ec02aa45540446eef41..7ae506a9f9b4e6947eb2a1a01c083724df4d1722
+--- a/src/lib/db/schema.ts
++++ b/src/lib/db/schema.ts
+@@ -33,7 +33,9 @@
+   "watchlist_items",
+   {
+     id: uuid("id").primaryKey().defaultRandom(),
+-    userId: text("user_id").notNull(),
++    userId: text("user_id")
++      .notNull()
++      .references(() => userSettings.userId, { onDelete: "cascade" }),
+     address: text("address").notNull(),
+     addressHash: text("address_hash").notNull(),
+     label: text("label"),
+diff --git a/src/lib/db/scoped-queries.test.ts b/src/lib/db/scoped-queries.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a82889dd19d926ff77427d81febc77c5ead8c91
+--- /dev/null
++++ b/src/lib/db/scoped-queries.test.ts
+@@ -0,0 +1,57 @@
++import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import postgres from "postgres";
++import { drizzle } from "drizzle-orm/postgres-js";
++
++import { buildGetSavedReportByIdQuery, buildListSavedReportsForAddressQuery } from "@/lib/db/saved-reports";
++import { buildGetWatchlistItemByIdQuery, buildListWatchlistItemsForAddressQuery } from "@/lib/db/watchlist";
++import * as schema from "@/lib/db/schema";
++
++describe("scoped queries", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  const sqlClient = postgres("postgres://user:pass@127.0.0.1:5432/db", {
++    max: 1,
++    connect_timeout: 1,
++    idle_timeout: 0,
++  });
++  const db = drizzle(sqlClient, { schema });
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  afterAll(async () => {
++    await sqlClient.end({ timeout: 0 });
++  });
++
++  it("always scopes saved report lookups by userId + id", () => {
++    const { sql } = buildGetSavedReportByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes saved report lookups by userId + addressHash", () => {
++    const { sql } = buildListSavedReportsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."address_hash"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + id", () => {
++    const { sql } = buildGetWatchlistItemByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + addressHash", () => {
++    const { sql } = buildListWatchlistItemsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."address_hash"\s*=\s*\$/);
++  });
++});
++
+diff --git a/src/lib/db/user-settings.ts b/src/lib/db/user-settings.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9766648a5c375d4d4dee5fc8ed8b051c8ce1932
+--- /dev/null
++++ b/src/lib/db/user-settings.ts
+@@ -0,0 +1,33 @@
++import "server-only";
++
++import { eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { schema } from "@/lib/db";
++
++export function buildGetUserSettingsQuery(db: DbClient, userId: string) {
++  return db.select().from(schema.userSettings).where(eq(schema.userSettings.userId, userId)).limit(1);
++}
++
++export async function getUserSettings(db: DbClient, userId: string) {
++  const rows = await buildGetUserSettingsQuery(db, userId).execute();
++  return rows[0] ?? null;
++}
++
++export async function upsertUserSettings(db: DbClient, userId: string, loggingEnabled: boolean) {
++  const rows = await db
++    .insert(schema.userSettings)
++    .values({ userId, loggingEnabled })
++    .onConflictDoUpdate({
++      target: schema.userSettings.userId,
++      set: {
++        loggingEnabled,
++        updatedAt: new Date(),
++      },
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/watchlist.ts b/src/lib/db/watchlist.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f32cff47614c9269662290f951b1b1714aea1eb5
+--- /dev/null
++++ b/src/lib/db/watchlist.ts
+@@ -0,0 +1,62 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type WatchlistItemCreateInput = {
++  address: string;
++  label?: string | null;
++};
++
++export function buildGetWatchlistItemByIdQuery(db: DbClient, userId: string, itemId: string) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.id, itemId)))
++    .limit(1);
++}
++
++export async function getWatchlistItemById(db: DbClient, userId: string, itemId: string) {
++  const rows = await buildGetWatchlistItemByIdQuery(db, userId, itemId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListWatchlistItemsQuery(db: DbClient, userId: string, limit = 200) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(eq(schema.watchlistItems.userId, userId))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export function buildListWatchlistItemsForAddressQuery(db: DbClient, userId: string, address: string, limit = 200) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.addressHash, addressHash)))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export async function createWatchlistItem(db: DbClient, userId: string, input: WatchlistItemCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.watchlistItems)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      label: input.label ?? null,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+
+exec
+/bin/zsh -lc 'git commit -m "chore(ralph): record US-003 progress" -m "- Append US-003 progress entry
+- Add iter-3 run summary
+- Update activity log run summary/events
+- Capture final iter-3 run log
+
+Reference: US-003"' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 92ms:
+[main 19c0ce5] chore(ralph): record US-003 progress
+ 4 files changed, 12916 insertions(+)
+ create mode 100644 .ralph/runs/run-20260123-044356-6274-iter-3.md
+file update:
+diff --git a/.ralph/activity.log b/.ralph/activity.log
+index f959a8f21b3b22be80db68efad96920378290905..fff6e07f7f10b6c98f5235ec77a9f88b60980555
+--- a/.ralph/activity.log
++++ b/.ralph/activity.log
+@@ -1,6 +1,7 @@
+ # Activity Log
+ 
+ ## Run Summary
++- 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
+ - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
+ - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
+ 
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index cd8706c11bf2cb8fcf1656449856cea0be008edd..6cda47c95c4ad9b7037a9c37a8b808da4fcb89a3
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -78,3 +78,46 @@
+   - `loggingEnabled` currently exists only as a client-side localStorage key; server-side persistence remains to be implemented.
+   - API routes explicitly run in `nodejs`, so a Postgres + Drizzle approach should avoid Edge-only assumptions.
+ ---
++
++## [2026-01-23 05:24] - US-003: [P2] Implement schema: user settings + saved reports + watchlist
++Thread: 019be944-302d-71d3-8a23-91587249b79d
++Run: 20260123-044356-6274 (iteration 3)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: 6e30910 feat(db): add address hashing and scoped queries
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - ralph
++  - src/lib/db/index.ts
++  - src/lib/db/schema.ts
++  - src/lib/db/address-hash.ts
++  - src/lib/db/user-settings.ts
++  - src/lib/db/saved-reports.ts
++  - src/lib/db/watchlist.ts
++  - src/lib/db/address-hash.test.ts
++  - src/lib/db/scoped-queries.test.ts
++  - src/lib/db/migrations/0001_overrated_plazm.sql
++  - src/lib/db/migrations/meta/0001_snapshot.json
++  - src/lib/db/migrations/meta/_journal.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-044356-6274-3.md
++  - .ralph/.tmp/story-20260123-044356-6274-3.json
++  - .ralph/.tmp/story-20260123-044356-6274-3.md
++  - .ralph/runs/run-20260123-044356-6274-iter-2.md
++  - .ralph/runs/run-20260123-044356-6274-iter-3.log
++  - .agents/tasks/prd-post-mvp.json
++- What was implemented
++  - Added `ADDRESS_HASH_KEY` HMAC hashing (`addressHash`) and scoped DB query helpers that always filter by `userId`.
++  - Added a `watchlist_items.user_id -> user_settings.user_id` FK (cascade delete) and migration.
++  - Added unit tests covering keyed hashing and query scoping (negative-case cross-user access).
++- **Learnings for future iterations:**
++  - Including `userId` in the HMAC input prevents cross-user correlation even if an `addressHash` leaks.
++  - Drizzle query builders can be tested offline by inspecting `.toSQL()` output (no DB required).
++---
+diff --git a/.ralph/runs/run-20260123-044356-6274-iter-3.md b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..10ae1c5431f229a896693c5d6854f9fd808b7fa1
+--- /dev/null
++++ b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+@@ -0,0 +1,43 @@
++# Ralph Run Summary
++
++- Run ID: 20260123-044356-6274
++- Iteration: 3
++- Mode: build
++- Story: US-003: [P2] Implement schema: user settings + saved reports + watchlist
++- Started: 2026-01-23 05:11:58
++- Ended: 2026-01-23 05:25:20
++- Duration: 802s
++- Status: success
++- Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++
++## Git
++- Head (before): b95c29191c6ded926c05e02e0f0149b3bbf94c0c
++- Head (after): 6e30910a876a7c06ae5c13726637a5cce7380308
++
++### Commits
++- 6e30910 feat(db): add address hashing and scoped queries
++
++### Changed Files (commits)
++- .agents/tasks/prd-post-mvp.json
++- .ralph/.tmp/prompt-20260123-044356-6274-3.md
++- .ralph/.tmp/story-20260123-044356-6274-3.json
++- .ralph/.tmp/story-20260123-044356-6274-3.md
++- .ralph/activity.log
++- .ralph/errors.log
++- .ralph/runs/run-20260123-044356-6274-iter-2.md
++- .ralph/runs/run-20260123-044356-6274-iter-3.log
++- ralph
++- src/lib/db/address-hash.test.ts
++- src/lib/db/address-hash.ts
++- src/lib/db/index.ts
++- src/lib/db/migrations/0001_overrated_plazm.sql
++- src/lib/db/migrations/meta/0001_snapshot.json
++- src/lib/db/migrations/meta/_journal.json
++- src/lib/db/saved-reports.ts
++- src/lib/db/schema.ts
++- src/lib/db/scoped-queries.test.ts
++- src/lib/db/user-settings.ts
++- src/lib/db/watchlist.ts
++
++### Uncommitted Changes
++- none
+diff --git a/ralph b/ralph
+new file mode 100755
+index 0000000000000000000000000000000000000000..3e5e92cb879aa5e096679b380b6500632873d57a
+--- /dev/null
++++ b/ralph
+@@ -0,0 +1,15 @@
++#!/bin/bash
++set -euo pipefail
++
++ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++
++cmd="${1:-}"
++shift || true
++
++if [ "$cmd" = "log" ]; then
++  exec "$ROOT_DIR/.agents/ralph/log-activity.sh" "$@"
++fi
++
++echo "Usage: $0 log \"message\"" >&2
++exit 1
++
+diff --git a/src/lib/db/address-hash.test.ts b/src/lib/db/address-hash.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..50d88d81d2f198b075431187c50e7f2fcafbecf0
+--- /dev/null
++++ b/src/lib/db/address-hash.test.ts
+@@ -0,0 +1,39 @@
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import { computeAddressHash, normalizeAddress } from "@/lib/db/address-hash";
++
++describe("address hashing", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  it("normalizes by trimming", () => {
++    expect(normalizeAddress("  T123  ")).toBe("T123");
++  });
++
++  it("is deterministic for the same user+address", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_1", "T123");
++    expect(a).toBe(b);
++    expect(a).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it("differs across users for the same address (no collisions)", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_2", "T123");
++    expect(a).not.toBe(b);
++  });
++
++  it("requires a secret key", () => {
++    delete process.env.ADDRESS_HASH_KEY;
++    expect(() => computeAddressHash("user_1", "T123")).toThrow(/ADDRESS_HASH_KEY/);
++  });
++});
++
+diff --git a/src/lib/db/address-hash.ts b/src/lib/db/address-hash.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..30ede62398de7697d91c70d6517fd1ac87a801b7
+--- /dev/null
++++ b/src/lib/db/address-hash.ts
+@@ -0,0 +1,20 @@
++import "server-only";
++
++import { createHmac } from "crypto";
++
++function requireAddressHashKey(): string {
++  const key = process.env.ADDRESS_HASH_KEY;
++  if (!key) throw new Error("Persistence is disabled (ADDRESS_HASH_KEY not set).");
++  return key;
++}
++
++export function normalizeAddress(address: string): string {
++  return address.trim();
++}
++
++export function computeAddressHash(userId: string, address: string): string {
++  const key = requireAddressHashKey();
++  const normalizedAddress = normalizeAddress(address);
++  return createHmac("sha256", key).update(`${userId}:${normalizedAddress}`, "utf8").digest("hex");
++}
++
+diff --git a/src/lib/db/index.ts b/src/lib/db/index.ts
+index ee715a263b530b357f29a7b3f1bcb4d948d7f27b..8e738c63323d3b627d3f615365974e8f19a99f48
+--- a/src/lib/db/index.ts
++++ b/src/lib/db/index.ts
+@@ -5,7 +5,7 @@
+ 
+ import * as schema from "@/lib/db/schema";
+ 
+-type DbClient = ReturnType<typeof createDbClient>;
++export type DbClient = ReturnType<typeof createDbClient>;
+ 
+ function createDbClient(databaseUrl: string) {
+   const sql = postgres(databaseUrl, {
+@@ -34,4 +34,3 @@
+ }
+ 
+ export { schema };
+-
+diff --git a/src/lib/db/saved-reports.ts b/src/lib/db/saved-reports.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a2056569f03c40ddb096fb62f83fe413f146d7f
+--- /dev/null
++++ b/src/lib/db/saved-reports.ts
+@@ -0,0 +1,70 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type SavedReportCreateInput = {
++  address: string;
++  riskScore: number;
++  riskTier: string;
++  confidence: number;
++  window: unknown;
++  reportJson: unknown;
++};
++
++export function buildGetSavedReportByIdQuery(db: DbClient, userId: string, reportId: string) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.id, reportId)))
++    .limit(1);
++}
++
++export async function getSavedReportById(db: DbClient, userId: string, reportId: string) {
++  const rows = await buildGetSavedReportByIdQuery(db, userId, reportId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListSavedReportsQuery(db: DbClient, userId: string, limit = 50) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(eq(schema.savedReports.userId, userId))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export function buildListSavedReportsForAddressQuery(db: DbClient, userId: string, address: string, limit = 50) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.addressHash, addressHash)))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export async function createSavedReport(db: DbClient, userId: string, input: SavedReportCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.savedReports)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      riskScore: input.riskScore,
++      riskTier: input.riskTier,
++      confidence: input.confidence,
++      window: input.window,
++      reportJson: input.reportJson,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/schema.ts b/src/lib/db/schema.ts
+index 21248fa093a1421b9f5e6ec02aa45540446eef41..7ae506a9f9b4e6947eb2a1a01c083724df4d1722
+--- a/src/lib/db/schema.ts
++++ b/src/lib/db/schema.ts
+@@ -33,7 +33,9 @@
+   "watchlist_items",
+   {
+     id: uuid("id").primaryKey().defaultRandom(),
+-    userId: text("user_id").notNull(),
++    userId: text("user_id")
++      .notNull()
++      .references(() => userSettings.userId, { onDelete: "cascade" }),
+     address: text("address").notNull(),
+     addressHash: text("address_hash").notNull(),
+     label: text("label"),
+diff --git a/src/lib/db/scoped-queries.test.ts b/src/lib/db/scoped-queries.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a82889dd19d926ff77427d81febc77c5ead8c91
+--- /dev/null
++++ b/src/lib/db/scoped-queries.test.ts
+@@ -0,0 +1,57 @@
++import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import postgres from "postgres";
++import { drizzle } from "drizzle-orm/postgres-js";
++
++import { buildGetSavedReportByIdQuery, buildListSavedReportsForAddressQuery } from "@/lib/db/saved-reports";
++import { buildGetWatchlistItemByIdQuery, buildListWatchlistItemsForAddressQuery } from "@/lib/db/watchlist";
++import * as schema from "@/lib/db/schema";
++
++describe("scoped queries", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  const sqlClient = postgres("postgres://user:pass@127.0.0.1:5432/db", {
++    max: 1,
++    connect_timeout: 1,
++    idle_timeout: 0,
++  });
++  const db = drizzle(sqlClient, { schema });
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  afterAll(async () => {
++    await sqlClient.end({ timeout: 0 });
++  });
++
++  it("always scopes saved report lookups by userId + id", () => {
++    const { sql } = buildGetSavedReportByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes saved report lookups by userId + addressHash", () => {
++    const { sql } = buildListSavedReportsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."address_hash"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + id", () => {
++    const { sql } = buildGetWatchlistItemByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + addressHash", () => {
++    const { sql } = buildListWatchlistItemsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."address_hash"\s*=\s*\$/);
++  });
++});
++
+diff --git a/src/lib/db/user-settings.ts b/src/lib/db/user-settings.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9766648a5c375d4d4dee5fc8ed8b051c8ce1932
+--- /dev/null
++++ b/src/lib/db/user-settings.ts
+@@ -0,0 +1,33 @@
++import "server-only";
++
++import { eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { schema } from "@/lib/db";
++
++export function buildGetUserSettingsQuery(db: DbClient, userId: string) {
++  return db.select().from(schema.userSettings).where(eq(schema.userSettings.userId, userId)).limit(1);
++}
++
++export async function getUserSettings(db: DbClient, userId: string) {
++  const rows = await buildGetUserSettingsQuery(db, userId).execute();
++  return rows[0] ?? null;
++}
++
++export async function upsertUserSettings(db: DbClient, userId: string, loggingEnabled: boolean) {
++  const rows = await db
++    .insert(schema.userSettings)
++    .values({ userId, loggingEnabled })
++    .onConflictDoUpdate({
++      target: schema.userSettings.userId,
++      set: {
++        loggingEnabled,
++        updatedAt: new Date(),
++      },
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/watchlist.ts b/src/lib/db/watchlist.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f32cff47614c9269662290f951b1b1714aea1eb5
+--- /dev/null
++++ b/src/lib/db/watchlist.ts
+@@ -0,0 +1,62 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type WatchlistItemCreateInput = {
++  address: string;
++  label?: string | null;
++};
++
++export function buildGetWatchlistItemByIdQuery(db: DbClient, userId: string, itemId: string) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.id, itemId)))
++    .limit(1);
++}
++
++export async function getWatchlistItemById(db: DbClient, userId: string, itemId: string) {
++  const rows = await buildGetWatchlistItemByIdQuery(db, userId, itemId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListWatchlistItemsQuery(db: DbClient, userId: string, limit = 200) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(eq(schema.watchlistItems.userId, userId))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export function buildListWatchlistItemsForAddressQuery(db: DbClient, userId: string, address: string, limit = 200) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.addressHash, addressHash)))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export async function createWatchlistItem(db: DbClient, userId: string, input: WatchlistItemCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.watchlistItems)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      label: input.label ?? null,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+
+exec
+/bin/zsh -lc 'git status --porcelain' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 93ms:
+ M .ralph/runs/run-20260123-044356-6274-iter-3.log
+file update:
+diff --git a/.ralph/activity.log b/.ralph/activity.log
+index f959a8f21b3b22be80db68efad96920378290905..fff6e07f7f10b6c98f5235ec77a9f88b60980555
+--- a/.ralph/activity.log
++++ b/.ralph/activity.log
+@@ -1,6 +1,7 @@
+ # Activity Log
+ 
+ ## Run Summary
++- 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
+ - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
+ - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
+ 
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index cd8706c11bf2cb8fcf1656449856cea0be008edd..6cda47c95c4ad9b7037a9c37a8b808da4fcb89a3
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -78,3 +78,46 @@
+   - `loggingEnabled` currently exists only as a client-side localStorage key; server-side persistence remains to be implemented.
+   - API routes explicitly run in `nodejs`, so a Postgres + Drizzle approach should avoid Edge-only assumptions.
+ ---
++
++## [2026-01-23 05:24] - US-003: [P2] Implement schema: user settings + saved reports + watchlist
++Thread: 019be944-302d-71d3-8a23-91587249b79d
++Run: 20260123-044356-6274 (iteration 3)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: 6e30910 feat(db): add address hashing and scoped queries
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - ralph
++  - src/lib/db/index.ts
++  - src/lib/db/schema.ts
++  - src/lib/db/address-hash.ts
++  - src/lib/db/user-settings.ts
++  - src/lib/db/saved-reports.ts
++  - src/lib/db/watchlist.ts
++  - src/lib/db/address-hash.test.ts
++  - src/lib/db/scoped-queries.test.ts
++  - src/lib/db/migrations/0001_overrated_plazm.sql
++  - src/lib/db/migrations/meta/0001_snapshot.json
++  - src/lib/db/migrations/meta/_journal.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-044356-6274-3.md
++  - .ralph/.tmp/story-20260123-044356-6274-3.json
++  - .ralph/.tmp/story-20260123-044356-6274-3.md
++  - .ralph/runs/run-20260123-044356-6274-iter-2.md
++  - .ralph/runs/run-20260123-044356-6274-iter-3.log
++  - .agents/tasks/prd-post-mvp.json
++- What was implemented
++  - Added `ADDRESS_HASH_KEY` HMAC hashing (`addressHash`) and scoped DB query helpers that always filter by `userId`.
++  - Added a `watchlist_items.user_id -> user_settings.user_id` FK (cascade delete) and migration.
++  - Added unit tests covering keyed hashing and query scoping (negative-case cross-user access).
++- **Learnings for future iterations:**
++  - Including `userId` in the HMAC input prevents cross-user correlation even if an `addressHash` leaks.
++  - Drizzle query builders can be tested offline by inspecting `.toSQL()` output (no DB required).
++---
+diff --git a/.ralph/runs/run-20260123-044356-6274-iter-3.md b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..10ae1c5431f229a896693c5d6854f9fd808b7fa1
+--- /dev/null
++++ b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+@@ -0,0 +1,43 @@
++# Ralph Run Summary
++
++- Run ID: 20260123-044356-6274
++- Iteration: 3
++- Mode: build
++- Story: US-003: [P2] Implement schema: user settings + saved reports + watchlist
++- Started: 2026-01-23 05:11:58
++- Ended: 2026-01-23 05:25:20
++- Duration: 802s
++- Status: success
++- Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++
++## Git
++- Head (before): b95c29191c6ded926c05e02e0f0149b3bbf94c0c
++- Head (after): 6e30910a876a7c06ae5c13726637a5cce7380308
++
++### Commits
++- 6e30910 feat(db): add address hashing and scoped queries
++
++### Changed Files (commits)
++- .agents/tasks/prd-post-mvp.json
++- .ralph/.tmp/prompt-20260123-044356-6274-3.md
++- .ralph/.tmp/story-20260123-044356-6274-3.json
++- .ralph/.tmp/story-20260123-044356-6274-3.md
++- .ralph/activity.log
++- .ralph/errors.log
++- .ralph/runs/run-20260123-044356-6274-iter-2.md
++- .ralph/runs/run-20260123-044356-6274-iter-3.log
++- ralph
++- src/lib/db/address-hash.test.ts
++- src/lib/db/address-hash.ts
++- src/lib/db/index.ts
++- src/lib/db/migrations/0001_overrated_plazm.sql
++- src/lib/db/migrations/meta/0001_snapshot.json
++- src/lib/db/migrations/meta/_journal.json
++- src/lib/db/saved-reports.ts
++- src/lib/db/schema.ts
++- src/lib/db/scoped-queries.test.ts
++- src/lib/db/user-settings.ts
++- src/lib/db/watchlist.ts
++
++### Uncommitted Changes
++- none
+diff --git a/ralph b/ralph
+new file mode 100755
+index 0000000000000000000000000000000000000000..3e5e92cb879aa5e096679b380b6500632873d57a
+--- /dev/null
++++ b/ralph
+@@ -0,0 +1,15 @@
++#!/bin/bash
++set -euo pipefail
++
++ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++
++cmd="${1:-}"
++shift || true
++
++if [ "$cmd" = "log" ]; then
++  exec "$ROOT_DIR/.agents/ralph/log-activity.sh" "$@"
++fi
++
++echo "Usage: $0 log \"message\"" >&2
++exit 1
++
+diff --git a/src/lib/db/address-hash.test.ts b/src/lib/db/address-hash.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..50d88d81d2f198b075431187c50e7f2fcafbecf0
+--- /dev/null
++++ b/src/lib/db/address-hash.test.ts
+@@ -0,0 +1,39 @@
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import { computeAddressHash, normalizeAddress } from "@/lib/db/address-hash";
++
++describe("address hashing", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  it("normalizes by trimming", () => {
++    expect(normalizeAddress("  T123  ")).toBe("T123");
++  });
++
++  it("is deterministic for the same user+address", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_1", "T123");
++    expect(a).toBe(b);
++    expect(a).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it("differs across users for the same address (no collisions)", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_2", "T123");
++    expect(a).not.toBe(b);
++  });
++
++  it("requires a secret key", () => {
++    delete process.env.ADDRESS_HASH_KEY;
++    expect(() => computeAddressHash("user_1", "T123")).toThrow(/ADDRESS_HASH_KEY/);
++  });
++});
++
+diff --git a/src/lib/db/address-hash.ts b/src/lib/db/address-hash.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..30ede62398de7697d91c70d6517fd1ac87a801b7
+--- /dev/null
++++ b/src/lib/db/address-hash.ts
+@@ -0,0 +1,20 @@
++import "server-only";
++
++import { createHmac } from "crypto";
++
++function requireAddressHashKey(): string {
++  const key = process.env.ADDRESS_HASH_KEY;
++  if (!key) throw new Error("Persistence is disabled (ADDRESS_HASH_KEY not set).");
++  return key;
++}
++
++export function normalizeAddress(address: string): string {
++  return address.trim();
++}
++
++export function computeAddressHash(userId: string, address: string): string {
++  const key = requireAddressHashKey();
++  const normalizedAddress = normalizeAddress(address);
++  return createHmac("sha256", key).update(`${userId}:${normalizedAddress}`, "utf8").digest("hex");
++}
++
+diff --git a/src/lib/db/index.ts b/src/lib/db/index.ts
+index ee715a263b530b357f29a7b3f1bcb4d948d7f27b..8e738c63323d3b627d3f615365974e8f19a99f48
+--- a/src/lib/db/index.ts
++++ b/src/lib/db/index.ts
+@@ -5,7 +5,7 @@
+ 
+ import * as schema from "@/lib/db/schema";
+ 
+-type DbClient = ReturnType<typeof createDbClient>;
++export type DbClient = ReturnType<typeof createDbClient>;
+ 
+ function createDbClient(databaseUrl: string) {
+   const sql = postgres(databaseUrl, {
+@@ -34,4 +34,3 @@
+ }
+ 
+ export { schema };
+-
+diff --git a/src/lib/db/saved-reports.ts b/src/lib/db/saved-reports.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a2056569f03c40ddb096fb62f83fe413f146d7f
+--- /dev/null
++++ b/src/lib/db/saved-reports.ts
+@@ -0,0 +1,70 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type SavedReportCreateInput = {
++  address: string;
++  riskScore: number;
++  riskTier: string;
++  confidence: number;
++  window: unknown;
++  reportJson: unknown;
++};
++
++export function buildGetSavedReportByIdQuery(db: DbClient, userId: string, reportId: string) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.id, reportId)))
++    .limit(1);
++}
++
++export async function getSavedReportById(db: DbClient, userId: string, reportId: string) {
++  const rows = await buildGetSavedReportByIdQuery(db, userId, reportId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListSavedReportsQuery(db: DbClient, userId: string, limit = 50) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(eq(schema.savedReports.userId, userId))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export function buildListSavedReportsForAddressQuery(db: DbClient, userId: string, address: string, limit = 50) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.addressHash, addressHash)))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export async function createSavedReport(db: DbClient, userId: string, input: SavedReportCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.savedReports)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      riskScore: input.riskScore,
++      riskTier: input.riskTier,
++      confidence: input.confidence,
++      window: input.window,
++      reportJson: input.reportJson,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/schema.ts b/src/lib/db/schema.ts
+index 21248fa093a1421b9f5e6ec02aa45540446eef41..7ae506a9f9b4e6947eb2a1a01c083724df4d1722
+--- a/src/lib/db/schema.ts
++++ b/src/lib/db/schema.ts
+@@ -33,7 +33,9 @@
+   "watchlist_items",
+   {
+     id: uuid("id").primaryKey().defaultRandom(),
+-    userId: text("user_id").notNull(),
++    userId: text("user_id")
++      .notNull()
++      .references(() => userSettings.userId, { onDelete: "cascade" }),
+     address: text("address").notNull(),
+     addressHash: text("address_hash").notNull(),
+     label: text("label"),
+diff --git a/src/lib/db/scoped-queries.test.ts b/src/lib/db/scoped-queries.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a82889dd19d926ff77427d81febc77c5ead8c91
+--- /dev/null
++++ b/src/lib/db/scoped-queries.test.ts
+@@ -0,0 +1,57 @@
++import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import postgres from "postgres";
++import { drizzle } from "drizzle-orm/postgres-js";
++
++import { buildGetSavedReportByIdQuery, buildListSavedReportsForAddressQuery } from "@/lib/db/saved-reports";
++import { buildGetWatchlistItemByIdQuery, buildListWatchlistItemsForAddressQuery } from "@/lib/db/watchlist";
++import * as schema from "@/lib/db/schema";
++
++describe("scoped queries", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  const sqlClient = postgres("postgres://user:pass@127.0.0.1:5432/db", {
++    max: 1,
++    connect_timeout: 1,
++    idle_timeout: 0,
++  });
++  const db = drizzle(sqlClient, { schema });
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  afterAll(async () => {
++    await sqlClient.end({ timeout: 0 });
++  });
++
++  it("always scopes saved report lookups by userId + id", () => {
++    const { sql } = buildGetSavedReportByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes saved report lookups by userId + addressHash", () => {
++    const { sql } = buildListSavedReportsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."address_hash"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + id", () => {
++    const { sql } = buildGetWatchlistItemByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + addressHash", () => {
++    const { sql } = buildListWatchlistItemsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."address_hash"\s*=\s*\$/);
++  });
++});
++
+diff --git a/src/lib/db/user-settings.ts b/src/lib/db/user-settings.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9766648a5c375d4d4dee5fc8ed8b051c8ce1932
+--- /dev/null
++++ b/src/lib/db/user-settings.ts
+@@ -0,0 +1,33 @@
++import "server-only";
++
++import { eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { schema } from "@/lib/db";
++
++export function buildGetUserSettingsQuery(db: DbClient, userId: string) {
++  return db.select().from(schema.userSettings).where(eq(schema.userSettings.userId, userId)).limit(1);
++}
++
++export async function getUserSettings(db: DbClient, userId: string) {
++  const rows = await buildGetUserSettingsQuery(db, userId).execute();
++  return rows[0] ?? null;
++}
++
++export async function upsertUserSettings(db: DbClient, userId: string, loggingEnabled: boolean) {
++  const rows = await db
++    .insert(schema.userSettings)
++    .values({ userId, loggingEnabled })
++    .onConflictDoUpdate({
++      target: schema.userSettings.userId,
++      set: {
++        loggingEnabled,
++        updatedAt: new Date(),
++      },
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/watchlist.ts b/src/lib/db/watchlist.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f32cff47614c9269662290f951b1b1714aea1eb5
+--- /dev/null
++++ b/src/lib/db/watchlist.ts
+@@ -0,0 +1,62 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type WatchlistItemCreateInput = {
++  address: string;
++  label?: string | null;
++};
++
++export function buildGetWatchlistItemByIdQuery(db: DbClient, userId: string, itemId: string) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.id, itemId)))
++    .limit(1);
++}
++
++export async function getWatchlistItemById(db: DbClient, userId: string, itemId: string) {
++  const rows = await buildGetWatchlistItemByIdQuery(db, userId, itemId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListWatchlistItemsQuery(db: DbClient, userId: string, limit = 200) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(eq(schema.watchlistItems.userId, userId))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export function buildListWatchlistItemsForAddressQuery(db: DbClient, userId: string, address: string, limit = 200) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.addressHash, addressHash)))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export async function createWatchlistItem(db: DbClient, userId: string, input: WatchlistItemCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.watchlistItems)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      label: input.label ?? null,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+
+
+
+
+
+
+
+
+thinking
+**Evaluating run log dynamics**
+
+I’m pondering how the harness writes the run log after the run ends and whether that could affect the working tree. It seems previous errors indicated uncommitted changes likely resulted from activity logs after the run finished. So, maybe we should only commit after the run ends? The run log could be static from the start, which means it shouldn’t change until we commit it as the final step—no additional writes after that, I think.
+thinking
+**Considering run log modification**
+
+I'm thinking about how the final response might modify the run log. It seems like only tool calls update the file, but the run log captures CLI output, including user instructions and assistant content. So, the final response could also be appended. After we commit, if it adds any new information, it may mark the run log as dirty again. Previous summaries showed uncommitted changes were due to the activity log, so I wonder if tracking the run log after the run is necessary. It seems expected to be committed.
+thinking
+**Addressing run log errors**
+
+I’m considering how leaving the run log modified could cause errors. One option is to make the file read-only to prevent modifications, but that doesn't seem ideal. I could also ignore the run log with git, but that feels a bit drastic. I think the simplest approach is to avoid committing the run log during the run; instead, I’ll commit it once it’s stable at the end. It’s okay that we committed it earlier—I can just recommit the updated version later. For now, I’ll capture the commit hash and subject using `git show ... HEAD`.
+thinking
+**Managing run log modifications**
+
+I'm realizing that running the command to capture the commit hash will modify the run log further, but we can commit again afterward, so that's manageable. I’ll use `git show -s --format="%h %s" HEAD` to record this, which will append to the run log and potentially modify the activity log too. After these final commands, I plan to stage and commit again to get a clean state. It sounds like I should update the progress entry next, ensuring everything is set before the final commit.
+thinking
+**Finalizing the commit process**
+
+I'm grappling with when to capture the commit hash after committing, as the log will get modified by further commands. The plan is to ensure a clean working tree with the final commit, which includes the run log modifications. I need to perform any remaining tool commands, like `git show` for the hash, before the final commit to ensure it captures that information. But I realize running `git show` will append to the run log, potentially making it dirty again unless I commit those changes afterward. I want to make sure everything is sorted before sending the final response.
+thinking
+**Clarifying the commit process**
+
+I’m trying to work out the sequence of commands for committing and capturing the hash. I need to run `git show` before the final commit to capture the hash; otherwise, I’d miss the latest commit info. However, the requirements specify using `git show` after the commit. I realize I can capture the hash from the `git commit` output instead. So I'll commit a temporary change, run `git show` to get the hash from that commit, and then finalize everything in a subsequent commit without issuing more commands after the last one. This keeps everything clean!
+thinking
+**Running the necessary commands**
+
+I’m focusing on meeting the requirement to capture the commit hash and subject. I previously completed commit X as 6e30910 and commit Y as 19c0ce5. It's important to run `git show` now for commit X, even if HEAD points to commit Y. Since the instruction specifies using HEAD, I can interpret it as needing to execute this after the final commit but still manage to fulfill it now. 
+
+So, I’ll run `git show -s --format="%h %s" HEAD`, record the result, and then make the final commit including any necessary run log adjustments. This approach satisfies all steps and keeps everything organized!
+exec
+/bin/zsh -lc 'git show -s --format="%h %s" HEAD' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 85ms:
+19c0ce5 chore(ralph): record US-003 progress
+file update:
+diff --git a/.ralph/activity.log b/.ralph/activity.log
+index f959a8f21b3b22be80db68efad96920378290905..fff6e07f7f10b6c98f5235ec77a9f88b60980555
+--- a/.ralph/activity.log
++++ b/.ralph/activity.log
+@@ -1,6 +1,7 @@
+ # Activity Log
+ 
+ ## Run Summary
++- 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
+ - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
+ - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
+ 
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index cd8706c11bf2cb8fcf1656449856cea0be008edd..6cda47c95c4ad9b7037a9c37a8b808da4fcb89a3
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -78,3 +78,46 @@
+   - `loggingEnabled` currently exists only as a client-side localStorage key; server-side persistence remains to be implemented.
+   - API routes explicitly run in `nodejs`, so a Postgres + Drizzle approach should avoid Edge-only assumptions.
+ ---
++
++## [2026-01-23 05:24] - US-003: [P2] Implement schema: user settings + saved reports + watchlist
++Thread: 019be944-302d-71d3-8a23-91587249b79d
++Run: 20260123-044356-6274 (iteration 3)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: 6e30910 feat(db): add address hashing and scoped queries
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - ralph
++  - src/lib/db/index.ts
++  - src/lib/db/schema.ts
++  - src/lib/db/address-hash.ts
++  - src/lib/db/user-settings.ts
++  - src/lib/db/saved-reports.ts
++  - src/lib/db/watchlist.ts
++  - src/lib/db/address-hash.test.ts
++  - src/lib/db/scoped-queries.test.ts
++  - src/lib/db/migrations/0001_overrated_plazm.sql
++  - src/lib/db/migrations/meta/0001_snapshot.json
++  - src/lib/db/migrations/meta/_journal.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-044356-6274-3.md
++  - .ralph/.tmp/story-20260123-044356-6274-3.json
++  - .ralph/.tmp/story-20260123-044356-6274-3.md
++  - .ralph/runs/run-20260123-044356-6274-iter-2.md
++  - .ralph/runs/run-20260123-044356-6274-iter-3.log
++  - .agents/tasks/prd-post-mvp.json
++- What was implemented
++  - Added `ADDRESS_HASH_KEY` HMAC hashing (`addressHash`) and scoped DB query helpers that always filter by `userId`.
++  - Added a `watchlist_items.user_id -> user_settings.user_id` FK (cascade delete) and migration.
++  - Added unit tests covering keyed hashing and query scoping (negative-case cross-user access).
++- **Learnings for future iterations:**
++  - Including `userId` in the HMAC input prevents cross-user correlation even if an `addressHash` leaks.
++  - Drizzle query builders can be tested offline by inspecting `.toSQL()` output (no DB required).
++---
+diff --git a/.ralph/runs/run-20260123-044356-6274-iter-3.md b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..10ae1c5431f229a896693c5d6854f9fd808b7fa1
+--- /dev/null
++++ b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+@@ -0,0 +1,43 @@
++# Ralph Run Summary
++
++- Run ID: 20260123-044356-6274
++- Iteration: 3
++- Mode: build
++- Story: US-003: [P2] Implement schema: user settings + saved reports + watchlist
++- Started: 2026-01-23 05:11:58
++- Ended: 2026-01-23 05:25:20
++- Duration: 802s
++- Status: success
++- Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++
++## Git
++- Head (before): b95c29191c6ded926c05e02e0f0149b3bbf94c0c
++- Head (after): 6e30910a876a7c06ae5c13726637a5cce7380308
++
++### Commits
++- 6e30910 feat(db): add address hashing and scoped queries
++
++### Changed Files (commits)
++- .agents/tasks/prd-post-mvp.json
++- .ralph/.tmp/prompt-20260123-044356-6274-3.md
++- .ralph/.tmp/story-20260123-044356-6274-3.json
++- .ralph/.tmp/story-20260123-044356-6274-3.md
++- .ralph/activity.log
++- .ralph/errors.log
++- .ralph/runs/run-20260123-044356-6274-iter-2.md
++- .ralph/runs/run-20260123-044356-6274-iter-3.log
++- ralph
++- src/lib/db/address-hash.test.ts
++- src/lib/db/address-hash.ts
++- src/lib/db/index.ts
++- src/lib/db/migrations/0001_overrated_plazm.sql
++- src/lib/db/migrations/meta/0001_snapshot.json
++- src/lib/db/migrations/meta/_journal.json
++- src/lib/db/saved-reports.ts
++- src/lib/db/schema.ts
++- src/lib/db/scoped-queries.test.ts
++- src/lib/db/user-settings.ts
++- src/lib/db/watchlist.ts
++
++### Uncommitted Changes
++- none
+diff --git a/ralph b/ralph
+new file mode 100755
+index 0000000000000000000000000000000000000000..3e5e92cb879aa5e096679b380b6500632873d57a
+--- /dev/null
++++ b/ralph
+@@ -0,0 +1,15 @@
++#!/bin/bash
++set -euo pipefail
++
++ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++
++cmd="${1:-}"
++shift || true
++
++if [ "$cmd" = "log" ]; then
++  exec "$ROOT_DIR/.agents/ralph/log-activity.sh" "$@"
++fi
++
++echo "Usage: $0 log \"message\"" >&2
++exit 1
++
+diff --git a/src/lib/db/address-hash.test.ts b/src/lib/db/address-hash.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..50d88d81d2f198b075431187c50e7f2fcafbecf0
+--- /dev/null
++++ b/src/lib/db/address-hash.test.ts
+@@ -0,0 +1,39 @@
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import { computeAddressHash, normalizeAddress } from "@/lib/db/address-hash";
++
++describe("address hashing", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  it("normalizes by trimming", () => {
++    expect(normalizeAddress("  T123  ")).toBe("T123");
++  });
++
++  it("is deterministic for the same user+address", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_1", "T123");
++    expect(a).toBe(b);
++    expect(a).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it("differs across users for the same address (no collisions)", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_2", "T123");
++    expect(a).not.toBe(b);
++  });
++
++  it("requires a secret key", () => {
++    delete process.env.ADDRESS_HASH_KEY;
++    expect(() => computeAddressHash("user_1", "T123")).toThrow(/ADDRESS_HASH_KEY/);
++  });
++});
++
+diff --git a/src/lib/db/address-hash.ts b/src/lib/db/address-hash.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..30ede62398de7697d91c70d6517fd1ac87a801b7
+--- /dev/null
++++ b/src/lib/db/address-hash.ts
+@@ -0,0 +1,20 @@
++import "server-only";
++
++import { createHmac } from "crypto";
++
++function requireAddressHashKey(): string {
++  const key = process.env.ADDRESS_HASH_KEY;
++  if (!key) throw new Error("Persistence is disabled (ADDRESS_HASH_KEY not set).");
++  return key;
++}
++
++export function normalizeAddress(address: string): string {
++  return address.trim();
++}
++
++export function computeAddressHash(userId: string, address: string): string {
++  const key = requireAddressHashKey();
++  const normalizedAddress = normalizeAddress(address);
++  return createHmac("sha256", key).update(`${userId}:${normalizedAddress}`, "utf8").digest("hex");
++}
++
+diff --git a/src/lib/db/index.ts b/src/lib/db/index.ts
+index ee715a263b530b357f29a7b3f1bcb4d948d7f27b..8e738c63323d3b627d3f615365974e8f19a99f48
+--- a/src/lib/db/index.ts
++++ b/src/lib/db/index.ts
+@@ -5,7 +5,7 @@
+ 
+ import * as schema from "@/lib/db/schema";
+ 
+-type DbClient = ReturnType<typeof createDbClient>;
++export type DbClient = ReturnType<typeof createDbClient>;
+ 
+ function createDbClient(databaseUrl: string) {
+   const sql = postgres(databaseUrl, {
+@@ -34,4 +34,3 @@
+ }
+ 
+ export { schema };
+-
+diff --git a/src/lib/db/saved-reports.ts b/src/lib/db/saved-reports.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a2056569f03c40ddb096fb62f83fe413f146d7f
+--- /dev/null
++++ b/src/lib/db/saved-reports.ts
+@@ -0,0 +1,70 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type SavedReportCreateInput = {
++  address: string;
++  riskScore: number;
++  riskTier: string;
++  confidence: number;
++  window: unknown;
++  reportJson: unknown;
++};
++
++export function buildGetSavedReportByIdQuery(db: DbClient, userId: string, reportId: string) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.id, reportId)))
++    .limit(1);
++}
++
++export async function getSavedReportById(db: DbClient, userId: string, reportId: string) {
++  const rows = await buildGetSavedReportByIdQuery(db, userId, reportId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListSavedReportsQuery(db: DbClient, userId: string, limit = 50) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(eq(schema.savedReports.userId, userId))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export function buildListSavedReportsForAddressQuery(db: DbClient, userId: string, address: string, limit = 50) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.addressHash, addressHash)))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export async function createSavedReport(db: DbClient, userId: string, input: SavedReportCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.savedReports)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      riskScore: input.riskScore,
++      riskTier: input.riskTier,
++      confidence: input.confidence,
++      window: input.window,
++      reportJson: input.reportJson,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/schema.ts b/src/lib/db/schema.ts
+index 21248fa093a1421b9f5e6ec02aa45540446eef41..7ae506a9f9b4e6947eb2a1a01c083724df4d1722
+--- a/src/lib/db/schema.ts
++++ b/src/lib/db/schema.ts
+@@ -33,7 +33,9 @@
+   "watchlist_items",
+   {
+     id: uuid("id").primaryKey().defaultRandom(),
+-    userId: text("user_id").notNull(),
++    userId: text("user_id")
++      .notNull()
++      .references(() => userSettings.userId, { onDelete: "cascade" }),
+     address: text("address").notNull(),
+     addressHash: text("address_hash").notNull(),
+     label: text("label"),
+diff --git a/src/lib/db/scoped-queries.test.ts b/src/lib/db/scoped-queries.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a82889dd19d926ff77427d81febc77c5ead8c91
+--- /dev/null
++++ b/src/lib/db/scoped-queries.test.ts
+@@ -0,0 +1,57 @@
++import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import postgres from "postgres";
++import { drizzle } from "drizzle-orm/postgres-js";
++
++import { buildGetSavedReportByIdQuery, buildListSavedReportsForAddressQuery } from "@/lib/db/saved-reports";
++import { buildGetWatchlistItemByIdQuery, buildListWatchlistItemsForAddressQuery } from "@/lib/db/watchlist";
++import * as schema from "@/lib/db/schema";
++
++describe("scoped queries", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  const sqlClient = postgres("postgres://user:pass@127.0.0.1:5432/db", {
++    max: 1,
++    connect_timeout: 1,
++    idle_timeout: 0,
++  });
++  const db = drizzle(sqlClient, { schema });
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  afterAll(async () => {
++    await sqlClient.end({ timeout: 0 });
++  });
++
++  it("always scopes saved report lookups by userId + id", () => {
++    const { sql } = buildGetSavedReportByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes saved report lookups by userId + addressHash", () => {
++    const { sql } = buildListSavedReportsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."address_hash"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + id", () => {
++    const { sql } = buildGetWatchlistItemByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + addressHash", () => {
++    const { sql } = buildListWatchlistItemsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."address_hash"\s*=\s*\$/);
++  });
++});
++
+diff --git a/src/lib/db/user-settings.ts b/src/lib/db/user-settings.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9766648a5c375d4d4dee5fc8ed8b051c8ce1932
+--- /dev/null
++++ b/src/lib/db/user-settings.ts
+@@ -0,0 +1,33 @@
++import "server-only";
++
++import { eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { schema } from "@/lib/db";
++
++export function buildGetUserSettingsQuery(db: DbClient, userId: string) {
++  return db.select().from(schema.userSettings).where(eq(schema.userSettings.userId, userId)).limit(1);
++}
++
++export async function getUserSettings(db: DbClient, userId: string) {
++  const rows = await buildGetUserSettingsQuery(db, userId).execute();
++  return rows[0] ?? null;
++}
++
++export async function upsertUserSettings(db: DbClient, userId: string, loggingEnabled: boolean) {
++  const rows = await db
++    .insert(schema.userSettings)
++    .values({ userId, loggingEnabled })
++    .onConflictDoUpdate({
++      target: schema.userSettings.userId,
++      set: {
++        loggingEnabled,
++        updatedAt: new Date(),
++      },
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/watchlist.ts b/src/lib/db/watchlist.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f32cff47614c9269662290f951b1b1714aea1eb5
+--- /dev/null
++++ b/src/lib/db/watchlist.ts
+@@ -0,0 +1,62 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type WatchlistItemCreateInput = {
++  address: string;
++  label?: string | null;
++};
++
++export function buildGetWatchlistItemByIdQuery(db: DbClient, userId: string, itemId: string) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.id, itemId)))
++    .limit(1);
++}
++
++export async function getWatchlistItemById(db: DbClient, userId: string, itemId: string) {
++  const rows = await buildGetWatchlistItemByIdQuery(db, userId, itemId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListWatchlistItemsQuery(db: DbClient, userId: string, limit = 200) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(eq(schema.watchlistItems.userId, userId))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export function buildListWatchlistItemsForAddressQuery(db: DbClient, userId: string, address: string, limit = 200) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.addressHash, addressHash)))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export async function createWatchlistItem(db: DbClient, userId: string, input: WatchlistItemCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.watchlistItems)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      label: input.label ?? null,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+
+
+thinking
+**Checking git status**
+
+Alright, I’m thinking about running a log check and then a `git status`. I know that checking the status will slightly modify the run log too. It’s important to make sure everything's clean at the end. So, I plan to do a final `git status` before the final commit, even though that will update the run log again. I guess I'll just include everything in that final commit anyway.
+exec
+/bin/zsh -lc 'git status --porcelain' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 65ms:
+ M .ralph/runs/run-20260123-044356-6274-iter-3.log
+file update:
+diff --git a/.ralph/activity.log b/.ralph/activity.log
+index f959a8f21b3b22be80db68efad96920378290905..fff6e07f7f10b6c98f5235ec77a9f88b60980555
+--- a/.ralph/activity.log
++++ b/.ralph/activity.log
+@@ -1,6 +1,7 @@
+ # Activity Log
+ 
+ ## Run Summary
++- 2026-01-23 05:25:20 | run=20260123-044356-6274 | iter=3 | mode=build | story=US-003 | duration=802s | status=success
+ - 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
+ - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
+ 
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index cd8706c11bf2cb8fcf1656449856cea0be008edd..6cda47c95c4ad9b7037a9c37a8b808da4fcb89a3
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -78,3 +78,46 @@
+   - `loggingEnabled` currently exists only as a client-side localStorage key; server-side persistence remains to be implemented.
+   - API routes explicitly run in `nodejs`, so a Postgres + Drizzle approach should avoid Edge-only assumptions.
+ ---
++
++## [2026-01-23 05:24] - US-003: [P2] Implement schema: user settings + saved reports + watchlist
++Thread: 019be944-302d-71d3-8a23-91587249b79d
++Run: 20260123-044356-6274 (iteration 3)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: 6e30910 feat(db): add address hashing and scoped queries
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - ralph
++  - src/lib/db/index.ts
++  - src/lib/db/schema.ts
++  - src/lib/db/address-hash.ts
++  - src/lib/db/user-settings.ts
++  - src/lib/db/saved-reports.ts
++  - src/lib/db/watchlist.ts
++  - src/lib/db/address-hash.test.ts
++  - src/lib/db/scoped-queries.test.ts
++  - src/lib/db/migrations/0001_overrated_plazm.sql
++  - src/lib/db/migrations/meta/0001_snapshot.json
++  - src/lib/db/migrations/meta/_journal.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-044356-6274-3.md
++  - .ralph/.tmp/story-20260123-044356-6274-3.json
++  - .ralph/.tmp/story-20260123-044356-6274-3.md
++  - .ralph/runs/run-20260123-044356-6274-iter-2.md
++  - .ralph/runs/run-20260123-044356-6274-iter-3.log
++  - .agents/tasks/prd-post-mvp.json
++- What was implemented
++  - Added `ADDRESS_HASH_KEY` HMAC hashing (`addressHash`) and scoped DB query helpers that always filter by `userId`.
++  - Added a `watchlist_items.user_id -> user_settings.user_id` FK (cascade delete) and migration.
++  - Added unit tests covering keyed hashing and query scoping (negative-case cross-user access).
++- **Learnings for future iterations:**
++  - Including `userId` in the HMAC input prevents cross-user correlation even if an `addressHash` leaks.
++  - Drizzle query builders can be tested offline by inspecting `.toSQL()` output (no DB required).
++---
+diff --git a/.ralph/runs/run-20260123-044356-6274-iter-3.md b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..10ae1c5431f229a896693c5d6854f9fd808b7fa1
+--- /dev/null
++++ b/.ralph/runs/run-20260123-044356-6274-iter-3.md
+@@ -0,0 +1,43 @@
++# Ralph Run Summary
++
++- Run ID: 20260123-044356-6274
++- Iteration: 3
++- Mode: build
++- Story: US-003: [P2] Implement schema: user settings + saved reports + watchlist
++- Started: 2026-01-23 05:11:58
++- Ended: 2026-01-23 05:25:20
++- Duration: 802s
++- Status: success
++- Log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-3.log
++
++## Git
++- Head (before): b95c29191c6ded926c05e02e0f0149b3bbf94c0c
++- Head (after): 6e30910a876a7c06ae5c13726637a5cce7380308
++
++### Commits
++- 6e30910 feat(db): add address hashing and scoped queries
++
++### Changed Files (commits)
++- .agents/tasks/prd-post-mvp.json
++- .ralph/.tmp/prompt-20260123-044356-6274-3.md
++- .ralph/.tmp/story-20260123-044356-6274-3.json
++- .ralph/.tmp/story-20260123-044356-6274-3.md
++- .ralph/activity.log
++- .ralph/errors.log
++- .ralph/runs/run-20260123-044356-6274-iter-2.md
++- .ralph/runs/run-20260123-044356-6274-iter-3.log
++- ralph
++- src/lib/db/address-hash.test.ts
++- src/lib/db/address-hash.ts
++- src/lib/db/index.ts
++- src/lib/db/migrations/0001_overrated_plazm.sql
++- src/lib/db/migrations/meta/0001_snapshot.json
++- src/lib/db/migrations/meta/_journal.json
++- src/lib/db/saved-reports.ts
++- src/lib/db/schema.ts
++- src/lib/db/scoped-queries.test.ts
++- src/lib/db/user-settings.ts
++- src/lib/db/watchlist.ts
++
++### Uncommitted Changes
++- none
+diff --git a/ralph b/ralph
+new file mode 100755
+index 0000000000000000000000000000000000000000..3e5e92cb879aa5e096679b380b6500632873d57a
+--- /dev/null
++++ b/ralph
+@@ -0,0 +1,15 @@
++#!/bin/bash
++set -euo pipefail
++
++ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++
++cmd="${1:-}"
++shift || true
++
++if [ "$cmd" = "log" ]; then
++  exec "$ROOT_DIR/.agents/ralph/log-activity.sh" "$@"
++fi
++
++echo "Usage: $0 log \"message\"" >&2
++exit 1
++
+diff --git a/src/lib/db/address-hash.test.ts b/src/lib/db/address-hash.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..50d88d81d2f198b075431187c50e7f2fcafbecf0
+--- /dev/null
++++ b/src/lib/db/address-hash.test.ts
+@@ -0,0 +1,39 @@
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import { computeAddressHash, normalizeAddress } from "@/lib/db/address-hash";
++
++describe("address hashing", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  it("normalizes by trimming", () => {
++    expect(normalizeAddress("  T123  ")).toBe("T123");
++  });
++
++  it("is deterministic for the same user+address", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_1", "T123");
++    expect(a).toBe(b);
++    expect(a).toMatch(/^[0-9a-f]{64}$/);
++  });
++
++  it("differs across users for the same address (no collisions)", () => {
++    const a = computeAddressHash("user_1", "T123");
++    const b = computeAddressHash("user_2", "T123");
++    expect(a).not.toBe(b);
++  });
++
++  it("requires a secret key", () => {
++    delete process.env.ADDRESS_HASH_KEY;
++    expect(() => computeAddressHash("user_1", "T123")).toThrow(/ADDRESS_HASH_KEY/);
++  });
++});
++
+diff --git a/src/lib/db/address-hash.ts b/src/lib/db/address-hash.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..30ede62398de7697d91c70d6517fd1ac87a801b7
+--- /dev/null
++++ b/src/lib/db/address-hash.ts
+@@ -0,0 +1,20 @@
++import "server-only";
++
++import { createHmac } from "crypto";
++
++function requireAddressHashKey(): string {
++  const key = process.env.ADDRESS_HASH_KEY;
++  if (!key) throw new Error("Persistence is disabled (ADDRESS_HASH_KEY not set).");
++  return key;
++}
++
++export function normalizeAddress(address: string): string {
++  return address.trim();
++}
++
++export function computeAddressHash(userId: string, address: string): string {
++  const key = requireAddressHashKey();
++  const normalizedAddress = normalizeAddress(address);
++  return createHmac("sha256", key).update(`${userId}:${normalizedAddress}`, "utf8").digest("hex");
++}
++
+diff --git a/src/lib/db/index.ts b/src/lib/db/index.ts
+index ee715a263b530b357f29a7b3f1bcb4d948d7f27b..8e738c63323d3b627d3f615365974e8f19a99f48
+--- a/src/lib/db/index.ts
++++ b/src/lib/db/index.ts
+@@ -5,7 +5,7 @@
+ 
+ import * as schema from "@/lib/db/schema";
+ 
+-type DbClient = ReturnType<typeof createDbClient>;
++export type DbClient = ReturnType<typeof createDbClient>;
+ 
+ function createDbClient(databaseUrl: string) {
+   const sql = postgres(databaseUrl, {
+@@ -34,4 +34,3 @@
+ }
+ 
+ export { schema };
+-
+diff --git a/src/lib/db/saved-reports.ts b/src/lib/db/saved-reports.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a2056569f03c40ddb096fb62f83fe413f146d7f
+--- /dev/null
++++ b/src/lib/db/saved-reports.ts
+@@ -0,0 +1,70 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type SavedReportCreateInput = {
++  address: string;
++  riskScore: number;
++  riskTier: string;
++  confidence: number;
++  window: unknown;
++  reportJson: unknown;
++};
++
++export function buildGetSavedReportByIdQuery(db: DbClient, userId: string, reportId: string) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.id, reportId)))
++    .limit(1);
++}
++
++export async function getSavedReportById(db: DbClient, userId: string, reportId: string) {
++  const rows = await buildGetSavedReportByIdQuery(db, userId, reportId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListSavedReportsQuery(db: DbClient, userId: string, limit = 50) {
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(eq(schema.savedReports.userId, userId))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export function buildListSavedReportsForAddressQuery(db: DbClient, userId: string, address: string, limit = 50) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.savedReports)
++    .where(and(eq(schema.savedReports.userId, userId), eq(schema.savedReports.addressHash, addressHash)))
++    .orderBy(desc(schema.savedReports.createdAt))
++    .limit(limit);
++}
++
++export async function createSavedReport(db: DbClient, userId: string, input: SavedReportCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.savedReports)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      riskScore: input.riskScore,
++      riskTier: input.riskTier,
++      confidence: input.confidence,
++      window: input.window,
++      reportJson: input.reportJson,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/schema.ts b/src/lib/db/schema.ts
+index 21248fa093a1421b9f5e6ec02aa45540446eef41..7ae506a9f9b4e6947eb2a1a01c083724df4d1722
+--- a/src/lib/db/schema.ts
++++ b/src/lib/db/schema.ts
+@@ -33,7 +33,9 @@
+   "watchlist_items",
+   {
+     id: uuid("id").primaryKey().defaultRandom(),
+-    userId: text("user_id").notNull(),
++    userId: text("user_id")
++      .notNull()
++      .references(() => userSettings.userId, { onDelete: "cascade" }),
+     address: text("address").notNull(),
+     addressHash: text("address_hash").notNull(),
+     label: text("label"),
+diff --git a/src/lib/db/scoped-queries.test.ts b/src/lib/db/scoped-queries.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a82889dd19d926ff77427d81febc77c5ead8c91
+--- /dev/null
++++ b/src/lib/db/scoped-queries.test.ts
+@@ -0,0 +1,57 @@
++import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import postgres from "postgres";
++import { drizzle } from "drizzle-orm/postgres-js";
++
++import { buildGetSavedReportByIdQuery, buildListSavedReportsForAddressQuery } from "@/lib/db/saved-reports";
++import { buildGetWatchlistItemByIdQuery, buildListWatchlistItemsForAddressQuery } from "@/lib/db/watchlist";
++import * as schema from "@/lib/db/schema";
++
++describe("scoped queries", () => {
++  const originalKey = process.env.ADDRESS_HASH_KEY;
++
++  const sqlClient = postgres("postgres://user:pass@127.0.0.1:5432/db", {
++    max: 1,
++    connect_timeout: 1,
++    idle_timeout: 0,
++  });
++  const db = drizzle(sqlClient, { schema });
++
++  beforeEach(() => {
++    process.env.ADDRESS_HASH_KEY = "test-key";
++  });
++
++  afterEach(() => {
++    if (originalKey) process.env.ADDRESS_HASH_KEY = originalKey;
++    else delete process.env.ADDRESS_HASH_KEY;
++  });
++
++  afterAll(async () => {
++    await sqlClient.end({ timeout: 0 });
++  });
++
++  it("always scopes saved report lookups by userId + id", () => {
++    const { sql } = buildGetSavedReportByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes saved report lookups by userId + addressHash", () => {
++    const { sql } = buildListSavedReportsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"saved_reports"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"saved_reports"\."address_hash"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + id", () => {
++    const { sql } = buildGetWatchlistItemByIdQuery(db, "user_a", "00000000-0000-0000-0000-000000000000").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."id"\s*=\s*\$/);
++  });
++
++  it("always scopes watchlist lookups by userId + addressHash", () => {
++    const { sql } = buildListWatchlistItemsForAddressQuery(db, "user_a", "T123").toSQL();
++    expect(sql).toMatch(/"watchlist_items"\."user_id"\s*=\s*\$/);
++    expect(sql).toMatch(/"watchlist_items"\."address_hash"\s*=\s*\$/);
++  });
++});
++
+diff --git a/src/lib/db/user-settings.ts b/src/lib/db/user-settings.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d9766648a5c375d4d4dee5fc8ed8b051c8ce1932
+--- /dev/null
++++ b/src/lib/db/user-settings.ts
+@@ -0,0 +1,33 @@
++import "server-only";
++
++import { eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { schema } from "@/lib/db";
++
++export function buildGetUserSettingsQuery(db: DbClient, userId: string) {
++  return db.select().from(schema.userSettings).where(eq(schema.userSettings.userId, userId)).limit(1);
++}
++
++export async function getUserSettings(db: DbClient, userId: string) {
++  const rows = await buildGetUserSettingsQuery(db, userId).execute();
++  return rows[0] ?? null;
++}
++
++export async function upsertUserSettings(db: DbClient, userId: string, loggingEnabled: boolean) {
++  const rows = await db
++    .insert(schema.userSettings)
++    .values({ userId, loggingEnabled })
++    .onConflictDoUpdate({
++      target: schema.userSettings.userId,
++      set: {
++        loggingEnabled,
++        updatedAt: new Date(),
++      },
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+diff --git a/src/lib/db/watchlist.ts b/src/lib/db/watchlist.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f32cff47614c9269662290f951b1b1714aea1eb5
+--- /dev/null
++++ b/src/lib/db/watchlist.ts
+@@ -0,0 +1,62 @@
++import "server-only";
++
++import { and, desc, eq } from "drizzle-orm";
++
++import type { DbClient } from "@/lib/db";
++import { computeAddressHash } from "@/lib/db/address-hash";
++import { schema } from "@/lib/db";
++
++export type WatchlistItemCreateInput = {
++  address: string;
++  label?: string | null;
++};
++
++export function buildGetWatchlistItemByIdQuery(db: DbClient, userId: string, itemId: string) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.id, itemId)))
++    .limit(1);
++}
++
++export async function getWatchlistItemById(db: DbClient, userId: string, itemId: string) {
++  const rows = await buildGetWatchlistItemByIdQuery(db, userId, itemId).execute();
++  return rows[0] ?? null;
++}
++
++export function buildListWatchlistItemsQuery(db: DbClient, userId: string, limit = 200) {
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(eq(schema.watchlistItems.userId, userId))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export function buildListWatchlistItemsForAddressQuery(db: DbClient, userId: string, address: string, limit = 200) {
++  const addressHash = computeAddressHash(userId, address);
++  return db
++    .select()
++    .from(schema.watchlistItems)
++    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.addressHash, addressHash)))
++    .orderBy(desc(schema.watchlistItems.createdAt))
++    .limit(limit);
++}
++
++export async function createWatchlistItem(db: DbClient, userId: string, input: WatchlistItemCreateInput) {
++  const addressHash = computeAddressHash(userId, input.address);
++
++  const rows = await db
++    .insert(schema.watchlistItems)
++    .values({
++      userId,
++      address: input.address,
++      addressHash,
++      label: input.label ?? null,
++    })
++    .returning()
++    .execute();
++
++  return rows[0] ?? null;
++}
++
+
+
+thinking
+**Finalizing the run log**
+
+I'm running the log modifications now, which feels like a good step forward. I'll stage everything and commit the changes with the message `chore(ralph): finalize iter-3 run log`. After that, I need to remember not to call any tools for the final answer. It seems like I'm in a good spot here, and I'm ready to proceed with the final steps!
+exec
 /bin/zsh -lc 'git add -A' in /Users/chiko/side_projects/usdt_blacklisted_web
