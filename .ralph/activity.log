@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 05:11:56 | run=20260123-044356-6274 | iter=2 | mode=build | story=US-002 | duration=957s | status=success
 - 2026-01-23 04:55:57 | run=20260123-044356-6274 | iter=1 | mode=build | story=US-001 | duration=721s | status=success
 
 ## Events
@@ -20,3 +21,9 @@
 [2026-01-23 05:04:33] Verification complete: pnpm lint/test/build PASS (build verified without DATABASE_URL)
 [2026-01-23 05:10:03] Appended US-002 progress entry
 [2026-01-23 05:11:12] Wrote run summary for iter 2
+[2026-01-23 05:11:56] ITERATION 2 end (duration=957s)
+[2026-01-23 05:11:58] ITERATION 3 start (mode=build story=US-003)
+[2026-01-23 05:13:15] US-003 start: implement schema for user_settings, saved_reports, watchlist_items
+[2026-01-23 05:17:21] US-003: added address hash util and watchlist FK migration
+[2026-01-23 05:18:59] US-003: added scoped DB query helpers and unit tests for hashing/query scoping
+[2026-01-23 05:19:38] US-003: verification complete (pnpm lint/test/build)

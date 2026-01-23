@@ -153,7 +153,7 @@
     {
       "id": "US-002",
       "title": "[P2] Add DB/ORM setup, migrations workflow, and connection safety",
-      "status": "open",
+      "status": "done",
       "dependsOn": [
         "US-001"
       ],
@@ -165,12 +165,15 @@
         "Ensure DB initialization is server-only and does not run on the client bundle.",
         "Example: Running the migration command against a local Postgres succeeds and creates tables.",
         "Negative case: Running `pnpm build` without `DATABASE_URL` does not crash; DB-backed features are gated/disabled."
-      ]
+      ],
+      "updatedAt": "2026-01-23T05:11:56.469415+00:00",
+      "completedAt": "2026-01-23T05:11:56.469528+00:00",
+      "startedAt": "2026-01-23T05:11:56.469530+00:00"
     },
     {
       "id": "US-003",
       "title": "[P2] Implement schema: user settings + saved reports + watchlist",
-      "status": "open",
+      "status": "in_progress",
       "dependsOn": [
         "US-002"
       ],
@@ -181,7 +184,10 @@
         "Include a keyed-hash strategy for `addressHash` (no plain SHA256 without a secret).",
         "Example: Two different users can save the same address without collisions (rows are scoped by userId).",
         "Negative case: Attempting to query another user\u2019s data by id/address is blocked at the query layer (always filter by authenticated userId)."
-      ]
+      ],
+      "startedAt": "2026-01-23T05:11:58.613523+00:00",
+      "completedAt": null,
+      "updatedAt": "2026-01-23T05:11:58.613711+00:00"
     },
     {
       "id": "US-004",

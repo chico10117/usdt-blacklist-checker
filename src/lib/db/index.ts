@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 
 import * as schema from "@/lib/db/schema";
 
-type DbClient = ReturnType<typeof createDbClient>;
+export type DbClient = ReturnType<typeof createDbClient>;
 
 function createDbClient(databaseUrl: string) {
   const sql = postgres(databaseUrl, {
@@ -34,4 +34,3 @@ export function requireDb(): DbClient {
 }
 
 export { schema };
-

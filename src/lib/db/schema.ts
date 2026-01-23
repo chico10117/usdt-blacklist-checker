@@ -33,7 +33,9 @@ export const watchlistItems = pgTable(
   "watchlist_items",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userSettings.userId, { onDelete: "cascade" }),
     address: text("address").notNull(),
     addressHash: text("address_hash").notNull(),
     label: text("label"),
