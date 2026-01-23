@@ -5,6 +5,41 @@ Started: Fri Jan 23 04:25:26 WET 2026
 - (add reusable patterns here)
 
 ---
+## [2026-01-23 05:40] - US-004: [P2] Add API: user settings (loggingEnabled) with safe defaults
+Thread:
+Run: 20260123-044356-6274 (iteration 4)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-4.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-044356-6274-iter-4.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: 2d89d12 feat(settings): persist loggingEnabled per user
+- Post-commit status: clean
+- Verification:
+  - Command: pnpm lint -> PASS
+  - Command: pnpm test -> PASS
+  - Command: pnpm build -> PASS
+- Files changed:
+  - src/app/api/user-settings/route.ts
+  - middleware.ts
+  - src/__tests__/api-user-settings.test.ts
+  - src/components/blacklist-checker.tsx
+  - .agents/tasks/prd-post-mvp.json
+  - .ralph/activity.log
+  - .ralph/errors.log
+  - .ralph/runs/run-20260123-044356-6274-iter-3.log
+  - .ralph/runs/run-20260123-044356-6274-iter-3.md
+  - .ralph/runs/run-20260123-044356-6274-iter-4.log
+  - .ralph/.tmp/prompt-20260123-044356-6274-4.md
+  - .ralph/.tmp/story-20260123-044356-6274-4.json
+  - .ralph/.tmp/story-20260123-044356-6274-4.md
+- What was implemented
+  - Added `/api/user-settings` GET/PATCH for authenticated users to read/update `loggingEnabled` with default `false` when no row exists.
+  - Ensured unauthenticated requests return 401 and do not create DB rows.
+  - Wired the signed-in UI toggle to persist via the API (and fetch server state on sign-in).
+- **Learnings for future iterations:**
+  - For JSON API routes, prefer returning 401s from the handler (and allow the route through middleware) to avoid redirect responses in fetch callers.
+  - Route-level behavior can be tested offline by mocking Clerk `auth()` and DB adapters.
+---
 
 ## [2026-01-23 05:09] - US-002: [P2] Add DB/ORM setup, migrations workflow, and connection safety
 Thread:
