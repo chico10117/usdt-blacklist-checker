@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { History, Home, LayoutDashboard, Settings, Star } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -28,6 +28,12 @@ function isActivePath(pathname: string, href: string) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
   const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const { user } = useUser();
+
+  // Get user's display name
+  const displayName = user
+    ? user.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.username || user.primaryEmailAddress?.emailAddress || "Account"
+    : "Account";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
@@ -86,30 +92,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             {/* Spacer */}
             <div className="hidden flex-1 md:block" />
-
-            {/* Auth section (mobile hidden, shown in header) */}
-            <div className="hidden border-t border-border/60 px-4 py-3 md:block">
-              {clerkEnabled && (
-                <>
-                  <SignedOut>
-                    <SignInButton mode="modal">
-                      <Button type="button" variant="outline" size="sm" className="w-full">
-                        Sign in
-                      </Button>
-                    </SignInButton>
-                  </SignedOut>
-                  <SignedIn>
-                    <div className="flex items-center gap-2">
-                      <UserButton />
-                      <span className="text-sm text-muted-foreground">Account</span>
-                    </div>
-                  </SignedIn>
-                </>
-              )}
-              {!clerkEnabled && (
-                <div className="text-xs text-muted-foreground">Auth disabled</div>
-              )}
-            </div>
           </div>
         </aside>
 
@@ -123,7 +105,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="hidden md:block" />
             <div className="flex items-center gap-2">
               {clerkEnabled && (
-                <div className="md:hidden">
+                <>
                   <SignedOut>
                     <SignInButton mode="modal">
                       <Button type="button" variant="outline" size="sm">
@@ -132,9 +114,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
-                    <UserButton />
+                    <div className="flex items-center gap-2">
+                      <UserButton />
+                      <span className="hidden text-sm text-muted-foreground md:inline">{displayName}</span>
+                    </div>
                   </SignedIn>
-                </div>
+                </>
               )}
               <ThemeToggle />
             </div>

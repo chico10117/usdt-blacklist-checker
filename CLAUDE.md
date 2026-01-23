@@ -23,6 +23,11 @@ pnpm test             # Run all tests once
 pnpm test:watch       # Run tests in watch mode
 pnpm test:coverage    # Run tests with coverage report
 
+# Database (Drizzle + PostgreSQL)
+pnpm db:generate      # Generate migrations from schema changes
+pnpm db:migrate       # Apply pending migrations
+pnpm db:studio        # Open Drizzle Studio GUI
+
 # Data updates
 pnpm ofac:update      # Refresh OFAC TRON addresses dataset
 ```
@@ -33,6 +38,7 @@ pnpm ofac:update      # Refresh OFAC TRON addresses dataset
 - **Framework**: Next.js 16 (App Router, React 19, TypeScript)
 - **Styling**: Tailwind CSS v4, shadcn/ui components
 - **Auth**: Clerk (optional, gates volume analysis features)
+- **Database**: PostgreSQL + Drizzle ORM (optional, enables persistence)
 - **Blockchain**: TronWeb for on-chain reads
 - **Testing**: Vitest
 - **Package manager**: pnpm
@@ -48,6 +54,15 @@ pnpm ofac:update      # Refresh OFAC TRON addresses dataset
 - OFAC sanctions screening (free)
 - Volume analysis: 7/30/90-day USDT transfer stats (requires auth)
 - Returns 0–100 risk score with tier (`low`/`guarded`/`elevated`/`high`/`severe`)
+
+**`GET/PUT /api/user-settings`** — User preferences (requires auth)
+- Toggle logging/data persistence preferences
+
+**`GET/POST /api/saved-reports`** + **`GET/DELETE /api/saved-reports/[id]`** — Saved reports (requires auth)
+- Persist and retrieve risk analysis results
+
+**`GET/POST /api/watchlist`** + **`GET/PUT/DELETE /api/watchlist/[id]`** — Address watchlist (requires auth)
+- Track addresses of interest with optional labels
 
 ### Key Modules
 
@@ -70,11 +85,18 @@ pnpm ofac:update      # Refresh OFAC TRON addresses dataset
 **`src/lib/validators.ts`** — TRON address validation
 - Base58 decode → 0x41 prefix check → SHA-256 checksum verification
 
+**`src/lib/db/`** — PostgreSQL persistence (Drizzle ORM)
+- `schema.ts` — Tables: `userSettings`, `savedReports`, `watchlistItems`
+- `address-hash.ts` — HMAC-based address hashing for privacy
+- Scoped query modules: `user-settings.ts`, `saved-reports.ts`, `watchlist.ts`
+- Database is optional; features degrade gracefully when `DATABASE_URL` not set
+
 ## Environment Variables
 
 ```bash
-# Optional - improves TronGrid reliability
-TRONGRID_API_KEY=
+# Optional - improves rate limits and reliability
+TRONGRID_API_KEY=   # For on-chain reads (TronWeb/TronGrid)
+TRONSCAN_API_KEY=   # For indexed data (blacklist, transfers, tags)
 
 # Site URL for OG tags
 NEXT_PUBLIC_SITE_URL=https://usdt.chikocorp.com
@@ -84,6 +106,10 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+
+# PostgreSQL (optional - enables persistence features)
+DATABASE_URL=postgresql://...
+ADDRESS_HASH_KEY=  # Required when DB is enabled (for address privacy hashing)
 ```
 
 ## Privacy & Security
@@ -99,3 +125,5 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 - **Consensus Logic**: Only definitive if both methods succeed and agree
 - **Path Aliases**: `@/*` → `./src/*`
 - **Test files**: `src/**/*.test.ts` (Vitest with Node environment)
+- **Address Privacy**: Addresses stored as HMAC hashes (user-scoped) in DB
+- **Optional Persistence**: DB features degrade gracefully; core blacklist checking works without DB

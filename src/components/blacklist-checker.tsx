@@ -543,7 +543,8 @@ function SaveReportControl({ report }: { report: ApiResponse }) {
   }, [isLoaded, isSignedIn]);
 
   if (!report.access?.authenticated) return null;
-  if (!settings?.persistenceAvailable || !settings.loggingEnabled) return null;
+
+  const canSave = Boolean(settings?.persistenceAvailable && settings.loggingEnabled);
 
   async function saveReport() {
     if (saveState.state === "saving" || saveState.state === "saved") return;
@@ -584,8 +585,15 @@ function SaveReportControl({ report }: { report: ApiResponse }) {
           <div className="min-w-0">
             <div className="text-sm font-medium text-foreground">Save this report</div>
             <div className="mt-1 text-sm text-muted-foreground">Stores this analysis under your account history.</div>
+            {!settings && <div className="mt-1 text-xs text-muted-foreground">Checking save settings…</div>}
+            {settings && !settings.persistenceAvailable && (
+              <div className="mt-1 text-xs text-muted-foreground">Report saving is unavailable on this deployment.</div>
+            )}
+            {settings?.persistenceAvailable && settings && !settings.loggingEnabled && (
+              <div className="mt-1 text-xs text-muted-foreground">Enable report saving in Settings to use this button.</div>
+            )}
           </div>
-          <Button type="button" size="sm" onClick={saveReport} disabled={saving || saved}>
+          <Button type="button" size="sm" onClick={saveReport} disabled={saving || saved || !canSave}>
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -609,6 +617,14 @@ function SaveReportControl({ report }: { report: ApiResponse }) {
 /* ────────────────────────────────────────────────────────────────────────────
  * Main Component
  * ──────────────────────────────────────────────────────────────────────────── */
+
+// Helper to format volume amounts to 2 decimal places
+function formatVolumeAmount(amountStr: string): string {
+  // Remove thousand separators, parse as number, format to 2 decimals, then add separators back
+  const num = parseFloat(amountStr.replace(/,/g, ""));
+  if (isNaN(num)) return amountStr;
+  return num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 export function BlacklistChecker() {
   const m = getMessages("en");
@@ -884,7 +900,7 @@ export function BlacklistChecker() {
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
                   >
-                    {truncateAddress(USDT_TRC20_CONTRACT, 6, 4)}
+                    {USDT_TRC20_CONTRACT}
                     <ExternalLink className="h-3 w-3" />
                   </a>
                   <InlineCopyButton value={USDT_TRC20_CONTRACT} />
@@ -1202,28 +1218,28 @@ export function BlacklistChecker() {
                             <div className="rounded-lg bg-background/60 p-3">
                               <div className="text-xs font-medium text-muted-foreground">7 days</div>
                               <div className="mt-1 text-sm text-foreground">
-                                In: {load.data.checks.volume.stats.windows.d7.inbound.amount} ({load.data.checks.volume.stats.windows.d7.inbound.txCount})
+                                In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d7.inbound.amount)} ({load.data.checks.volume.stats.windows.d7.inbound.txCount})
                               </div>
                               <div className="text-sm text-foreground">
-                                Out: {load.data.checks.volume.stats.windows.d7.outbound.amount} ({load.data.checks.volume.stats.windows.d7.outbound.txCount})
+                                Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d7.outbound.amount)} ({load.data.checks.volume.stats.windows.d7.outbound.txCount})
                               </div>
                             </div>
                             <div className="rounded-lg bg-background/60 p-3">
                               <div className="text-xs font-medium text-muted-foreground">30 days</div>
                               <div className="mt-1 text-sm text-foreground">
-                                In: {load.data.checks.volume.stats.windows.d30.inbound.amount} ({load.data.checks.volume.stats.windows.d30.inbound.txCount})
+                                In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d30.inbound.amount)} ({load.data.checks.volume.stats.windows.d30.inbound.txCount})
                               </div>
                               <div className="text-sm text-foreground">
-                                Out: {load.data.checks.volume.stats.windows.d30.outbound.amount} ({load.data.checks.volume.stats.windows.d30.outbound.txCount})
+                                Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d30.outbound.amount)} ({load.data.checks.volume.stats.windows.d30.outbound.txCount})
                               </div>
                             </div>
                             <div className="rounded-lg bg-background/60 p-3">
                               <div className="text-xs font-medium text-muted-foreground">90 days</div>
                               <div className="mt-1 text-sm text-foreground">
-                                In: {load.data.checks.volume.stats.windows.d90.inbound.amount} ({load.data.checks.volume.stats.windows.d90.inbound.txCount})
+                                In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d90.inbound.amount)} ({load.data.checks.volume.stats.windows.d90.inbound.txCount})
                               </div>
                               <div className="text-sm text-foreground">
-                                Out: {load.data.checks.volume.stats.windows.d90.outbound.amount} ({load.data.checks.volume.stats.windows.d90.outbound.txCount})
+                                Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d90.outbound.amount)} ({load.data.checks.volume.stats.windows.d90.outbound.txCount})
                               </div>
                             </div>
                           </div>

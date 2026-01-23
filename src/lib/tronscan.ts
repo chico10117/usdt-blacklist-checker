@@ -18,22 +18,62 @@ function withFetchTimeout(timeoutMs: number) {
   return { controller, timeout };
 }
 
+function getTronScanHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    accept: "application/json",
+    "user-agent": "usdt_blacklisted_web/1.0",
+  };
+  const apiKey = process.env.TRONSCAN_API_KEY?.trim();
+  if (apiKey) {
+    headers["TRON-PRO-API-KEY"] = apiKey;
+  }
+  return headers;
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function fetchTronScanJson(url: string, timeoutMs = 8_000): Promise<unknown> {
   const cacheKey = sha256Key(["tronscan_json", url]);
   return await getOrSetCache(cacheKey, 30_000, async () => {
-    const { controller, timeout } = withFetchTimeout(timeoutMs);
-    try {
-      const res = await fetch(url, {
-        method: "GET",
-        headers: { accept: "application/json", "user-agent": "usdt_blacklisted_web/1.0" },
-        signal: controller.signal,
-        cache: "no-store",
-      });
-      if (!res.ok) throw new Error(`Upstream returned ${res.status}`);
-      return await res.json();
-    } finally {
-      clearTimeout(timeout);
+    const maxRetries = 3;
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const { controller, timeout } = withFetchTimeout(timeoutMs);
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          headers: getTronScanHeaders(),
+          signal: controller.signal,
+          cache: "no-store",
+        });
+
+        if (res.status === 429) {
+          clearTimeout(timeout);
+          const retryAfter = res.headers.get("Retry-After");
+          const delayMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : (attempt + 1) * 1000;
+          if (attempt < maxRetries - 1) {
+            await sleep(Math.min(delayMs, 5000));
+            continue;
+          }
+          throw new Error("Upstream returned 429");
+        }
+
+        if (!res.ok) throw new Error(`Upstream returned ${res.status}`);
+        return await res.json();
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        if (lastError.name === "AbortError" || attempt >= maxRetries - 1) {
+          throw lastError;
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
     }
+
+    throw lastError ?? new Error("Fetch failed");
   });
 }
 
