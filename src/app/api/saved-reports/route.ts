@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import { getDb } from "@/lib/db";
-import { createSavedReport } from "@/lib/db/saved-reports";
+import { createSavedReport, deleteAllSavedReportsForUser, listSavedReportsSummary } from "@/lib/db/saved-reports";
 import { getUserSettings } from "@/lib/db/user-settings";
 import { TronAddressSchema } from "@/lib/validators";
 
@@ -60,6 +60,33 @@ async function getAuthenticatedUserId(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+export async function GET(request: Request) {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Persistence is disabled." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const url = new URL(request.url);
+  const limitRaw = url.searchParams.get("limit");
+  const limit = clampInt(limitRaw ? Number(limitRaw) : 50, 1, 100);
+
+  const reports = await listSavedReportsSummary(db, userId, limit);
+  return NextResponse.json(
+    {
+      reports: reports.map((r) => ({
+        ...r,
+        createdAt: r.createdAt.toISOString(),
+      })),
+    },
+    { status: 200, headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function POST(request: Request) {
@@ -127,4 +154,19 @@ export async function POST(request: Request) {
     { id: created.id, createdAt: created.createdAt },
     { status: 200, headers: { "Cache-Control": "no-store" } },
   );
+}
+
+export async function DELETE() {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const db = getDb();
+  if (!db) {
+    return NextResponse.json({ error: "Persistence is disabled." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const deletedCount = await deleteAllSavedReportsForUser(db, userId);
+  return NextResponse.json({ deletedCount }, { status: 200, headers: { "Cache-Control": "no-store" } });
 }

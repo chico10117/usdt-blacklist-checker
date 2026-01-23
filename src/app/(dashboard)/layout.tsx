@@ -18,6 +18,9 @@ export default function DashboardLayout({
             </Link>
             <Separator orientation="vertical" className="h-5 bg-border/60" />
             <nav className="flex items-center gap-4 text-sm">
+              <Link href="/history" className="font-medium text-foreground">
+                History
+              </Link>
               <Link href="/settings" className="font-medium text-foreground">
                 Settings
               </Link>
@@ -32,4 +35,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-

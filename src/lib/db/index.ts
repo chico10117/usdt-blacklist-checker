@@ -4,11 +4,13 @@ import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 
 import * as schema from "@/lib/db/schema";
+import { getDatabaseUrlFromEnv, normalizeDatabaseUrl } from "@/lib/db/database-url";
 
 export type DbClient = ReturnType<typeof createDbClient>;
 
 function createDbClient(databaseUrl: string) {
-  const sql = postgres(databaseUrl, {
+  const normalizedUrl = normalizeDatabaseUrl(databaseUrl);
+  const sql = postgres(normalizedUrl, {
     max: process.env.NODE_ENV === "production" ? 10 : 1,
   });
 
@@ -20,7 +22,7 @@ const globalForDb = globalThis as unknown as {
 };
 
 export function getDb(): DbClient | null {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = getDatabaseUrlFromEnv();
   if (!databaseUrl) return null;
 
   if (!globalForDb.dbClient) globalForDb.dbClient = createDbClient(databaseUrl);

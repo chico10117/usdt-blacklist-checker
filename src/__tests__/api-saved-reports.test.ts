@@ -10,7 +10,9 @@ const getUserSettings = vi.fn();
 vi.mock("@/lib/db/user-settings", () => ({ getUserSettings }));
 
 const createSavedReport = vi.fn();
-vi.mock("@/lib/db/saved-reports", () => ({ createSavedReport }));
+const listSavedReportsSummary = vi.fn();
+const deleteAllSavedReportsForUser = vi.fn();
+vi.mock("@/lib/db/saved-reports", () => ({ createSavedReport, listSavedReportsSummary, deleteAllSavedReportsForUser }));
 
 const VALID_ADDRESS = "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb";
 
