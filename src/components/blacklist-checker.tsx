@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { SignedIn, useAuth } from "@clerk/nextjs";
 import {
@@ -629,10 +630,19 @@ function formatVolumeAmount(amountStr: string): string {
 export function BlacklistChecker() {
   const m = getMessages("en");
   const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const searchParams = useSearchParams();
 
   const [address, setAddress] = React.useState("");
   const [validation, setValidation] = React.useState<ReturnType<typeof validateTronAddress> | null>(null);
   const [load, setLoad] = React.useState<LoadState>({ state: "idle" });
+
+  // Pre-fill address from URL params (e.g., from watchlist link)
+  React.useEffect(() => {
+    const addressParam = searchParams.get("address");
+    if (addressParam && !address) {
+      setAddress(addressParam);
+    }
+  }, [searchParams, address]);
 
   React.useEffect(() => {
     const handle = window.setTimeout(() => {

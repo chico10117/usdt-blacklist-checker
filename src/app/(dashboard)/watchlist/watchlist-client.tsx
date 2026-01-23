@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -202,12 +203,17 @@ export function WatchlistClient() {
                 <div key={item.id} className="p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      {item.label && (
-                        <div className="font-semibold text-foreground">{item.label}</div>
-                      )}
-                      <div className={item.label ? "text-sm text-muted-foreground" : "font-medium text-foreground"}>
-                        {truncateAddress(item.address)}
-                      </div>
+                      <Link
+                        href={`/?address=${encodeURIComponent(item.address)}`}
+                        className="group block"
+                      >
+                        {item.label && (
+                          <div className="font-semibold text-foreground group-hover:text-primary transition-colors">{item.label}</div>
+                        )}
+                        <div className={`${item.label ? "text-sm text-muted-foreground" : "font-medium text-foreground"} group-hover:text-primary transition-colors`}>
+                          {truncateAddress(item.address)}
+                        </div>
+                      </Link>
                       <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
                         {item.usdtBalance !== null && (
                           <span className="inline-flex items-center gap-1">
