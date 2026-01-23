@@ -91,3 +91,4 @@
 [2026-01-23 16:30:31] US-008 browser verification: abandoned :3001 server due to Clerk secretKey error; will verify using existing Clerk-enabled dev server/profile
 [2026-01-23 16:32:15] US-008 browser verified: dashboard sidebar nav works (/overview,/history,/watchlist,/settings), active-route styling via aria-current, and signed-out /overview redirects to /sign-in (screenshots in /Users/chiko/.codex/skills/dev-browser/tmp/)
 [2026-01-23 16:32:47] US-008 re-verification: pnpm lint/test/build passed after final tweaks
+[2026-01-23 16:36:39] US-008: appended progress entry

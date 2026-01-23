@@ -5,6 +5,42 @@ Started: Fri Jan 23 04:25:26 WET 2026
 - (add reusable patterns here)
 
 ---
+## [2026-01-23 16:36] - US-008: [P3] Add authenticated dashboard layout with sidebar navigation
+Thread:
+Run: 20260123-151826-11541 (iteration 2)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: ee1c2d5 feat(dashboard): add sidebar navigation
+- Post-commit status: clean
+- Verification:
+  - Command: pnpm lint -> PASS
+  - Command: pnpm test -> PASS
+  - Command: pnpm build -> PASS
+- Files changed:
+  - src/app/(dashboard)/layout.tsx
+  - src/app/(dashboard)/overview/page.tsx
+  - src/app/(dashboard)/watchlist/page.tsx
+  - src/components/dashboard-sidebar.tsx
+  - .agents/tasks/prd-post-mvp.json
+  - .ralph/activity.log
+  - .ralph/errors.log
+  - .ralph/.tmp/prompt-20260123-151826-11541-2.md
+  - .ralph/.tmp/story-20260123-151826-11541-2.json
+  - .ralph/.tmp/story-20260123-151826-11541-2.md
+  - .ralph/runs/run-20260123-151826-11541-iter-1.log
+  - .ralph/runs/run-20260123-151826-11541-iter-1.md
+  - .ralph/runs/run-20260123-151826-11541-iter-2.log
+  - .ralph/progress.md
+- What was implemented
+  - Added a dashboard layout with a vertical left sidebar (Overview, History, Watchlist, Settings) and active-route styling.
+  - Added `/overview` and `/watchlist` pages and ensured App Router navigation keeps the shared layout without full reload.
+  - Confirmed unauthenticated visits to `/overview` redirect to Clerk sign-in via existing `src/middleware.ts` protection.
+- **Learnings for future iterations:**
+  - Route protection is centrally handled via `src/middleware.ts` (non-public routes redirect via Clerk `redirectToSignIn()`).
+  - When scripting shell reads, quote `src/app/(dashboard)` and `[[...route]]` paths to avoid zsh glob expansion.
+---
 ## [2026-01-23 16:11:08] - US-007: [P2] Add History list + report detail + deletion (single + all)
 Thread: 019beb6f-6c28-7851-bdfc-785402934107
 Run: 20260123-151826-11541 (iteration 1)
