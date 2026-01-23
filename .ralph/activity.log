@@ -56,3 +56,13 @@
 [2026-01-23 05:59:21] US-005: browser verification passed for /settings (mocked /api/user-settings); screenshot saved to dev-browser/tmp/us-005-settings.png
 [2026-01-23 06:00:00] US-005: re-ran pnpm lint/test/build after final UI tweaks (PASS)
 [2026-01-23 06:04:31] US-005: appended progress entry
+[2026-01-23 13:52:10] ITERATION 1 start (mode=build story=US-006)
+[2026-01-23 13:52:27] Start US-006: implement save report flow gated by loggingEnabled
+[2026-01-23 13:55:35] Added /api/saved-reports route (auth + loggingEnabled gated) and updated middleware public API list
+[2026-01-23 13:56:56] Updated main analysis UI to conditionally show Save this report control (SignedIn + loggingEnabled) and call /api/saved-reports
+[2026-01-23 13:57:41] Added Vitest coverage for /api/saved-reports (auth, persistence, loggingEnabled gating, payload validation, create success)
+[2026-01-23 13:58:28] Quality gates: pnpm lint/test/build all passed
+[2026-01-23 13:59:54] Hardened /api/saved-reports: require ADDRESS_HASH_KEY for persistence; updated tests env
+[2026-01-23 14:13:21] Adjusted Clerk middleware to enable with publishable key and always evaluate auth() so route handlers can see sessions
+[2026-01-23 14:18:28] Browser verification passed: Save control hidden when loggingEnabled=false; enabling setting shows Save, clicking saves and shows toast
+[2026-01-23 14:20:45] Re-ran pnpm lint/test/build after middleware move (PASS)

@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "total": 16,
+  "remaining": 12,
+  "quality_gates": [
+    "pnpm lint",
+    "pnpm test",
+    "pnpm build"
+  ],
+  "id": "US-006",
+  "title": "[P2] Add Save Report flow (UI + API) gated by loggingEnabled"
+}

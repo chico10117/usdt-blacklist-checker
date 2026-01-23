@@ -506,6 +506,108 @@ function ScamWarningAlert() {
   );
 }
 
+function SaveReportControl({ report }: { report: ApiResponse }) {
+  const { isLoaded, isSignedIn } = useAuth();
+  const [settings, setSettings] = React.useState<{ loggingEnabled: boolean; persistenceAvailable: boolean } | null>(null);
+  const [saveState, setSaveState] = React.useState<
+    | { state: "idle" }
+    | { state: "saving" }
+    | { state: "saved"; id?: string }
+  >({ state: "idle" });
+
+  React.useEffect(() => {
+    setSaveState({ state: "idle" });
+  }, [report.address, report.timestamps.checkedAtIso]);
+
+  React.useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    let cancelled = false;
+
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/user-settings", { credentials: "include" });
+        const json = (await res.json().catch(() => null)) as unknown;
+        if (!res.ok || !json || typeof json !== "object") return;
+
+        const obj = json as Record<string, unknown>;
+        if (typeof obj.loggingEnabled !== "boolean" || typeof obj.persistenceAvailable !== "boolean") return;
+        if (cancelled) return;
+        setSettings({ loggingEnabled: obj.loggingEnabled, persistenceAvailable: obj.persistenceAvailable });
+      } catch {
+        // ignore
+      }
+    }
+
+    loadSettings();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn]);
+
+  if (!report.access?.authenticated) return null;
+  if (!settings?.persistenceAvailable || !settings.loggingEnabled) return null;
+
+  async function saveReport() {
+    if (saveState.state === "saving" || saveState.state === "saved") return;
+
+    setSaveState({ state: "saving" });
+    try {
+      const res = await fetch("/api/saved-reports", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ address: report.address, report }),
+      });
+
+      const json = (await res.json().catch(() => null)) as unknown;
+      if (!res.ok) {
+        const err = json && typeof json === "object" ? (json as Record<string, unknown>).error : null;
+        toast.error(typeof err === "string" ? err : `Save failed (${res.status}).`);
+        setSaveState({ state: "idle" });
+        return;
+      }
+
+      const id = json && typeof json === "object" ? (json as Record<string, unknown>).id : null;
+      toast.success("Report saved.");
+      setSaveState({ state: "saved", id: typeof id === "string" ? id : undefined });
+    } catch {
+      toast.error("Network error.");
+      setSaveState({ state: "idle" });
+    }
+  }
+
+  const saving = saveState.state === "saving";
+  const saved = saveState.state === "saved";
+
+  return (
+    <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
+      <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+        <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-foreground">Save this report</div>
+            <div className="mt-1 text-sm text-muted-foreground">Stores this analysis under your account history.</div>
+          </div>
+          <Button type="button" size="sm" onClick={saveReport} disabled={saving || saved}>
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving…
+              </>
+            ) : saved ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Saved
+              </>
+            ) : (
+              "Save"
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 /* ────────────────────────────────────────────────────────────────────────────
  * Main Component
  * ──────────────────────────────────────────────────────────────────────────── */
@@ -962,6 +1064,12 @@ export function BlacklistChecker() {
               >
                 {/* Status Banner */}
                 <StatusBanner data={load.data} />
+
+                {clerkEnabled && (
+                  <SignedIn>
+                    <SaveReportControl report={load.data} />
+                  </SignedIn>
+                )}
 
                 {/* Summary Card */}
                 <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
