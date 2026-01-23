@@ -35,7 +35,7 @@ Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-202
 - What was implemented
   - Added `/api/user-settings` GET/PATCH for authenticated users to read/update `loggingEnabled` with default `false` when no row exists.
   - Ensured unauthenticated requests return 401 and do not create DB rows.
-  - Wired the signed-in UI toggle to persist via the API (and fetch server state on sign-in).
+  - Added route-level tests covering default behavior and 401 unauthenticated responses.
 - **Learnings for future iterations:**
   - For JSON API routes, prefer returning 401s from the handler (and allow the route through middleware) to avoid redirect responses in fetch callers.
   - Route-level behavior can be tested offline by mocking Clerk `auth()` and DB adapters.

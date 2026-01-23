@@ -533,13 +533,11 @@ function ScamWarningAlert() {
 export function BlacklistChecker() {
   const m = getMessages("en");
   const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-  const { isLoaded: authLoaded, isSignedIn } = useAuth();
 
   const [address, setAddress] = React.useState("");
   const [validation, setValidation] = React.useState<ReturnType<typeof validateTronAddress> | null>(null);
   const [load, setLoad] = React.useState<LoadState>({ state: "idle" });
   const [loggingEnabled, setLoggingEnabled] = React.useState(false);
-  const fetchedServerLoggingPref = React.useRef(false);
 
   React.useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -552,35 +550,6 @@ export function BlacklistChecker() {
   React.useEffect(() => {
     setLoggingEnabled(readLocalLoggingPref());
   }, []);
-
-  React.useEffect(() => {
-    if (!clerkEnabled) return;
-    if (!authLoaded) return;
-    if (!isSignedIn) {
-      fetchedServerLoggingPref.current = false;
-      return;
-    }
-    if (fetchedServerLoggingPref.current) return;
-    fetchedServerLoggingPref.current = true;
-
-    const controller = new AbortController();
-    void (async () => {
-      try {
-        const res = await fetch("/api/user-settings", { method: "GET", credentials: "include", signal: controller.signal });
-        if (!res.ok) return;
-        const json = (await res.json()) as unknown;
-        if (!json || typeof json !== "object") return;
-        const v = (json as Record<string, unknown>).loggingEnabled;
-        if (typeof v !== "boolean") return;
-        setLoggingEnabled(v);
-        writeLocalLoggingPref(v);
-      } catch {
-        // ignore
-      }
-    })();
-
-    return () => controller.abort();
-  }, [clerkEnabled, authLoaded, isSignedIn]);
 
   const normalizedAddress = validation?.normalized ?? address.trim();
   const isValid = validation?.ok ?? false;
@@ -916,14 +885,14 @@ export function BlacklistChecker() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Account</CardTitle>
                   <CardDescription>
-                    Configure privacy defaults. Report saving is opt-in and controlled by this setting.
+                    Configure privacy defaults. Saving reports is not enabled yet (DB/credits work is next).
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="text-sm font-medium text-foreground">Opt-in: save screening history</div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      This setting is saved to your account. Screening history persistence remains opt-in.
+                      This currently stores only a local preference. No server-side address logging is performed yet.
                     </div>
                   </div>
                   <Switch
@@ -931,33 +900,7 @@ export function BlacklistChecker() {
                     onCheckedChange={(v) => {
                       setLoggingEnabled(v);
                       writeLocalLoggingPref(v);
-
-                      void (async () => {
-                        try {
-                          const res = await fetch("/api/user-settings", {
-                            method: "PATCH",
-                            headers: { "content-type": "application/json" },
-                            credentials: "include",
-                            body: JSON.stringify({ loggingEnabled: v }),
-                          });
-
-                          if (!res.ok) throw new Error(`Request failed (${res.status}).`);
-                          const json = (await res.json()) as unknown;
-                          const value =
-                            json && typeof json === "object" ? (json as Record<string, unknown>).loggingEnabled : undefined;
-                          if (typeof value === "boolean") {
-                            setLoggingEnabled(value);
-                            writeLocalLoggingPref(value);
-                          }
-
-                          toast.message(v ? "Saving preference enabled" : "Saving preference disabled");
-                        } catch {
-                          const revert = !v;
-                          setLoggingEnabled(revert);
-                          writeLocalLoggingPref(revert);
-                          toast.message("Could not update preference. Please try again.");
-                        }
-                      })();
+                      toast.message(v ? "Logging preference enabled (local only)" : "Logging preference disabled");
                     }}
                     aria-label="Enable saving screening history"
                   />
