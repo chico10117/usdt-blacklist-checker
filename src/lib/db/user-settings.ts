@@ -31,3 +31,10 @@ export async function upsertUserSettings(db: DbClient, userId: string, loggingEn
   return rows[0] ?? null;
 }
 
+export async function ensureUserSettingsExists(db: DbClient, userId: string) {
+  await db
+    .insert(schema.userSettings)
+    .values({ userId, loggingEnabled: false })
+    .onConflictDoNothing({ target: schema.userSettings.userId })
+    .execute();
+}
