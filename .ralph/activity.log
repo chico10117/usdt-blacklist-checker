@@ -1,6 +1,7 @@
 # Activity Log
 
 ## Run Summary
+- 2026-01-23 16:39:48 | run=20260123-151826-11541 | iter=2 | mode=build | story=US-008 | duration=1250s | status=success
 - 2026-01-23 16:18:56 | run=20260123-151826-11541 | iter=1 | mode=build | story=US-007 | duration=3629s | status=success
 - 2026-01-23 14:28:23 | run=20260123-135210-55147 | iter=1 | mode=build | story=US-006 | duration=2173s | status=success
 - 2026-01-23 05:48:31 | run=20260123-044356-6274 | iter=4 | mode=build | story=US-004 | duration=1085s | status=success
@@ -92,3 +93,11 @@
 [2026-01-23 16:32:15] US-008 browser verified: dashboard sidebar nav works (/overview,/history,/watchlist,/settings), active-route styling via aria-current, and signed-out /overview redirects to /sign-in (screenshots in /Users/chiko/.codex/skills/dev-browser/tmp/)
 [2026-01-23 16:32:47] US-008 re-verification: pnpm lint/test/build passed after final tweaks
 [2026-01-23 16:36:39] US-008: appended progress entry
+[2026-01-23 16:39:48] ITERATION 2 end (duration=1250s)
+[2026-01-23 16:39:51] ITERATION 3 start (mode=build story=US-009)
+[2026-01-23 16:40:48] US-009 start: implementing watchlist CRUD (API + UI)
+[2026-01-23 16:45:28] US-009: added watchlist DB helpers and API routes (list/add/delete)
+[2026-01-23 16:47:11] US-009: implemented /watchlist UI with add/list/remove client flow
+[2026-01-23 16:49:06] US-009: verification passed (pnpm lint/test/build)
+[2026-01-23 17:02:14] US-009: browser verification complete for /watchlist (add persists after refresh, remove works, invalid address shows validation toast)
+[2026-01-23 17:12:34] US-009: appended progress entry

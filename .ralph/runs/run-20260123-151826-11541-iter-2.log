@@ -21648,4 +21648,813 @@ thinking
 
 I think we're on track to finalize everything! First, I plan to stage the run log and amend quietly as my last command. After that, I need to send the final response without running any more tools. However, I might still need to update plan statuses, which shouldn’t affect the run log. It’s a bit tricky because tee might capture the final response and modify the log. So, I’ll only run `git add` and `git commit` quietly, trusting that everything will stay clean from there on out. No more commands after that!
 exec
-/bin/zsh -lc 'git add .ralph/runs/run-20260123-151826-11541-iter-2.log && git commit --amend --no-edit --quiet' in /Users/chiko/side_projects/usdt_blacklisted_web
+/bin/zsh -lc 'git add .ralph/runs/run-20260123-151826-11541-iter-2.log && git commit --amend --no-edit --quiet' in /Users/chiko/side_projects/usdt_blacklisted_web succeeded in 144ms:
+
+file update:
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index 4b2c65fb057463e8cafc7b1084b2373d1ffc330d..5639f8e8cfbbdcbb602ef4188dac7d8f2b48d00f
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -5,6 +5,42 @@
+ - (add reusable patterns here)
+ 
+ ---
++## [2026-01-23 16:36] - US-008: [P3] Add authenticated dashboard layout with sidebar navigation
++Thread:
++Run: 20260123-151826-11541 (iteration 2)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: ee1c2d5 feat(dashboard): add sidebar navigation
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - src/app/(dashboard)/layout.tsx
++  - src/app/(dashboard)/overview/page.tsx
++  - src/app/(dashboard)/watchlist/page.tsx
++  - src/components/dashboard-sidebar.tsx
++  - .agents/tasks/prd-post-mvp.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-151826-11541-2.md
++  - .ralph/.tmp/story-20260123-151826-11541-2.json
++  - .ralph/.tmp/story-20260123-151826-11541-2.md
++  - .ralph/runs/run-20260123-151826-11541-iter-1.log
++  - .ralph/runs/run-20260123-151826-11541-iter-1.md
++  - .ralph/runs/run-20260123-151826-11541-iter-2.log
++  - .ralph/progress.md
++- What was implemented
++  - Added a dashboard layout with a vertical left sidebar (Overview, History, Watchlist, Settings) and active-route styling.
++  - Added `/overview` and `/watchlist` pages and ensured App Router navigation keeps the shared layout without full reload.
++  - Confirmed unauthenticated visits to `/overview` redirect to Clerk sign-in via existing `src/middleware.ts` protection.
++- **Learnings for future iterations:**
++  - Route protection is centrally handled via `src/middleware.ts` (non-public routes redirect via Clerk `redirectToSignIn()`).
++  - When scripting shell reads, quote `src/app/(dashboard)` and `[[...route]]` paths to avoid zsh glob expansion.
++---
+ ## [2026-01-23 16:11:08] - US-007: [P2] Add History list + report detail + deletion (single + all)
+ Thread: 019beb6f-6c28-7851-bdfc-785402934107
+ Run: 20260123-151826-11541 (iteration 1)
+diff --git a/src/app/(dashboard)/layout.tsx b/src/app/(dashboard)/layout.tsx
+index 838430781fa4a2acd71564fa8127a626872e1903..7588ff1f98509ac686b435213e76b5092bf36f0b
+--- a/src/app/(dashboard)/layout.tsx
++++ b/src/app/(dashboard)/layout.tsx
+@@ -1,37 +1,26 @@
+-import Link from "next/link";
+-
++import { UserButton } from "@clerk/nextjs";
+ import { ThemeToggle } from "@/components/theme-toggle";
+-import { Separator } from "@/components/ui/separator";
++import { DashboardSidebar } from "@/components/dashboard-sidebar";
+ 
+ export default function DashboardLayout({
+   children,
+ }: Readonly<{
+   children: React.ReactNode;
+ }>) {
++  const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
++
+   return (
+-    <div className="min-h-screen">
+-      <header className="border-b border-border/60 bg-card/60 backdrop-blur-sm">
+-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+-          <div className="flex items-center gap-3">
+-            <Link href="/" className="font-semibold tracking-tight text-foreground">
+-              USDT Checker
+-            </Link>
+-            <Separator orientation="vertical" className="h-5 bg-border/60" />
+-            <nav className="flex items-center gap-4 text-sm">
+-              <Link href="/history" className="font-medium text-foreground">
+-                History
+-              </Link>
+-              <Link href="/settings" className="font-medium text-foreground">
+-                Settings
+-              </Link>
+-            </nav>
+-          </div>
+-          <div className="flex items-center gap-2">
++    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
++      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col md:flex-row">
++        <DashboardSidebar />
++        <div className="flex min-w-0 flex-1 flex-col">
++          <header className="flex items-center justify-end border-b border-border/60 bg-card/40 px-4 py-3 backdrop-blur-sm sm:px-6">
++            {clerkEnabled && <UserButton />}
+             <ThemeToggle />
+-          </div>
++          </header>
++          <main className="w-full min-w-0 flex-1 px-4 py-8 sm:px-6">{children}</main>
+         </div>
+-      </header>
+-      <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">{children}</main>
++      </div>
+     </div>
+   );
+ }
+diff --git a/src/app/(dashboard)/overview/page.tsx b/src/app/(dashboard)/overview/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..46928d17e12724b1d052f3adae4dc6ed05ade586
+--- /dev/null
++++ b/src/app/(dashboard)/overview/page.tsx
+@@ -0,0 +1,48 @@
++import type { Metadata } from "next";
++import Link from "next/link";
++
++import { Button } from "@/components/ui/button";
++import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
++
++export const metadata: Metadata = {
++  title: "Overview",
++};
++
++export default function OverviewPage() {
++  return (
++    <div className="space-y-6">
++      <div className="flex flex-wrap items-end justify-between gap-3">
++        <div>
++          <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
++          <p className="mt-1 text-sm text-muted-foreground">Quick links for running screenings and reviewing saved reports.</p>
++        </div>
++      </div>
++
++      <div className="grid gap-4 sm:grid-cols-2">
++        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
++          <CardHeader>
++            <CardTitle>Run a screening</CardTitle>
++            <CardDescription>Start a new TRON address check from the home page.</CardDescription>
++          </CardHeader>
++          <CardContent>
++            <Button asChild>
++              <Link href="/">Go to checker</Link>
++            </Button>
++          </CardContent>
++        </Card>
++        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
++          <CardHeader>
++            <CardTitle>Review history</CardTitle>
++            <CardDescription>View your most recent saved reports and details.</CardDescription>
++          </CardHeader>
++          <CardContent>
++            <Button asChild variant="outline">
++              <Link href="/history">Open history</Link>
++            </Button>
++          </CardContent>
++        </Card>
++      </div>
++    </div>
++  );
++}
++
+diff --git a/src/app/(dashboard)/watchlist/page.tsx b/src/app/(dashboard)/watchlist/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..79e4c604291d7c0e61dbde19501f8d26e109c303
+--- /dev/null
++++ b/src/app/(dashboard)/watchlist/page.tsx
+@@ -0,0 +1,32 @@
++import type { Metadata } from "next";
++import Link from "next/link";
++
++import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
++import { Button } from "@/components/ui/button";
++
++export const metadata: Metadata = {
++  title: "Watchlist",
++};
++
++export default function WatchlistPage() {
++  return (
++    <div className="space-y-6">
++      <div>
++        <h1 className="text-2xl font-semibold tracking-tight">Watchlist</h1>
++        <p className="mt-1 text-sm text-muted-foreground">Keep track of addresses you want to re-check regularly.</p>
++      </div>
++
++      <Alert>
++        <AlertTitle>No watchlist items yet</AlertTitle>
++        <AlertDescription>
++          Run a screening from the checker, then come back here to manage watched addresses.
++        </AlertDescription>
++      </Alert>
++
++      <Button asChild>
++        <Link href="/">Go to checker</Link>
++      </Button>
++    </div>
++  );
++}
++
+diff --git a/src/components/dashboard-sidebar.tsx b/src/components/dashboard-sidebar.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9d2a46ad30b77ddb2ffde13e61b28739635d970
+--- /dev/null
++++ b/src/components/dashboard-sidebar.tsx
+@@ -0,0 +1,58 @@
++"use client";
++
++import * as React from "react";
++import Link from "next/link";
++import { usePathname } from "next/navigation";
++import { History, LayoutDashboard, Settings, Star } from "lucide-react";
++
++import { cn } from "@/lib/utils";
++
++const NAV_ITEMS = [
++  { href: "/overview", label: "Overview", icon: LayoutDashboard },
++  { href: "/history", label: "History", icon: History },
++  { href: "/watchlist", label: "Watchlist", icon: Star },
++  { href: "/settings", label: "Settings", icon: Settings },
++] as const;
++
++function isActivePath(pathname: string, href: string) {
++  if (pathname === href) return true;
++  return pathname.startsWith(`${href}/`);
++}
++
++export function DashboardSidebar({ className }: { className?: string }) {
++  const pathname = usePathname() ?? "/";
++
++  return (
++    <aside className={cn("w-full border-b border-border/60 bg-card/60 md:w-64 md:border-b-0 md:border-r", className)}>
++      <div className="flex h-full flex-col">
++        <div className="flex items-center justify-between gap-3 px-4 py-4">
++          <Link href="/" className="text-sm font-semibold tracking-tight text-foreground">
++            USDT Checker
++          </Link>
++        </div>
++        <nav className="flex flex-row gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:pb-4">
++          {NAV_ITEMS.map((item) => {
++            const active = isActivePath(pathname, item.href);
++            const Icon = item.icon;
++            return (
++              <Link
++                key={item.href}
++                href={item.href}
++                aria-current={active ? "page" : undefined}
++                className={cn(
++                  "inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors",
++                  "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
++                  active && "bg-muted/70 text-foreground",
++                )}
++              >
++                <Icon className="h-4 w-4" />
++                {item.label}
++              </Link>
++            );
++          })}
++        </nav>
++      </div>
++    </aside>
++  );
++}
++
+
+
+thinking
+**Updating project plan**
+
+Alright, we’ve decided to move away from shell commands. But I still need to update our plan to show it's completed—this shouldn’t be a problem. I also want to make sure I've logged the major actions we've done so far. A completion signal and final summary are also necessary. Before wrapping this up, I need to confirm that story acceptance criteria are met. We’ve implemented the sidebar and pages with authentication via middleware, and the navigation should be good to go!
+Plan update
+  ✓ Review guardrails, logs, PRD
+  ✓ Audit existing Clerk routing patterns
+  ✓ Implement dashboard layout and pages
+  ✓ Add auth protection for routes
+  ✓ Browser-verify dashboard navigation
+  ✓ Re-run lint, test, build
+  ✓ Security/perf/regression review, commit, log progress
+file update:
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index 4b2c65fb057463e8cafc7b1084b2373d1ffc330d..5639f8e8cfbbdcbb602ef4188dac7d8f2b48d00f
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -5,6 +5,42 @@
+ - (add reusable patterns here)
+ 
+ ---
++## [2026-01-23 16:36] - US-008: [P3] Add authenticated dashboard layout with sidebar navigation
++Thread:
++Run: 20260123-151826-11541 (iteration 2)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: ee1c2d5 feat(dashboard): add sidebar navigation
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - src/app/(dashboard)/layout.tsx
++  - src/app/(dashboard)/overview/page.tsx
++  - src/app/(dashboard)/watchlist/page.tsx
++  - src/components/dashboard-sidebar.tsx
++  - .agents/tasks/prd-post-mvp.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-151826-11541-2.md
++  - .ralph/.tmp/story-20260123-151826-11541-2.json
++  - .ralph/.tmp/story-20260123-151826-11541-2.md
++  - .ralph/runs/run-20260123-151826-11541-iter-1.log
++  - .ralph/runs/run-20260123-151826-11541-iter-1.md
++  - .ralph/runs/run-20260123-151826-11541-iter-2.log
++  - .ralph/progress.md
++- What was implemented
++  - Added a dashboard layout with a vertical left sidebar (Overview, History, Watchlist, Settings) and active-route styling.
++  - Added `/overview` and `/watchlist` pages and ensured App Router navigation keeps the shared layout without full reload.
++  - Confirmed unauthenticated visits to `/overview` redirect to Clerk sign-in via existing `src/middleware.ts` protection.
++- **Learnings for future iterations:**
++  - Route protection is centrally handled via `src/middleware.ts` (non-public routes redirect via Clerk `redirectToSignIn()`).
++  - When scripting shell reads, quote `src/app/(dashboard)` and `[[...route]]` paths to avoid zsh glob expansion.
++---
+ ## [2026-01-23 16:11:08] - US-007: [P2] Add History list + report detail + deletion (single + all)
+ Thread: 019beb6f-6c28-7851-bdfc-785402934107
+ Run: 20260123-151826-11541 (iteration 1)
+diff --git a/src/app/(dashboard)/layout.tsx b/src/app/(dashboard)/layout.tsx
+index 838430781fa4a2acd71564fa8127a626872e1903..7588ff1f98509ac686b435213e76b5092bf36f0b
+--- a/src/app/(dashboard)/layout.tsx
++++ b/src/app/(dashboard)/layout.tsx
+@@ -1,37 +1,26 @@
+-import Link from "next/link";
+-
++import { UserButton } from "@clerk/nextjs";
+ import { ThemeToggle } from "@/components/theme-toggle";
+-import { Separator } from "@/components/ui/separator";
++import { DashboardSidebar } from "@/components/dashboard-sidebar";
+ 
+ export default function DashboardLayout({
+   children,
+ }: Readonly<{
+   children: React.ReactNode;
+ }>) {
++  const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
++
+   return (
+-    <div className="min-h-screen">
+-      <header className="border-b border-border/60 bg-card/60 backdrop-blur-sm">
+-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+-          <div className="flex items-center gap-3">
+-            <Link href="/" className="font-semibold tracking-tight text-foreground">
+-              USDT Checker
+-            </Link>
+-            <Separator orientation="vertical" className="h-5 bg-border/60" />
+-            <nav className="flex items-center gap-4 text-sm">
+-              <Link href="/history" className="font-medium text-foreground">
+-                History
+-              </Link>
+-              <Link href="/settings" className="font-medium text-foreground">
+-                Settings
+-              </Link>
+-            </nav>
+-          </div>
+-          <div className="flex items-center gap-2">
++    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
++      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col md:flex-row">
++        <DashboardSidebar />
++        <div className="flex min-w-0 flex-1 flex-col">
++          <header className="flex items-center justify-end border-b border-border/60 bg-card/40 px-4 py-3 backdrop-blur-sm sm:px-6">
++            {clerkEnabled && <UserButton />}
+             <ThemeToggle />
+-          </div>
++          </header>
++          <main className="w-full min-w-0 flex-1 px-4 py-8 sm:px-6">{children}</main>
+         </div>
+-      </header>
+-      <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">{children}</main>
++      </div>
+     </div>
+   );
+ }
+diff --git a/src/app/(dashboard)/overview/page.tsx b/src/app/(dashboard)/overview/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..46928d17e12724b1d052f3adae4dc6ed05ade586
+--- /dev/null
++++ b/src/app/(dashboard)/overview/page.tsx
+@@ -0,0 +1,48 @@
++import type { Metadata } from "next";
++import Link from "next/link";
++
++import { Button } from "@/components/ui/button";
++import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
++
++export const metadata: Metadata = {
++  title: "Overview",
++};
++
++export default function OverviewPage() {
++  return (
++    <div className="space-y-6">
++      <div className="flex flex-wrap items-end justify-between gap-3">
++        <div>
++          <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
++          <p className="mt-1 text-sm text-muted-foreground">Quick links for running screenings and reviewing saved reports.</p>
++        </div>
++      </div>
++
++      <div className="grid gap-4 sm:grid-cols-2">
++        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
++          <CardHeader>
++            <CardTitle>Run a screening</CardTitle>
++            <CardDescription>Start a new TRON address check from the home page.</CardDescription>
++          </CardHeader>
++          <CardContent>
++            <Button asChild>
++              <Link href="/">Go to checker</Link>
++            </Button>
++          </CardContent>
++        </Card>
++        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
++          <CardHeader>
++            <CardTitle>Review history</CardTitle>
++            <CardDescription>View your most recent saved reports and details.</CardDescription>
++          </CardHeader>
++          <CardContent>
++            <Button asChild variant="outline">
++              <Link href="/history">Open history</Link>
++            </Button>
++          </CardContent>
++        </Card>
++      </div>
++    </div>
++  );
++}
++
+diff --git a/src/app/(dashboard)/watchlist/page.tsx b/src/app/(dashboard)/watchlist/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..79e4c604291d7c0e61dbde19501f8d26e109c303
+--- /dev/null
++++ b/src/app/(dashboard)/watchlist/page.tsx
+@@ -0,0 +1,32 @@
++import type { Metadata } from "next";
++import Link from "next/link";
++
++import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
++import { Button } from "@/components/ui/button";
++
++export const metadata: Metadata = {
++  title: "Watchlist",
++};
++
++export default function WatchlistPage() {
++  return (
++    <div className="space-y-6">
++      <div>
++        <h1 className="text-2xl font-semibold tracking-tight">Watchlist</h1>
++        <p className="mt-1 text-sm text-muted-foreground">Keep track of addresses you want to re-check regularly.</p>
++      </div>
++
++      <Alert>
++        <AlertTitle>No watchlist items yet</AlertTitle>
++        <AlertDescription>
++          Run a screening from the checker, then come back here to manage watched addresses.
++        </AlertDescription>
++      </Alert>
++
++      <Button asChild>
++        <Link href="/">Go to checker</Link>
++      </Button>
++    </div>
++  );
++}
++
+diff --git a/src/components/dashboard-sidebar.tsx b/src/components/dashboard-sidebar.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9d2a46ad30b77ddb2ffde13e61b28739635d970
+--- /dev/null
++++ b/src/components/dashboard-sidebar.tsx
+@@ -0,0 +1,58 @@
++"use client";
++
++import * as React from "react";
++import Link from "next/link";
++import { usePathname } from "next/navigation";
++import { History, LayoutDashboard, Settings, Star } from "lucide-react";
++
++import { cn } from "@/lib/utils";
++
++const NAV_ITEMS = [
++  { href: "/overview", label: "Overview", icon: LayoutDashboard },
++  { href: "/history", label: "History", icon: History },
++  { href: "/watchlist", label: "Watchlist", icon: Star },
++  { href: "/settings", label: "Settings", icon: Settings },
++] as const;
++
++function isActivePath(pathname: string, href: string) {
++  if (pathname === href) return true;
++  return pathname.startsWith(`${href}/`);
++}
++
++export function DashboardSidebar({ className }: { className?: string }) {
++  const pathname = usePathname() ?? "/";
++
++  return (
++    <aside className={cn("w-full border-b border-border/60 bg-card/60 md:w-64 md:border-b-0 md:border-r", className)}>
++      <div className="flex h-full flex-col">
++        <div className="flex items-center justify-between gap-3 px-4 py-4">
++          <Link href="/" className="text-sm font-semibold tracking-tight text-foreground">
++            USDT Checker
++          </Link>
++        </div>
++        <nav className="flex flex-row gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:pb-4">
++          {NAV_ITEMS.map((item) => {
++            const active = isActivePath(pathname, item.href);
++            const Icon = item.icon;
++            return (
++              <Link
++                key={item.href}
++                href={item.href}
++                aria-current={active ? "page" : undefined}
++                className={cn(
++                  "inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors",
++                  "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
++                  active && "bg-muted/70 text-foreground",
++                )}
++              >
++                <Icon className="h-4 w-4" />
++                {item.label}
++              </Link>
++            );
++          })}
++        </nav>
++      </div>
++    </aside>
++  );
++}
++
+
+codex
+- Implemented an authenticated dashboard shell with a vertical left sidebar (Overview, History, Watchlist, Settings) + active-route styling in `src/app/(dashboard)/layout.tsx` and `src/components/dashboard-sidebar.tsx`.
+- Added dedicated pages for `src/app/(dashboard)/overview/page.tsx` and `src/app/(dashboard)/watchlist/page.tsx`.
+- Confirmed unauthenticated `/overview` redirects to sign-in via existing Clerk middleware (`src/middleware.ts`), and verified sidebar navigation works without full reload in browser.
+- Quality gates: `pnpm lint`, `pnpm test`, `pnpm build` all PASS; progress logged in `.ralph/progress.md`.
+
+<promise>COMPLETE</promise>
+file update:
+diff --git a/.ralph/progress.md b/.ralph/progress.md
+index 4b2c65fb057463e8cafc7b1084b2373d1ffc330d..5639f8e8cfbbdcbb602ef4188dac7d8f2b48d00f
+--- a/.ralph/progress.md
++++ b/.ralph/progress.md
+@@ -5,6 +5,42 @@
+ - (add reusable patterns here)
+ 
+ ---
++## [2026-01-23 16:36] - US-008: [P3] Add authenticated dashboard layout with sidebar navigation
++Thread:
++Run: 20260123-151826-11541 (iteration 2)
++Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.log
++Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-2.md
++- Guardrails reviewed: yes
++- No-commit run: false
++- Commit: ee1c2d5 feat(dashboard): add sidebar navigation
++- Post-commit status: clean
++- Verification:
++  - Command: pnpm lint -> PASS
++  - Command: pnpm test -> PASS
++  - Command: pnpm build -> PASS
++- Files changed:
++  - src/app/(dashboard)/layout.tsx
++  - src/app/(dashboard)/overview/page.tsx
++  - src/app/(dashboard)/watchlist/page.tsx
++  - src/components/dashboard-sidebar.tsx
++  - .agents/tasks/prd-post-mvp.json
++  - .ralph/activity.log
++  - .ralph/errors.log
++  - .ralph/.tmp/prompt-20260123-151826-11541-2.md
++  - .ralph/.tmp/story-20260123-151826-11541-2.json
++  - .ralph/.tmp/story-20260123-151826-11541-2.md
++  - .ralph/runs/run-20260123-151826-11541-iter-1.log
++  - .ralph/runs/run-20260123-151826-11541-iter-1.md
++  - .ralph/runs/run-20260123-151826-11541-iter-2.log
++  - .ralph/progress.md
++- What was implemented
++  - Added a dashboard layout with a vertical left sidebar (Overview, History, Watchlist, Settings) and active-route styling.
++  - Added `/overview` and `/watchlist` pages and ensured App Router navigation keeps the shared layout without full reload.
++  - Confirmed unauthenticated visits to `/overview` redirect to Clerk sign-in via existing `src/middleware.ts` protection.
++- **Learnings for future iterations:**
++  - Route protection is centrally handled via `src/middleware.ts` (non-public routes redirect via Clerk `redirectToSignIn()`).
++  - When scripting shell reads, quote `src/app/(dashboard)` and `[[...route]]` paths to avoid zsh glob expansion.
++---
+ ## [2026-01-23 16:11:08] - US-007: [P2] Add History list + report detail + deletion (single + all)
+ Thread: 019beb6f-6c28-7851-bdfc-785402934107
+ Run: 20260123-151826-11541 (iteration 1)
+diff --git a/src/app/(dashboard)/layout.tsx b/src/app/(dashboard)/layout.tsx
+index 838430781fa4a2acd71564fa8127a626872e1903..7588ff1f98509ac686b435213e76b5092bf36f0b
+--- a/src/app/(dashboard)/layout.tsx
++++ b/src/app/(dashboard)/layout.tsx
+@@ -1,37 +1,26 @@
+-import Link from "next/link";
+-
++import { UserButton } from "@clerk/nextjs";
+ import { ThemeToggle } from "@/components/theme-toggle";
+-import { Separator } from "@/components/ui/separator";
++import { DashboardSidebar } from "@/components/dashboard-sidebar";
+ 
+ export default function DashboardLayout({
+   children,
+ }: Readonly<{
+   children: React.ReactNode;
+ }>) {
++  const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
++
+   return (
+-    <div className="min-h-screen">
+-      <header className="border-b border-border/60 bg-card/60 backdrop-blur-sm">
+-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+-          <div className="flex items-center gap-3">
+-            <Link href="/" className="font-semibold tracking-tight text-foreground">
+-              USDT Checker
+-            </Link>
+-            <Separator orientation="vertical" className="h-5 bg-border/60" />
+-            <nav className="flex items-center gap-4 text-sm">
+-              <Link href="/history" className="font-medium text-foreground">
+-                History
+-              </Link>
+-              <Link href="/settings" className="font-medium text-foreground">
+-                Settings
+-              </Link>
+-            </nav>
+-          </div>
+-          <div className="flex items-center gap-2">
++    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
++      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col md:flex-row">
++        <DashboardSidebar />
++        <div className="flex min-w-0 flex-1 flex-col">
++          <header className="flex items-center justify-end border-b border-border/60 bg-card/40 px-4 py-3 backdrop-blur-sm sm:px-6">
++            {clerkEnabled && <UserButton />}
+             <ThemeToggle />
+-          </div>
++          </header>
++          <main className="w-full min-w-0 flex-1 px-4 py-8 sm:px-6">{children}</main>
+         </div>
+-      </header>
+-      <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">{children}</main>
++      </div>
+     </div>
+   );
+ }
+diff --git a/src/app/(dashboard)/overview/page.tsx b/src/app/(dashboard)/overview/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..46928d17e12724b1d052f3adae4dc6ed05ade586
+--- /dev/null
++++ b/src/app/(dashboard)/overview/page.tsx
+@@ -0,0 +1,48 @@
++import type { Metadata } from "next";
++import Link from "next/link";
++
++import { Button } from "@/components/ui/button";
++import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
++
++export const metadata: Metadata = {
++  title: "Overview",
++};
++
++export default function OverviewPage() {
++  return (
++    <div className="space-y-6">
++      <div className="flex flex-wrap items-end justify-between gap-3">
++        <div>
++          <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
++          <p className="mt-1 text-sm text-muted-foreground">Quick links for running screenings and reviewing saved reports.</p>
++        </div>
++      </div>
++
++      <div className="grid gap-4 sm:grid-cols-2">
++        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
++          <CardHeader>
++            <CardTitle>Run a screening</CardTitle>
++            <CardDescription>Start a new TRON address check from the home page.</CardDescription>
++          </CardHeader>
++          <CardContent>
++            <Button asChild>
++              <Link href="/">Go to checker</Link>
++            </Button>
++          </CardContent>
++        </Card>
++        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
++          <CardHeader>
++            <CardTitle>Review history</CardTitle>
++            <CardDescription>View your most recent saved reports and details.</CardDescription>
++          </CardHeader>
++          <CardContent>
++            <Button asChild variant="outline">
++              <Link href="/history">Open history</Link>
++            </Button>
++          </CardContent>
++        </Card>
++      </div>
++    </div>
++  );
++}
++
+diff --git a/src/app/(dashboard)/watchlist/page.tsx b/src/app/(dashboard)/watchlist/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..79e4c604291d7c0e61dbde19501f8d26e109c303
+--- /dev/null
++++ b/src/app/(dashboard)/watchlist/page.tsx
+@@ -0,0 +1,32 @@
++import type { Metadata } from "next";
++import Link from "next/link";
++
++import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
++import { Button } from "@/components/ui/button";
++
++export const metadata: Metadata = {
++  title: "Watchlist",
++};
++
++export default function WatchlistPage() {
++  return (
++    <div className="space-y-6">
++      <div>
++        <h1 className="text-2xl font-semibold tracking-tight">Watchlist</h1>
++        <p className="mt-1 text-sm text-muted-foreground">Keep track of addresses you want to re-check regularly.</p>
++      </div>
++
++      <Alert>
++        <AlertTitle>No watchlist items yet</AlertTitle>
++        <AlertDescription>
++          Run a screening from the checker, then come back here to manage watched addresses.
++        </AlertDescription>
++      </Alert>
++
++      <Button asChild>
++        <Link href="/">Go to checker</Link>
++      </Button>
++    </div>
++  );
++}
++
+diff --git a/src/components/dashboard-sidebar.tsx b/src/components/dashboard-sidebar.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9d2a46ad30b77ddb2ffde13e61b28739635d970
+--- /dev/null
++++ b/src/components/dashboard-sidebar.tsx
+@@ -0,0 +1,58 @@
++"use client";
++
++import * as React from "react";
++import Link from "next/link";
++import { usePathname } from "next/navigation";
++import { History, LayoutDashboard, Settings, Star } from "lucide-react";
++
++import { cn } from "@/lib/utils";
++
++const NAV_ITEMS = [
++  { href: "/overview", label: "Overview", icon: LayoutDashboard },
++  { href: "/history", label: "History", icon: History },
++  { href: "/watchlist", label: "Watchlist", icon: Star },
++  { href: "/settings", label: "Settings", icon: Settings },
++] as const;
++
++function isActivePath(pathname: string, href: string) {
++  if (pathname === href) return true;
++  return pathname.startsWith(`${href}/`);
++}
++
++export function DashboardSidebar({ className }: { className?: string }) {
++  const pathname = usePathname() ?? "/";
++
++  return (
++    <aside className={cn("w-full border-b border-border/60 bg-card/60 md:w-64 md:border-b-0 md:border-r", className)}>
++      <div className="flex h-full flex-col">
++        <div className="flex items-center justify-between gap-3 px-4 py-4">
++          <Link href="/" className="text-sm font-semibold tracking-tight text-foreground">
++            USDT Checker
++          </Link>
++        </div>
++        <nav className="flex flex-row gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:pb-4">
++          {NAV_ITEMS.map((item) => {
++            const active = isActivePath(pathname, item.href);
++            const Icon = item.icon;
++            return (
++              <Link
++                key={item.href}
++                href={item.href}
++                aria-current={active ? "page" : undefined}
++                className={cn(
++                  "inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors",
++                  "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
++                  active && "bg-muted/70 text-foreground",
++                )}
++              >
++                <Icon className="h-4 w-4" />
++                {item.label}
++              </Link>
++            );
++          })}
++        </nav>
++      </div>
++    </aside>
++  );
++}
++
+
+tokens used
+117,958
+- Implemented an authenticated dashboard shell with a vertical left sidebar (Overview, History, Watchlist, Settings) + active-route styling in `src/app/(dashboard)/layout.tsx` and `src/components/dashboard-sidebar.tsx`.
+- Added dedicated pages for `src/app/(dashboard)/overview/page.tsx` and `src/app/(dashboard)/watchlist/page.tsx`.
+- Confirmed unauthenticated `/overview` redirects to sign-in via existing Clerk middleware (`src/middleware.ts`), and verified sidebar navigation works without full reload in browser.
+- Quality gates: `pnpm lint`, `pnpm test`, `pnpm build` all PASS; progress logged in `.ralph/progress.md`.
+
+<promise>COMPLETE</promise>

@@ -5,6 +5,46 @@ Started: Fri Jan 23 04:25:26 WET 2026
 - (add reusable patterns here)
 
 ---
+## [2026-01-23 17:11] - US-009: [P3] Add Watchlist CRUD (UI + API) for tracked addresses
+Thread:
+Run: 20260123-151826-11541 (iteration 3)
+Run log: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-3.log
+Run summary: /Users/chiko/side_projects/usdt_blacklisted_web/.ralph/runs/run-20260123-151826-11541-iter-3.md
+- Guardrails reviewed: yes
+- No-commit run: false
+- Commit: 8d702f9 feat(watchlist): add watchlist CRUD
+- Post-commit status: clean
+- Verification:
+  - Command: pnpm lint -> PASS
+  - Command: pnpm test -> PASS
+  - Command: pnpm build -> PASS
+- Files changed:
+  - src/app/api/watchlist/route.ts
+  - src/app/api/watchlist/[id]/route.ts
+  - src/app/(dashboard)/watchlist/page.tsx
+  - src/app/(dashboard)/watchlist/watchlist-client.tsx
+  - src/lib/db/user-settings.ts
+  - src/lib/db/watchlist.ts
+  - src/middleware.ts
+  - src/__tests__/api-watchlist.test.ts
+  - src/__tests__/api-watchlist-detail.test.ts
+  - .ralph/activity.log
+  - .ralph/errors.log
+  - .ralph/.tmp/prompt-20260123-151826-11541-3.md
+  - .ralph/.tmp/story-20260123-151826-11541-3.json
+  - .ralph/.tmp/story-20260123-151826-11541-3.md
+  - .ralph/runs/run-20260123-151826-11541-iter-2.log
+  - .ralph/runs/run-20260123-151826-11541-iter-2.md
+  - .ralph/runs/run-20260123-151826-11541-iter-3.log
+  - .ralph/progress.md
+- What was implemented
+  - Added `/api/watchlist` (GET/POST) and `/api/watchlist/[id]` (DELETE) scoped to the authenticated user.
+  - Validated TRON address format on add and stored a per-user HMAC `addressHash` for indexing (not returned in API responses).
+  - Implemented `/watchlist` UI with add form (address + optional label), list rows, and remove action; verified persistence after refresh.
+  - Added route-level tests including invalid-address rejection with no DB writes.
+- **Learnings for future iterations:**
+  - For zsh, quote paths like `src/app/(dashboard)/...` to avoid glob expansion errors.
+---
 ## [2026-01-23 16:36] - US-008: [P3] Add authenticated dashboard layout with sidebar navigation
 Thread:
 Run: 20260123-151826-11541 (iteration 2)
