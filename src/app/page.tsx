@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BlacklistChecker } from "@/components/blacklist-checker";
 
 export default function Home() {
@@ -7,7 +8,7 @@ export default function Home() {
     mainEntity: [
       {
         "@type": "Question",
-        name: "What does “blacklisted” mean for USDT on TRON?",
+        name: "What does 'blacklisted' mean for USDT on TRON?",
         acceptedAnswer: {
           "@type": "Answer",
           text: "The USDT smart contract can restrict addresses. If an address is blacklisted, USDT transfers from that address will likely revert on-chain.",
@@ -30,7 +31,9 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <BlacklistChecker />
+      <Suspense fallback={null}>
+        <BlacklistChecker />
+      </Suspense>
     </>
   );
 }
