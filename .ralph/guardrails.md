@@ -17,4 +17,8 @@
 ---
 
 ## Learned Signs
+### Sign: Never Kill Ralph Tee
+- **Trigger**: When trying to stop or “finalize” the run log
+- **Instruction**: Do not `kill` the `tee` process started by Ralph; it will exit when the agent exits. Killing it can terminate the iteration and leave PRD status/logs half-updated.
+- **Added after**: US-005 iteration ended early due to killing `tee`
 

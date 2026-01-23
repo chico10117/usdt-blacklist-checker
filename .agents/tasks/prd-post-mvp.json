@@ -192,7 +192,7 @@
     {
       "id": "US-004",
       "title": "[P2] Add API: user settings (loggingEnabled) with safe defaults",
-      "status": "in_progress",
+      "status": "done",
       "dependsOn": [
         "US-003"
       ],
@@ -205,13 +205,13 @@
         "Negative case: Unauthenticated request to update settings returns 401 and does not create DB rows."
       ],
       "startedAt": "2026-01-23T05:30:26.085635+00:00",
-      "completedAt": null,
-      "updatedAt": "2026-01-23T05:30:26.085800+00:00"
+      "completedAt": "2026-01-23T13:47:48.568202+00:00",
+      "updatedAt": "2026-01-23T13:47:48.568202+00:00"
     },
     {
       "id": "US-005",
       "title": "[P2] Add Settings screen with privacy toggle and copy",
-      "status": "open",
+      "status": "done",
       "dependsOn": [
         "US-004"
       ],
@@ -222,7 +222,10 @@
         "UI shows loading, success, and error states when reading/updating the setting.",
         "Example: User enables saving, sees confirmation, and the UI reflects enabled state after reload.",
         "Negative case: If settings API fails, UI shows an error state and does not silently flip the toggle."
-      ]
+      ],
+      "updatedAt": "2026-01-23T13:47:48.568202+00:00",
+      "completedAt": "2026-01-23T13:47:48.568202+00:00",
+      "startedAt": "2026-01-23T13:47:48.568202+00:00"
     },
     {
       "id": "US-006",
