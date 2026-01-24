@@ -745,46 +745,18 @@ export function BlacklistChecker() {
       )}
 
       {/* Hero Section */}
-      <section className="relative mx-auto max-w-3xl overflow-hidden">
-        {/* Background Effects */}
+      <section className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl">
+        {/* Background Image */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          {/* Radial gradient backdrop */}
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-transparent" />
-          {/* Grid pattern overlay */}
-          <div 
-            className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"
-            style={{
-              backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                               linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-              backgroundSize: '60px 60px',
-              maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)',
-            }}
+          <img
+            src="/hero-image.webp"
+            alt=""
+            className="h-full w-full object-cover"
           />
-          {/* Subtle glow */}
-          <div className="absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
         </div>
 
         {/* Content */}
-        <div className="relative pt-4 pb-8 text-center">
-          {/* Shield Icon with pulse */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="mx-auto mb-6"
-          >
-            <div className="relative inline-flex">
-              {/* Pulse ring */}
-              <span className="absolute inset-0 animate-ping rounded-full bg-primary/20" style={{ animationDuration: '3s' }} />
-              <span className="absolute inset-0 animate-ping rounded-full bg-primary/10" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
-              {/* Shield icon */}
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-primary/20 bg-gradient-to-b from-primary/10 to-transparent backdrop-blur-sm">
-                <ShieldCheck className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-          </motion.div>
-
+        <div className="relative pt-24 pb-10 text-center">
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -797,7 +769,7 @@ export function BlacklistChecker() {
               <br className="sm:hidden" />
               <span className="relative inline-block sm:ml-2">
                 <span className="relative z-10 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  Blacklist Checker
+                  Address Screening
                 </span>
                 {/* Underline accent */}
                 <span className="absolute -bottom-1 left-0 right-0 h-[3px] bg-gradient-to-r from-primary/60 via-primary to-primary/60 sm:-bottom-2" />
@@ -815,33 +787,33 @@ export function BlacklistChecker() {
             Verify if a TRON address is blocked by the USDT smart contract.
             <span className="mt-1 block text-muted-foreground/70">No keys required. No data stored.</span>
           </motion.p>
-
-          {/* Trust Badges - Enhanced */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-3"
-          >
-            <div className="group flex items-center gap-2 rounded-full border border-success/30 bg-success/5 px-4 py-2 transition-all hover:border-success/50 hover:bg-success/10">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-success/20">
-                <ShieldCheck className="h-3.5 w-3.5 text-success" />
-              </div>
-              <span className="text-xs font-medium uppercase tracking-wide text-success">
-                {m.noKeysBadge}
-              </span>
-            </div>
-            <div className="group flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-2 transition-all hover:border-border/80 hover:bg-card">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
-                <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
-              </div>
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {m.noTrackingBadge}
-              </span>
-            </div>
-          </motion.div>
         </div>
       </section>
+
+      {/* Trust Badges */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+        className="flex flex-wrap items-center justify-center gap-3"
+      >
+        <div className="group flex items-center gap-2 rounded-full border border-success/30 bg-success/5 px-4 py-2 transition-all hover:border-success/50 hover:bg-success/10">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-success/20">
+            <ShieldCheck className="h-3.5 w-3.5 text-success" />
+          </div>
+          <span className="text-xs font-medium uppercase tracking-wide text-success">
+            {m.noKeysBadge}
+          </span>
+        </div>
+        <div className="group flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-2 transition-all hover:border-border/80 hover:bg-card">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
+            <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {m.noTrackingBadge}
+          </span>
+        </div>
+      </motion.div>
 
       {/* Input Card */}
       <motion.section
