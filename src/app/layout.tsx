@@ -21,23 +21,23 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "USDT (TRON) Blacklist Checker",
-    template: "%s · USDT (TRON) Blacklist Checker",
+    default: "TRON Address Risk Checker",
+    template: "%s · TRON Address Risk Checker",
   },
   description:
-    "Check whether a TRON address is blacklisted for USDT (TRC20) via TronScan and an on-chain contract read. No keys. No tracking.",
+    "Check TRON address risk: blacklist status, OFAC sanctions, and transaction volume analysis. No keys. No tracking.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://usdt.chikocorp.com"),
   openGraph: {
-    title: "USDT (TRON) Blacklist Checker",
+    title: "TRON Address Risk Checker",
     description:
-      "Check whether a TRON address is blacklisted for USDT (TRC20) via TronScan and an on-chain contract read. No keys. No tracking.",
+      "Check TRON address risk: blacklist status, OFAC sanctions, and transaction volume analysis. No keys. No tracking.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "USDT (TRON) Blacklist Checker",
+    title: "TRON Address Risk Checker",
     description:
-      "Check whether a TRON address is blacklisted for USDT (TRC20) via TronScan and an on-chain contract read. No keys. No tracking.",
+      "Check TRON address risk: blacklist status, OFAC sanctions, and transaction volume analysis. No keys. No tracking.",
   },
 };
 

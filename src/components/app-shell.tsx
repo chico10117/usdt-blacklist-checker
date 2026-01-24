@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <div className="relative flex h-10 w-10 items-center justify-center">
                   <Image
                     src="/logo1.png"
-                    alt="USDT Checker"
+                    alt="TRON Checker"
                     width={40}
                     height={40}
                     className="h-10 w-10 rounded-sm object-contain"
@@ -56,8 +56,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-card bg-success" />
                 </div>
                 <div className="hidden sm:block md:hidden lg:block">
-                  <div className="text-sm font-semibold tracking-tight text-foreground">USDT Checker</div>
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">TRON Security</div>
+                  <div className="text-sm font-semibold tracking-tight text-foreground">TRON Checker</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Address Security</div>
                 </div>
               </Link>
             </div>

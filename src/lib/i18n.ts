@@ -14,8 +14,8 @@ export type Messages = {
 };
 
 const en: Messages = {
-  title: "USDT (TRON) Blacklist Checker",
-  subtitle: "Check whether a TRON address is blacklisted by the USDT smart contract. No keys. No tracking.",
+  title: "TRON Address Risk Checker",
+  subtitle: "Check blacklist status, OFAC sanctions, and transaction risk for any TRON address. No keys. No tracking.",
   inputLabel: "TRON address",
   inputPlaceholder: "Paste a TRON address (starts with T)…",
   checkCta: "Check",
