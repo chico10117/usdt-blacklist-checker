@@ -25,7 +25,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { USDT_TRC20_CONTRACT } from "@/lib/tron";
 import { getMessages } from "@/lib/i18n";
@@ -160,13 +159,13 @@ type LoadState =
  * ──────────────────────────────────────────────────────────────────────────── */
 
 const fadeInUp = {
-  initial: { opacity: 0, y: 12 },
+  initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 },
+  exit: { opacity: 0, y: -4 },
 };
 
 const staggerContainer = {
-  animate: { transition: { staggerChildren: 0.08 } },
+  animate: { transition: { staggerChildren: 0.06 } },
 };
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -238,7 +237,7 @@ function InlineCopyButton({ value, size = "sm" }: { value: string; size?: "sm" |
     <button
       type="button"
       aria-label="Copy to clipboard"
-      className={`${sizeClasses} inline-flex shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95`}
+      className={`${sizeClasses} inline-flex shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-all duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95`}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -251,7 +250,7 @@ function InlineCopyButton({ value, size = "sm" }: { value: string; size?: "sm" |
       }}
     >
       {copied ? (
-        <Check className={`${iconClasses} text-emerald-600 dark:text-emerald-400`} />
+        <Check className={`${iconClasses} text-success`} />
       ) : (
         <Copy className={iconClasses} />
       )}
@@ -261,7 +260,7 @@ function InlineCopyButton({ value, size = "sm" }: { value: string; size?: "sm" |
 
 function TrustBadge({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-muted">
+    <div className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground">
       <Icon className="h-3.5 w-3.5" />
       <span>{children}</span>
     </div>
@@ -270,10 +269,10 @@ function TrustBadge({ icon: Icon, children }: { icon: React.ElementType; childre
 
 function SectionHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`mb-4 flex items-center gap-2 ${className ?? ""}`}>
-      <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
-      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{children}</span>
-      <div className="h-px flex-1 bg-gradient-to-l from-border to-transparent" />
+    <div className={`mb-4 flex items-center gap-3 ${className ?? ""}`}>
+      <div className="h-px flex-1 bg-border" />
+      <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{children}</span>
+      <div className="h-px flex-1 bg-border" />
     </div>
   );
 }
@@ -297,15 +296,15 @@ function DataRow({
   const textClasses = mono ? "font-mono text-[13px]" : "text-sm";
 
   return (
-    <div className="group flex items-start justify-between gap-3 py-2">
-      <div className="min-w-0 flex-1">
-        <div className="mb-0.5 text-xs font-medium text-muted-foreground">{label}</div>
+    <div className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-3 py-2">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="min-w-0">
         {href ? (
           <a
             href={href}
             target="_blank"
             rel="noreferrer"
-            className={`${textClasses} inline-flex items-center gap-1.5 break-all text-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:decoration-primary`}
+            className={`${textClasses} inline-flex items-center gap-1.5 break-all text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-primary`}
           >
             {displayValue}
             <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
@@ -315,7 +314,7 @@ function DataRow({
         )}
       </div>
       {copyValue && (
-        <div className="opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="opacity-0 transition-opacity duration-150 group-hover:opacity-100">
           <InlineCopyButton value={copyValue} />
         </div>
       )}
@@ -334,18 +333,18 @@ function StatusBanner({ data }: { data: ApiResponse }) {
     return (
       <motion.div
         {...fadeInUp}
-        transition={{ duration: 0.25 }}
-        className="relative overflow-hidden rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 p-5 dark:border-red-500/30 dark:from-red-950/50 dark:to-red-900/20"
+        transition={{ duration: 0.15 }}
+        className="rounded-sm bg-danger p-5"
       >
         <div className="flex gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white shadow-lg shadow-red-600/25">
-            <ShieldAlert className="h-6 w-6" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm bg-white/20">
+            <ShieldAlert className="h-6 w-6 text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">
+            <h3 className="text-lg font-semibold text-white">
               Blacklisted for USDT on TRON
             </h3>
-            <p className="mt-1 text-sm leading-relaxed text-red-800/80 dark:text-red-200/80">
+            <p className="mt-1 text-sm leading-relaxed text-white/80">
               This address is blacklisted for USDT (TRC20). Transfers from this address will likely fail.
             </p>
           </div>
@@ -358,18 +357,18 @@ function StatusBanner({ data }: { data: ApiResponse }) {
     return (
       <motion.div
         {...fadeInUp}
-        transition={{ duration: 0.25 }}
-        className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 dark:border-emerald-500/30 dark:from-emerald-950/50 dark:to-emerald-900/20"
+        transition={{ duration: 0.15 }}
+        className="rounded-sm bg-success p-5"
       >
         <div className="flex gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/25">
-            <ShieldCheck className="h-6 w-6" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm bg-white/20">
+            <ShieldCheck className="h-6 w-6 text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+            <h3 className="text-lg font-semibold text-white">
               Not Blacklisted
             </h3>
-            <p className="mt-1 text-sm leading-relaxed text-emerald-800/80 dark:text-emerald-200/80">
+            <p className="mt-1 text-sm leading-relaxed text-white/80">
               No blacklist record found for USDT on TRON at the time of this check.
             </p>
           </div>
@@ -381,18 +380,18 @@ function StatusBanner({ data }: { data: ApiResponse }) {
   return (
     <motion.div
       {...fadeInUp}
-      transition={{ duration: 0.25 }}
-      className="relative overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 dark:border-amber-500/30 dark:from-amber-950/50 dark:to-amber-900/20"
+      transition={{ duration: 0.15 }}
+      className="rounded-sm bg-warning p-5"
     >
       <div className="flex gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/25">
-          <AlertTriangle className="h-6 w-6" />
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm bg-black/10">
+          <AlertTriangle className="h-6 w-6 text-warning-foreground" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+          <h3 className="text-lg font-semibold text-warning-foreground">
             Inconclusive
           </h3>
-          <p className="mt-1 text-sm leading-relaxed text-amber-800/80 dark:text-amber-200/80">
+          <p className="mt-1 text-sm leading-relaxed text-warning-foreground/80">
             Could not verify via both methods due to network issues. Please try again.
           </p>
         </div>
@@ -419,36 +418,33 @@ function MethodCard({
   const evidence = ok ? result.evidence : undefined;
 
   const statusConfig = !ok
-    ? { label: "Unavailable", variant: "warning" as BadgeVariant, dotClass: "bg-amber-500" }
+    ? { label: "Unavailable", variant: "warning" as BadgeVariant, accentClass: "accent-bar-warning" }
     : blacklisted
-      ? { label: "Blacklisted", variant: "danger" as BadgeVariant, dotClass: "bg-red-500" }
-      : { label: "Clear", variant: "success" as BadgeVariant, dotClass: "bg-emerald-500" };
+      ? { label: "Blacklisted", variant: "danger" as BadgeVariant, accentClass: "accent-bar-danger" }
+      : { label: "Clear", variant: "success" as BadgeVariant, accentClass: "accent-bar-success" };
 
   return (
-    <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
-      <Card className="h-full overflow-hidden border-border/60 bg-card/80 backdrop-blur-sm transition-shadow hover:shadow-md">
+    <motion.div {...fadeInUp} transition={{ duration: 0.15 }}>
+      <Card className={`h-full overflow-hidden accent-bar ${statusConfig.accentClass}`}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-base font-semibold">{title}</CardTitle>
+              <CardTitle>{title}</CardTitle>
               <CardDescription className="mt-0.5 text-xs">{description}</CardDescription>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className={`h-2 w-2 rounded-full ${statusConfig.dotClass}`} />
-              <Badge variant={statusConfig.variant} className="text-[11px]">
-                {statusConfig.label}
-              </Badge>
-            </div>
+            <Badge variant={statusConfig.variant}>
+              {statusConfig.label}
+            </Badge>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
           <Separator className="mb-4" />
           {!ok ? (
-            <div className="rounded-lg bg-muted/50 px-3 py-2.5 text-sm text-muted-foreground">
+            <div className="rounded-sm bg-muted px-3 py-2.5 text-sm text-muted-foreground">
               {result.error}
             </div>
           ) : (
-            <div className="space-y-0 divide-y divide-border/50">
+            <div className="space-y-0 divide-y divide-border">
               <DataRow
                 label="Contract"
                 value={evidence?.contractAddress ?? USDT_TRC20_CONTRACT}
@@ -489,14 +485,14 @@ function ScamWarningAlert() {
   return (
     <motion.div
       {...fadeInUp}
-      transition={{ duration: 0.25, delay: 0.1 }}
-      className="rounded-xl border border-red-200/60 bg-red-50/50 p-4 dark:border-red-500/20 dark:bg-red-950/30"
+      transition={{ duration: 0.15, delay: 0.08 }}
+      className="rounded-sm border-l-2 border-l-danger bg-danger-muted p-4"
     >
       <div className="flex gap-3">
-        <ShieldAlert className="h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+        <ShieldAlert className="h-5 w-5 shrink-0 text-danger" />
         <div>
-          <p className="text-sm font-medium text-red-900 dark:text-red-100">Scam Warning</p>
-          <p className="mt-0.5 text-sm text-red-800/80 dark:text-red-200/70">
+          <p className="text-sm font-medium text-foreground">Scam Warning</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             No legitimate service can &quot;unblacklist&quot; an address for a fee. Never share your seed phrase.
           </p>
         </div>
@@ -580,13 +576,13 @@ function SaveReportControl({ report }: { report: ApiResponse }) {
   const saved = saveState.state === "saved";
 
   return (
-    <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
-      <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+    <motion.div {...fadeInUp} transition={{ duration: 0.15 }}>
+      <Card>
         <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="text-sm font-medium text-foreground">Save this report</div>
             <div className="mt-1 text-sm text-muted-foreground">Stores this analysis under your account history.</div>
-            {!settings && <div className="mt-1 text-xs text-muted-foreground">Checking save settings…</div>}
+            {!settings && <div className="mt-1 text-xs text-muted-foreground">Checking save settings...</div>}
             {settings && !settings.persistenceAvailable && (
               <div className="mt-1 text-xs text-muted-foreground">Report saving is unavailable on this deployment.</div>
             )}
@@ -598,7 +594,7 @@ function SaveReportControl({ report }: { report: ApiResponse }) {
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving…
+                Saving
               </>
             ) : saved ? (
               <>
@@ -741,7 +737,7 @@ export function BlacklistChecker() {
             normalizedAddress={normalizedAddress}
             shouldRerun={isValid && shouldAutoRerunAfterSignIn}
             onRerun={(addr) => {
-              toast.message("Signed in — loading enhanced checks…");
+              toast.message("Signed in — loading enhanced checks...");
               runCheck(addr);
             }}
           />
@@ -750,902 +746,887 @@ export function BlacklistChecker() {
 
       {/* Hero Section */}
       <section className="mx-auto max-w-2xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <h1 className="bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl lg:text-5xl">
-              {m.title}
-            </h1>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {m.subtitle}
-            </p>
-          </motion.div>
-
-          {/* Trust Badges */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="mt-6 flex flex-wrap items-center justify-center gap-2"
-          >
-            <TrustBadge icon={ShieldCheck}>{m.noKeysBadge}</TrustBadge>
-            <TrustBadge icon={EyeOff}>{m.noTrackingBadge}</TrustBadge>
-          </motion.div>
-        </section>
-
-        {/* Input Card */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          className="mx-auto mt-8 max-w-2xl sm:mt-10"
+          transition={{ duration: 0.2 }}
         >
-          <Card className="overflow-hidden border-border/60 bg-card/95 shadow-xl shadow-black/5 backdrop-blur-sm">
-            <CardHeader className="space-y-2 pb-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Info className="h-4 w-4" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Check Any TRON Address</CardTitle>
-                  <CardDescription className="mt-0.5 leading-relaxed">
-                    Only paste a public address. Never share seed phrases or private keys.
-                  </CardDescription>
-                </div>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            {m.title}
+          </h1>
+          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {m.subtitle}
+          </p>
+        </motion.div>
+
+        {/* Trust Badges */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.08 }}
+          className="mt-6 flex flex-wrap items-center justify-center gap-2"
+        >
+          <TrustBadge icon={ShieldCheck}>{m.noKeysBadge}</TrustBadge>
+          <TrustBadge icon={EyeOff}>{m.noTrackingBadge}</TrustBadge>
+        </motion.div>
+      </section>
+
+      {/* Input Card */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: 0.1 }}
+        className="mx-auto mt-8 max-w-2xl sm:mt-10"
+      >
+        <Card className="overflow-hidden">
+          <CardHeader className="space-y-2 pb-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-primary/10 text-primary">
+                <Info className="h-4 w-4" />
               </div>
-            </CardHeader>
+              <div>
+                <CardTitle>Check Any TRON Address</CardTitle>
+                <CardDescription className="mt-0.5 leading-relaxed">
+                  Only paste a public address. Never share seed phrases or private keys.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
 
-            <CardContent className="space-y-5">
-              {/* Input Group */}
-              <div className="space-y-2">
-                <label htmlFor="tron-address" className="text-sm font-medium text-foreground">
-                  {m.inputLabel}
-                </label>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <div className="relative flex-1">
-                    <Input
-                      id="tron-address"
-                      inputMode="text"
-                      autoComplete="off"
-                      spellCheck={false}
-                      placeholder={m.inputPlaceholder}
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      className="h-12 border-border/60 bg-muted/30 pr-10 font-mono text-[15px] shadow-inner transition-all placeholder:font-sans placeholder:text-muted-foreground/60 focus:border-primary/50 focus:bg-background"
-                      aria-invalid={address.trim().length > 0 && !isValid}
-                    />
-                    {address && (
-                      <button
-                        type="button"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                        onClick={() => setAddress("")}
-                        aria-label="Clear input"
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-9"
-                    onClick={async () => {
-                      try {
-                        const text = await navigator.clipboard.readText();
-                        setAddress(text);
-                        toast.success("Pasted from clipboard");
-                      } catch {
-                        toast.error("Unable to access clipboard");
-                      }
-                    }}
-                  >
-                    {m.pasteCta}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-9"
-                    onClick={() => setAddress("TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7")}
-                  >
-                    {m.exampleCta}
-                  </Button>
-                  <div className="flex-1" />
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="h-9 min-w-[100px] gap-2 shadow-md shadow-primary/20"
-                    onClick={() => runCheck(normalizedAddress)}
-                    disabled={load.state === "loading" || !normalizedAddress || (validation !== null && !validation.ok)}
-                  >
-                    {load.state === "loading" ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Checking</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>{m.checkCta}</span>
-                        <ChevronRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                {/* Validation Feedback */}
-                <div className="min-h-[20px] pt-1">
-                  {validation && !validation.ok ? (
-                    <p className="text-sm text-red-600 dark:text-red-400">{validation.error}</p>
-                  ) : validation && validation.ok ? (
-                    <p className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Valid TRON address
-                    </p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Tip: double-check the first and last 4 characters
-                    </p>
+          <CardContent className="space-y-5">
+            {/* Input Group */}
+            <div className="space-y-3">
+              <label htmlFor="tron-address" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {m.inputLabel}
+              </label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="relative flex-1">
+                  <Input
+                    id="tron-address"
+                    inputMode="text"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder={m.inputPlaceholder}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="h-12 border-b-2 border-border bg-transparent pr-10 font-mono text-[15px] transition-colors placeholder:font-sans placeholder:text-muted-foreground/60 focus-visible:border-primary"
+                    aria-invalid={address.trim().length > 0 && !isValid}
+                  />
+                  {address && (
+                    <button
+                      type="button"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 rounded-sm p-2 text-muted-foreground transition-colors hover:text-foreground"
+                      onClick={() => setAddress("")}
+                      aria-label="Clear input"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   )}
                 </div>
               </div>
 
-              <Separator className="bg-border/60" />
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-9"
+                  onClick={async () => {
+                    try {
+                      const text = await navigator.clipboard.readText();
+                      setAddress(text);
+                      toast.success("Pasted from clipboard");
+                    } catch {
+                      toast.error("Unable to access clipboard");
+                    }
+                  }}
+                >
+                  {m.pasteCta}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-9"
+                  onClick={() => setAddress("TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7")}
+                >
+                  {m.exampleCta}
+                </Button>
+                <div className="flex-1" />
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-9 min-w-[100px] gap-2"
+                  onClick={() => runCheck(normalizedAddress)}
+                  disabled={load.state === "loading" || !normalizedAddress || (validation !== null && !validation.ok)}
+                >
+                  {load.state === "loading" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Checking</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{m.checkCta}</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
 
-              {/* Contract Reference */}
-              <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-foreground">USDT Contract:</span>
-                  <a
-                    href={tronscanContractUrl(USDT_TRC20_CONTRACT)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
-                  >
-                    {USDT_TRC20_CONTRACT}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                  <InlineCopyButton value={USDT_TRC20_CONTRACT} />
-                </div>
+              {/* Validation Feedback */}
+              <div className="min-h-[20px] pt-1">
+                {validation && !validation.ok ? (
+                  <p className="text-sm text-danger">{validation.error}</p>
+                ) : validation && validation.ok ? (
+                  <p className="flex items-center gap-1.5 text-sm text-success">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Valid TRON address
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Tip: double-check the first and last 4 characters
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Contract Reference */}
+            <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">USDT Contract:</span>
                 <a
-                  href="https://tronscan.org/#/blockchain/contracts"
+                  href={tronscanContractUrl(USDT_TRC20_CONTRACT)}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-muted-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
+                  className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
                 >
-                  Open TronScan
+                  {USDT_TRC20_CONTRACT}
                   <ExternalLink className="h-3 w-3" />
                 </a>
+                <InlineCopyButton value={USDT_TRC20_CONTRACT} />
               </div>
-            </CardContent>
-          </Card>
-        </motion.section>
-
-        {/* Results Section */}
-        <section className="mx-auto mt-8 max-w-5xl">
-          <AnimatePresence mode="wait">
-            {/* Loading State */}
-            {load.state === "loading" && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
+              <a
+                href="https://tronscan.org/#/blockchain/contracts"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
               >
-                {/* Main loading card - minimal design */}
-                <div className="rounded-2xl border border-border/60 bg-card/80 p-8">
-                  <div className="flex flex-col items-center justify-center gap-5">
-                    {/* Simple elegant spinner */}
-                    <div className="relative h-12 w-12">
-                      <div className="absolute inset-0 animate-spin rounded-full border-[2.5px] border-muted/40 border-t-primary" />
-                    </div>
+                Open TronScan
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.section>
 
-                    {/* Loading text */}
-                    <div className="text-center">
-                      <p className="text-base font-medium text-foreground">Analyzing address</p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Running blacklist checks and risk analysis
-                      </p>
-                    </div>
+      {/* Results Section */}
+      <section className="mx-auto mt-8 max-w-5xl">
+        <AnimatePresence mode="wait">
+          {/* Loading State */}
+          {load.state === "loading" && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-4"
+            >
+              {/* Main loading card */}
+              <div className="rounded-sm border border-border bg-card p-8">
+                <div className="flex flex-col items-center justify-center gap-5">
+                  {/* Simple spinner */}
+                  <div className="h-10 w-10 spinner" />
+
+                  {/* Loading text */}
+                  <div className="text-center">
+                    <p className="text-base font-medium text-foreground">Analyzing address</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Running blacklist checks and risk analysis
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Method cards - compact */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="flex items-center gap-4 rounded-sm border border-border bg-card px-5 py-4">
+                  <div className="h-6 w-6 spinner border-t-success" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">TronScan Index</p>
+                    <p className="text-xs text-muted-foreground">Querying indexed data...</p>
                   </div>
                 </div>
 
-                {/* Method cards - compact */}
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/80 px-5 py-4">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted/40 border-t-emerald-500" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">TronScan Index</p>
-                      <p className="text-xs text-muted-foreground">Querying indexed data...</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/80 px-5 py-4">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted/40 border-t-blue-500" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">On-chain Read</p>
-                      <p className="text-xs text-muted-foreground">Reading smart contract...</p>
-                    </div>
+                <div className="flex items-center gap-4 rounded-sm border border-border bg-card px-5 py-4">
+                  <div className="h-6 w-6 spinner border-t-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">On-chain Read</p>
+                    <p className="text-xs text-muted-foreground">Reading smart contract...</p>
                   </div>
                 </div>
-              </motion.div>
-            )}
+              </div>
+            </motion.div>
+          )}
 
-            {/* Error State */}
-            {load.state === "error" && (
-              <motion.div
-                key="error"
-                {...fadeInUp}
-                transition={{ duration: 0.25 }}
-                className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 dark:border-amber-500/30 dark:from-amber-950/50 dark:to-amber-900/20"
-              >
-                <div className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
-                    <AlertTriangle className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-amber-900 dark:text-amber-100">
-                      Couldn&apos;t complete the check
-                    </h3>
-                    <p className="mt-1 text-sm text-amber-800/80 dark:text-amber-200/80">{load.message}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => runCheck(normalizedAddress)}
-                        disabled={!isValid}
-                      >
-                        Retry
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setLoad({ state: "idle" })}
-                      >
-                        Clear
-                      </Button>
-                    </div>
-                    {load.details && (
-                      <details className="mt-4 rounded-lg border border-amber-200/60 bg-white/50 dark:border-amber-500/20 dark:bg-black/20">
-                        <summary className="cursor-pointer px-3 py-2 text-xs font-medium text-amber-800 dark:text-amber-200">
-                          Technical details
-                        </summary>
-                        <pre className="overflow-auto border-t border-amber-200/60 px-3 py-2 font-mono text-xs text-amber-700/80 dark:border-amber-500/20 dark:text-amber-300/80">
-                          {load.details}
-                        </pre>
-                      </details>
-                    )}
-                  </div>
+          {/* Error State */}
+          {load.state === "error" && (
+            <motion.div
+              key="error"
+              {...fadeInUp}
+              transition={{ duration: 0.15 }}
+              className="rounded-sm bg-warning p-5"
+            >
+              <div className="flex gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-black/10">
+                  <AlertTriangle className="h-5 w-5 text-warning-foreground" />
                 </div>
-              </motion.div>
-            )}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-warning-foreground">
+                    Couldn&apos;t complete the check
+                  </h3>
+                  <p className="mt-1 text-sm text-warning-foreground/80">{load.message}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="border-warning-foreground/30 bg-transparent text-warning-foreground hover:bg-warning-foreground/10"
+                      onClick={() => runCheck(normalizedAddress)}
+                      disabled={!isValid}
+                    >
+                      Retry
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-warning-foreground hover:bg-warning-foreground/10"
+                      onClick={() => setLoad({ state: "idle" })}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                  {load.details && (
+                    <details className="mt-4 rounded-sm border border-warning-foreground/20 bg-black/5">
+                      <summary className="cursor-pointer px-3 py-2 text-xs font-medium text-warning-foreground">
+                        Technical details
+                      </summary>
+                      <pre className="overflow-auto border-t border-warning-foreground/20 px-3 py-2 font-mono text-xs text-warning-foreground/80">
+                        {load.details}
+                      </pre>
+                    </details>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
-            {/* Success State */}
-            {load.state === "success" && (
-              <motion.div
-                key="success"
-                variants={staggerContainer}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="space-y-6"
-              >
-                {/* Status Banner */}
-                <StatusBanner data={load.data} />
+          {/* Success State */}
+          {load.state === "success" && (
+            <motion.div
+              key="success"
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="space-y-6"
+            >
+              {/* Status Banner */}
+              <StatusBanner data={load.data} />
 
-                {/* USDT Balance - Prominent Display */}
-                {load.data.balance?.ok && (
-                  <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
-                    <Card className="overflow-hidden border-border/60 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/30 dark:to-teal-950/30">
-                      <CardContent className="p-5">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-4">
-                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
-                              <span className="text-xl font-bold">₮</span>
-                            </div>
-                            <div>
-                              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">USDT Balance</div>
-                              <div className="mt-1 text-3xl font-bold tracking-tight text-foreground">
-                                {Number(load.data.balance.usdt).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
-                              </div>
-                            </div>
-                          </div>
-                          <Badge variant="outline" className="shrink-0 bg-background/60">TRC-20</Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )}
-
-                {clerkEnabled && (
-                  <SignedIn>
-                    <SaveReportControl report={load.data} />
-                  </SignedIn>
-                )}
-
-                {/* Summary Card */}
-                <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
-                  <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+              {/* USDT Balance - Prominent Display */}
+              {load.data.balance?.ok && (
+                <motion.div {...fadeInUp} transition={{ duration: 0.15 }}>
+                  <Card className="overflow-hidden accent-bar accent-bar-success">
                     <CardContent className="p-5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {consensus?.status === "blacklisted" && (
-                          <Badge variant="danger" className="gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                            Blacklisted
-                          </Badge>
-                        )}
-                        {consensus?.status === "not_blacklisted" && (
-                          <Badge variant="success" className="gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                            Not blacklisted
-                          </Badge>
-                        )}
-                        {consensus?.status === "inconclusive" && (
-                          <Badge variant="warning" className="gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                            Inconclusive
-                          </Badge>
-                        )}
-                        {load.data.consensus.match ? (
-                          <Badge variant="secondary" className="gap-1 text-emerald-700 dark:text-emerald-400">
-                            <CheckCircle2 className="h-3 w-3" />
-                            Both methods agree
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="gap-1 text-amber-700 dark:text-amber-400">
-                            <AlertTriangle className="h-3 w-3" />
-                            Partial / mismatch
-                          </Badge>
-                        )}
-
-                        {typeof load.data.risk?.score === "number" && (
-                          <Badge
-                            variant={
-                              load.data.risk.tier === "low"
-                                ? "success"
-                                : load.data.risk.tier === "guarded"
-                                  ? "secondary"
-                                  : load.data.risk.tier === "elevated"
-                                    ? "warning"
-                                    : "danger"
-                            }
-                            className="gap-1"
-                          >
-                            Risk {load.data.risk.score}/100
-                          </Badge>
-                        )}
-
-                        {typeof load.data.risk?.confidence === "number" && (
-                          <Badge variant="outline" className="gap-1">
-                            Confidence {Math.round(load.data.risk.confidence)}/100
-                          </Badge>
-                        )}
-
-                        {load.data.checks?.entity?.ok && (
-                          <Badge
-                            variant={
-                              load.data.checks.entity.kind === "exchange"
-                                ? "secondary"
-                                : load.data.checks.entity.kind === "particular"
-                                  ? "outline"
-                                  : "outline"
-                            }
-                            className="gap-1"
-                          >
-                            {load.data.checks.entity.kind === "exchange" ? "Exchange" : load.data.checks.entity.kind === "particular" ? "Particular" : "Unlabeled"}
-                          </Badge>
-                        )}
-
-                        {load.data.checks?.sanctions?.ok && (
-                          <Badge
-                            variant={load.data.checks.sanctions.matched ? "danger" : "success"}
-                            className="gap-1"
-                          >
-                            {load.data.checks.sanctions.matched ? "OFAC match" : "No OFAC match"}
-                          </Badge>
-                        )}
-
-                        {!load.data.checks?.sanctions?.ok && (
-                          <Badge variant="warning" className="gap-1">
-                            Sanctions screen unavailable
-                          </Badge>
-                        )}
-
-                        {load.data.access?.authenticated === false && (
-                          <Badge variant="outline" className="gap-1">
-                            Free (limited)
-                          </Badge>
-                        )}
-                        <Badge variant="outline" className="ml-auto">
-                          {formatDateTime(load.data.timestamps.checkedAtIso)}
-                        </Badge>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-sm bg-success text-white">
+                            <span className="text-xl font-bold">₮</span>
+                          </div>
+                          <div>
+                            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">USDT Balance</div>
+                            <div className="mt-1 text-3xl font-bold tracking-tight text-foreground">
+                              {Number(load.data.balance.usdt).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant="outline">TRC-20</Badge>
                       </div>
-
-                      <Separator className="my-4 bg-border/60" />
-
-                      <DataRow
-                        label="Checked Address"
-                        value={load.data.address}
-                        copyValue={load.data.address}
-                        href={tronscanAddressUrl(load.data.address)}
-                        mono
-                      />
-
-                      {/* Desktop 2-column grid for entity and volume */}
-                      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                      {load.data.checks?.entity?.ok && (
-                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              Entity tag (best-effort)
-                            </div>
-                            <Badge variant="outline">
-                              Confidence {Math.round(load.data.checks.entity.confidence * 100)}%
-                            </Badge>
-                          </div>
-                          <div className="mt-2 text-sm text-foreground">{load.data.checks.entity.label}</div>
-                          {load.data.checks.entity.subjectTag?.publicTag && (
-                            <div className="mt-2 text-sm text-muted-foreground">
-                              TronScan tag:{" "}
-                              <a
-                                href={tronscanAddressUrl(load.data.address)}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
-                              >
-                                {load.data.checks.entity.subjectTag.publicTag}
-                              </a>
-                            </div>
-                          )}
-                          {load.data.checks.entity.outbound && (
-                            <div className="mt-3 text-sm text-muted-foreground">
-                              Observed outbound: {load.data.checks.entity.outbound.totalOutboundAmount} USDT · To exchange-tagged:{" "}
-                              {Math.round(load.data.checks.entity.outbound.exchangeTaggedShare * 100)}%
-                            </div>
-                          )}
-                          {load.data.checks.entity.outbound && load.data.checks.entity.outbound.top.some((t) => t.isExchangeTagged) && (
-                            <div className="mt-3 space-y-2">
-                              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                Top outbound exchange destinations
-                              </div>
-                              {load.data.checks.entity.outbound.top
-                                .filter((t) => t.isExchangeTagged)
-                                .slice(0, 3)
-                                .map((t) => (
-                                  <div key={t.address} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background/60 px-3 py-2">
-                                    <div className="min-w-0">
-                                      <a
-                                        href={tronscanAddressUrl(t.address)}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="font-mono text-[13px] text-foreground underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
-                                      >
-                                        {truncateAddress(t.address)}
-                                      </a>
-                                      {t.publicTag && <div className="mt-0.5 text-xs text-muted-foreground">{t.publicTag}</div>}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                      {t.outboundAmount} USDT ({t.outboundTxCount})
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          )}
-                          {load.data.checks.entity.reasons?.length > 0 && (
-                            <div className="mt-3 text-xs text-muted-foreground">
-                              {load.data.checks.entity.reasons.join(" ")}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {load.data.checks?.volume && load.data.checks.volume.ok && (
-                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                          <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            USDT volume (best-effort)
-                          </div>
-                          <div className="mt-2 grid gap-3 sm:grid-cols-3">
-                            <div className="rounded-lg bg-background/60 p-3">
-                              <div className="text-xs font-medium text-muted-foreground">7 days</div>
-                              <div className="mt-1 text-sm text-foreground">
-                                In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d7.inbound.amount)} ({load.data.checks.volume.stats.windows.d7.inbound.txCount})
-                              </div>
-                              <div className="text-sm text-foreground">
-                                Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d7.outbound.amount)} ({load.data.checks.volume.stats.windows.d7.outbound.txCount})
-                              </div>
-                            </div>
-                            <div className="rounded-lg bg-background/60 p-3">
-                              <div className="text-xs font-medium text-muted-foreground">30 days</div>
-                              <div className="mt-1 text-sm text-foreground">
-                                In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d30.inbound.amount)} ({load.data.checks.volume.stats.windows.d30.inbound.txCount})
-                              </div>
-                              <div className="text-sm text-foreground">
-                                Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d30.outbound.amount)} ({load.data.checks.volume.stats.windows.d30.outbound.txCount})
-                              </div>
-                            </div>
-                            <div className="rounded-lg bg-background/60 p-3">
-                              <div className="text-xs font-medium text-muted-foreground">90 days</div>
-                              <div className="mt-1 text-sm text-foreground">
-                                In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d90.inbound.amount)} ({load.data.checks.volume.stats.windows.d90.inbound.txCount})
-                              </div>
-                              <div className="text-sm text-foreground">
-                                Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d90.outbound.amount)} ({load.data.checks.volume.stats.windows.d90.outbound.txCount})
-                              </div>
-                            </div>
-                          </div>
-                          {(load.data.checks.volume.stats.largestInbound || load.data.checks.volume.stats.largestOutbound) && (
-                            <div className="mt-3 space-y-2">
-                              {load.data.checks.volume.stats.largestInbound && (
-                                <DataRow
-                                  label="Largest inbound"
-                                  value={`${load.data.checks.volume.stats.largestInbound.amount} USDT`}
-                                  href={tronscanTxUrl(load.data.checks.volume.stats.largestInbound.txHash)}
-                                />
-                              )}
-                              {load.data.checks.volume.stats.largestOutbound && (
-                                <DataRow
-                                  label="Largest outbound"
-                                  value={`${load.data.checks.volume.stats.largestOutbound.amount} USDT`}
-                                  href={tronscanTxUrl(load.data.checks.volume.stats.largestOutbound.txHash)}
-                                />
-                              )}
-                            </div>
-                          )}
-                          {load.data.checks.volume.notices?.length > 0 && (
-                            <div className="mt-3 text-xs text-muted-foreground">
-                              {load.data.checks.volume.notices.join(" ")}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {load.data.checks?.volume &&
-                        typeof load.data.checks.volume === "object" &&
-                        "ok" in load.data.checks.volume &&
-                        (load.data.checks.volume as { ok: boolean }).ok === false &&
-                        (load.data.checks.volume as { locked?: boolean }).locked && (
-                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground lg:col-span-2">
-                            Volume context is locked. Sign in to unlock additional AML checks.
-                          </div>
-                        )}
-                      </div>
-                      {/* End of entity/volume 2-column grid */}
-
-                      {/* Desktop 2-column grid for exposure and tracing */}
-                      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                      {load.data.checks?.exposure1hop && load.data.checks.exposure1hop.ok && (
-                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              Direct exposure (1-hop, inbound)
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant={load.data.checks.exposure1hop.summary.flaggedCounterpartyCount > 0 ? "warning" : "success"}>
-                                Flagged: {load.data.checks.exposure1hop.summary.flaggedCounterpartyCount}/10
-                              </Badge>
-                              <Badge variant="outline">
-                                Window: {load.data.checks.exposure1hop.window.lookbackDays}d
-                              </Badge>
-                            </div>
-                          </div>
-
-                          <div className="mt-2 text-sm text-muted-foreground">
-                            Observed inbound: {load.data.checks.exposure1hop.inbound.totalInboundAmount} USDT ({load.data.checks.exposure1hop.inbound.totalInboundTxCount} tx)
-                          </div>
-
-                          <div className="mt-3 space-y-2">
-                            {load.data.checks.exposure1hop.counterparties.slice(0, 10).map((c) => (
-                              <div key={c.address} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-background/60 px-3 py-2">
-                                <div className="flex min-w-0 items-center gap-2">
-                                  <a
-                                    href={tronscanAddressUrl(c.address)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="truncate font-mono text-[13px] text-foreground underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
-                                  >
-                                    {truncateAddress(c.address)}
-                                  </a>
-                                  {c.flags.usdtBlacklisted && <Badge variant="danger">USDT blacklisted</Badge>}
-                                  {c.flags.sanctioned && <Badge variant="danger">OFAC</Badge>}
-                                </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <span>{c.inboundAmount} USDT</span>
-                                  <span className="text-muted-foreground/60">·</span>
-                                  <span>{c.inboundTxCount} tx</span>
-                                  {c.sampleTxHash && (
-                                    <>
-                                      <span className="text-muted-foreground/60">·</span>
-                                      <a
-                                        href={tronscanTxUrl(c.sampleTxHash)}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="inline-flex items-center gap-1 underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
-                                      >
-                                        tx
-                                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
-                                      </a>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          {load.data.checks.exposure1hop.notices?.length > 0 && (
-                            <div className="mt-3 text-xs text-muted-foreground">
-                              {load.data.checks.exposure1hop.notices.join(" ")}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {load.data.checks?.exposure1hop &&
-                        typeof load.data.checks.exposure1hop === "object" &&
-                        "ok" in load.data.checks.exposure1hop &&
-                        (load.data.checks.exposure1hop as { ok: boolean }).ok === false && (
-                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
-                            Exposure check unavailable: {(load.data.checks.exposure1hop as { error: string }).error}
-                          </div>
-                        )}
-
-                      {load.data.checks?.tracing2hop &&
-                        typeof load.data.checks.tracing2hop === "object" &&
-                        "ok" in load.data.checks.tracing2hop &&
-                        (load.data.checks.tracing2hop as { ok: boolean }).ok === false &&
-                        (load.data.checks.tracing2hop as { locked?: boolean }).locked && (
-                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
-                            2-hop tracing is locked. Sign in to unlock advanced AML checks.
-                          </div>
-                        )}
-
-                      {load.data.checks?.tracing2hop && load.data.checks.tracing2hop.ok && (
-                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              2-hop tracing (sampled)
-                            </div>
-                            <Badge variant={load.data.checks.tracing2hop.anyFlagged ? "warning" : "success"}>
-                              {load.data.checks.tracing2hop.anyFlagged ? "Flagged proximity detected" : "No flagged proximity detected"}
-                            </Badge>
-                          </div>
-
-                          {load.data.checks.tracing2hop.anyFlagged && (
-                            <div className="mt-3 space-y-2">
-                              {load.data.checks.tracing2hop.paths
-                                .filter((p) => p.sources.length > 0)
-                                .slice(0, 5)
-                                .map((p) => (
-                                  <div key={p.viaCounterparty} className="rounded-lg bg-background/60 px-3 py-2">
-                                    <div className="text-xs font-medium text-muted-foreground">
-                                      via{" "}
-                                      <a
-                                        href={tronscanAddressUrl(p.viaCounterparty)}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="font-mono underline decoration-muted-foreground/30 underline-offset-4 hover:decoration-primary"
-                                      >
-                                        {truncateAddress(p.viaCounterparty)}
-                                      </a>
-                                    </div>
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                      {p.sources.slice(0, 5).map((s) => (
-                                        <Badge key={s.address} variant="outline">
-                                          {truncateAddress(s.address)}{s.flags.usdtBlacklisted ? " · USDT" : ""}{s.flags.sanctioned ? " · OFAC" : ""}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          )}
-
-                          {load.data.checks.tracing2hop.notices?.length > 0 && (
-                            <div className="mt-3 text-xs text-muted-foreground">
-                              {load.data.checks.tracing2hop.notices.join(" ")}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {load.data.checks?.heuristics &&
-                        typeof load.data.checks.heuristics === "object" &&
-                        "ok" in load.data.checks.heuristics &&
-                        (load.data.checks.heuristics as { ok: boolean }).ok === false &&
-                        (load.data.checks.heuristics as { locked?: boolean }).locked && (
-                          <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
-                            Flow heuristics are locked. Sign in to unlock advanced AML checks.
-                          </div>
-                        )}
-
-                      {load.data.checks?.heuristics && load.data.checks.heuristics.ok && (
-                        <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              Flow heuristics (best-effort)
-                            </div>
-                            <Badge variant={load.data.checks.heuristics.findings.length ? "warning" : "success"}>
-                              Findings: {load.data.checks.heuristics.findings.length}
-                            </Badge>
-                          </div>
-                          {load.data.checks.heuristics.findings.length > 0 ? (
-                            <ul className="mt-3 space-y-2 text-sm">
-                              {load.data.checks.heuristics.findings.map((f, i) => (
-                                <li key={`${f.key}-${i}`} className="flex items-start justify-between gap-2 rounded-lg bg-background/60 px-3 py-2">
-                                  <span className="text-foreground">{f.label}</span>
-                                  <Badge variant={f.severity === "danger" ? "danger" : f.severity === "warning" ? "warning" : "secondary"}>
-                                    {f.severity}
-                                  </Badge>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <div className="mt-3 text-sm text-muted-foreground">No suspicious flow patterns detected in the sampled window.</div>
-                          )}
-                        </div>
-                      )}
-                      </div>
-                      {/* End of exposure/tracing/heuristics 2-column grid */}
-
-                      {load.data.notices?.length > 0 && (
-                        <div className="mt-4 rounded-lg bg-muted/50 p-3">
-                          <ul className="space-y-1 text-sm text-muted-foreground">
-                            {load.data.notices.map((n, i) => (
-                              <li key={i} className="flex items-start gap-2">
-                                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-                                {n}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
+              )}
 
-                {/* Scam Warning (only for blacklisted) */}
-                {load.data.consensus.status === "blacklisted" && <ScamWarningAlert />}
+              {clerkEnabled && (
+                <SignedIn>
+                  <SaveReportControl report={load.data} />
+                </SignedIn>
+              )}
 
-                {/* Evidence Cards */}
-                <div>
-                  <SectionHeader>Verification Details</SectionHeader>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <MethodCard
-                      title="TronScan Index"
-                      description="Indexed blacklist data"
-                      result={load.data.checks.tronscan}
+              {/* Summary Card */}
+              <motion.div {...fadeInUp} transition={{ duration: 0.15 }}>
+                <Card>
+                  <CardContent className="p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {consensus?.status === "blacklisted" && (
+                        <Badge variant="danger">
+                          Blacklisted
+                        </Badge>
+                      )}
+                      {consensus?.status === "not_blacklisted" && (
+                        <Badge variant="success">
+                          Not blacklisted
+                        </Badge>
+                      )}
+                      {consensus?.status === "inconclusive" && (
+                        <Badge variant="warning">
+                          Inconclusive
+                        </Badge>
+                      )}
+                      {load.data.consensus.match ? (
+                        <Badge variant="secondary" className="text-success">
+                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                          Both methods agree
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-warning">
+                          <AlertTriangle className="mr-1 h-3 w-3" />
+                          Partial / mismatch
+                        </Badge>
+                      )}
+
+                      {typeof load.data.risk?.score === "number" && (
+                        <Badge
+                          variant={
+                            load.data.risk.tier === "low"
+                              ? "success"
+                              : load.data.risk.tier === "guarded"
+                                ? "secondary"
+                                : load.data.risk.tier === "elevated"
+                                  ? "warning"
+                                  : "danger"
+                          }
+                        >
+                          Risk {load.data.risk.score}/100
+                        </Badge>
+                      )}
+
+                      {typeof load.data.risk?.confidence === "number" && (
+                        <Badge variant="outline">
+                          Confidence {Math.round(load.data.risk.confidence)}/100
+                        </Badge>
+                      )}
+
+                      {load.data.checks?.entity?.ok && (
+                        <Badge variant="outline">
+                          {load.data.checks.entity.kind === "exchange" ? "Exchange" : load.data.checks.entity.kind === "particular" ? "Particular" : "Unlabeled"}
+                        </Badge>
+                      )}
+
+                      {load.data.checks?.sanctions?.ok && (
+                        <Badge variant={load.data.checks.sanctions.matched ? "danger" : "success"}>
+                          {load.data.checks.sanctions.matched ? "OFAC match" : "No OFAC match"}
+                        </Badge>
+                      )}
+
+                      {!load.data.checks?.sanctions?.ok && (
+                        <Badge variant="warning">
+                          Sanctions screen unavailable
+                        </Badge>
+                      )}
+
+                      {load.data.access?.authenticated === false && (
+                        <Badge variant="outline">
+                          Free (limited)
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className="ml-auto">
+                        {formatDateTime(load.data.timestamps.checkedAtIso)}
+                      </Badge>
+                    </div>
+
+                    <Separator className="my-4" />
+
+                    <DataRow
+                      label="Checked Address"
+                      value={load.data.address}
+                      copyValue={load.data.address}
+                      href={tronscanAddressUrl(load.data.address)}
+                      mono
                     />
-                    <MethodCard
-                      title="On-chain Read"
-                      description="Direct contract query"
-                      result={load.data.checks.onchain}
-                    />
-                  </div>
-                </div>
 
-                {/* Guidance / FAQ */}
-                <motion.div {...fadeInUp} transition={{ duration: 0.25 }}>
-                  <SectionHeader>Learn More</SectionHeader>
-                  <Tabs defaultValue="guidance" className="mt-4">
-                    <TabsList className="h-10 w-full justify-start bg-muted/50 p-1">
-                      <TabsTrigger value="guidance" className="flex-1 sm:flex-none">
-                        Guidance
-                      </TabsTrigger>
-                      <TabsTrigger value="faq" className="flex-1 sm:flex-none">
-                        FAQ
-                      </TabsTrigger>
-                    </TabsList>
+                    {/* Desktop 2-column grid for entity and volume */}
+                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                    {load.data.checks?.entity?.ok && (
+                      <div className="rounded-sm border border-border bg-muted/50 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            Entity tag (best-effort)
+                          </div>
+                          <Badge variant="outline">
+                            Confidence {Math.round(load.data.checks.entity.confidence * 100)}%
+                          </Badge>
+                        </div>
+                        <div className="mt-2 text-sm text-foreground">{load.data.checks.entity.label}</div>
+                        {load.data.checks.entity.subjectTag?.publicTag && (
+                          <div className="mt-2 text-sm text-muted-foreground">
+                            TronScan tag:{" "}
+                            <a
+                              href={tronscanAddressUrl(load.data.address)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline decoration-border underline-offset-4 hover:decoration-primary"
+                            >
+                              {load.data.checks.entity.subjectTag.publicTag}
+                            </a>
+                          </div>
+                        )}
+                        {load.data.checks.entity.outbound && (
+                          <div className="mt-3 text-sm text-muted-foreground">
+                            Observed outbound: {load.data.checks.entity.outbound.totalOutboundAmount} USDT · To exchange-tagged:{" "}
+                            {Math.round(load.data.checks.entity.outbound.exchangeTaggedShare * 100)}%
+                          </div>
+                        )}
+                        {load.data.checks.entity.outbound && load.data.checks.entity.outbound.top.some((t) => t.isExchangeTagged) && (
+                          <div className="mt-3 space-y-2">
+                            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                              Top outbound exchange destinations
+                            </div>
+                            {load.data.checks.entity.outbound.top
+                              .filter((t) => t.isExchangeTagged)
+                              .slice(0, 3)
+                              .map((t) => (
+                                <div key={t.address} className="flex flex-wrap items-center justify-between gap-2 rounded-sm bg-background px-3 py-2">
+                                  <div className="min-w-0">
+                                    <a
+                                      href={tronscanAddressUrl(t.address)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="font-mono text-[13px] text-foreground underline decoration-border underline-offset-4 hover:decoration-primary"
+                                    >
+                                      {truncateAddress(t.address)}
+                                    </a>
+                                    {t.publicTag && <div className="mt-0.5 text-xs text-muted-foreground">{t.publicTag}</div>}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {t.outboundAmount} USDT ({t.outboundTxCount})
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                        {load.data.checks.entity.reasons?.length > 0 && (
+                          <div className="mt-3 text-xs text-muted-foreground">
+                            {load.data.checks.entity.reasons.join(" ")}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                    <TabsContent value="guidance" className="mt-4">
-                      <Card className="border-border/60 bg-card/80">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-base">What should I do next?</CardTitle>
-                          <CardDescription>Practical steps without panic</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <ul className="space-y-3 text-sm text-muted-foreground">
-                            <li className="flex items-start gap-3">
-                              <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                                1
+                    {load.data.checks?.volume && load.data.checks.volume.ok && (
+                      <div className="rounded-sm border border-border bg-muted/50 p-4">
+                        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          USDT volume (best-effort)
+                        </div>
+                        <div className="mt-2 grid gap-3 sm:grid-cols-3">
+                          <div className="rounded-sm bg-background p-3">
+                            <div className="text-xs font-medium text-muted-foreground">7 days</div>
+                            <div className="mt-1 text-sm text-foreground">
+                              In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d7.inbound.amount)} ({load.data.checks.volume.stats.windows.d7.inbound.txCount})
+                            </div>
+                            <div className="text-sm text-foreground">
+                              Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d7.outbound.amount)} ({load.data.checks.volume.stats.windows.d7.outbound.txCount})
+                            </div>
+                          </div>
+                          <div className="rounded-sm bg-background p-3">
+                            <div className="text-xs font-medium text-muted-foreground">30 days</div>
+                            <div className="mt-1 text-sm text-foreground">
+                              In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d30.inbound.amount)} ({load.data.checks.volume.stats.windows.d30.inbound.txCount})
+                            </div>
+                            <div className="text-sm text-foreground">
+                              Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d30.outbound.amount)} ({load.data.checks.volume.stats.windows.d30.outbound.txCount})
+                            </div>
+                          </div>
+                          <div className="rounded-sm bg-background p-3">
+                            <div className="text-xs font-medium text-muted-foreground">90 days</div>
+                            <div className="mt-1 text-sm text-foreground">
+                              In: {formatVolumeAmount(load.data.checks.volume.stats.windows.d90.inbound.amount)} ({load.data.checks.volume.stats.windows.d90.inbound.txCount})
+                            </div>
+                            <div className="text-sm text-foreground">
+                              Out: {formatVolumeAmount(load.data.checks.volume.stats.windows.d90.outbound.amount)} ({load.data.checks.volume.stats.windows.d90.outbound.txCount})
+                            </div>
+                          </div>
+                        </div>
+                        {(load.data.checks.volume.stats.largestInbound || load.data.checks.volume.stats.largestOutbound) && (
+                          <div className="mt-3 space-y-2">
+                            {load.data.checks.volume.stats.largestInbound && (
+                              <DataRow
+                                label="Largest inbound"
+                                value={`${load.data.checks.volume.stats.largestInbound.amount} USDT`}
+                                href={tronscanTxUrl(load.data.checks.volume.stats.largestInbound.txHash)}
+                              />
+                            )}
+                            {load.data.checks.volume.stats.largestOutbound && (
+                              <DataRow
+                                label="Largest outbound"
+                                value={`${load.data.checks.volume.stats.largestOutbound.amount} USDT`}
+                                href={tronscanTxUrl(load.data.checks.volume.stats.largestOutbound.txHash)}
+                              />
+                            )}
+                          </div>
+                        )}
+                        {load.data.checks.volume.notices?.length > 0 && (
+                          <div className="mt-3 text-xs text-muted-foreground">
+                            {load.data.checks.volume.notices.join(" ")}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {load.data.checks?.volume &&
+                      typeof load.data.checks.volume === "object" &&
+                      "ok" in load.data.checks.volume &&
+                      (load.data.checks.volume as { ok: boolean }).ok === false &&
+                      (load.data.checks.volume as { locked?: boolean }).locked && (
+                        <div className="rounded-sm border border-border bg-muted/50 p-4 text-sm text-muted-foreground lg:col-span-2">
+                          Volume context is locked. Sign in to unlock additional AML checks.
+                        </div>
+                      )}
+                    </div>
+                    {/* End of entity/volume 2-column grid */}
+
+                    {/* Desktop 2-column grid for exposure and tracing */}
+                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                    {load.data.checks?.exposure1hop && load.data.checks.exposure1hop.ok && (
+                      <div className="rounded-sm border border-border bg-muted/50 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            Direct exposure (1-hop, inbound)
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={load.data.checks.exposure1hop.summary.flaggedCounterpartyCount > 0 ? "warning" : "success"}>
+                              Flagged: {load.data.checks.exposure1hop.summary.flaggedCounterpartyCount}/10
+                            </Badge>
+                            <Badge variant="outline">
+                              Window: {load.data.checks.exposure1hop.window.lookbackDays}d
+                            </Badge>
+                          </div>
+                        </div>
+
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Observed inbound: {load.data.checks.exposure1hop.inbound.totalInboundAmount} USDT ({load.data.checks.exposure1hop.inbound.totalInboundTxCount} tx)
+                        </div>
+
+                        <div className="mt-3 space-y-2">
+                          {load.data.checks.exposure1hop.counterparties.slice(0, 10).map((c) => (
+                            <div key={c.address} className="flex flex-wrap items-center justify-between gap-2 rounded-sm bg-background px-3 py-2">
+                              <div className="flex min-w-0 items-center gap-2">
+                                <a
+                                  href={tronscanAddressUrl(c.address)}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="truncate font-mono text-[13px] text-foreground underline decoration-border underline-offset-4 hover:decoration-primary"
+                                >
+                                  {truncateAddress(c.address)}
+                                </a>
+                                {c.flags.usdtBlacklisted && <Badge variant="danger">USDT blacklisted</Badge>}
+                                {c.flags.sanctioned && <Badge variant="danger">OFAC</Badge>}
                               </div>
-                              <span>
-                                If this is an exchange address, contact the exchange&apos;s official support.
-                              </span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                              <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                                2
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span>{c.inboundAmount} USDT</span>
+                                <span className="text-muted-foreground/60">·</span>
+                                <span>{c.inboundTxCount} tx</span>
+                                {c.sampleTxHash && (
+                                  <>
+                                    <span className="text-muted-foreground/60">·</span>
+                                    <a
+                                      href={tronscanTxUrl(c.sampleTxHash)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:decoration-primary"
+                                    >
+                                      tx
+                                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                                    </a>
+                                  </>
+                                )}
                               </div>
-                              <span>
-                                Only the issuer (Tether) can address blacklist decisions.
-                              </span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                              <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                                3
-                              </div>
-                              <span>
-                                Don&apos;t pay &quot;recovery&quot; services. Never share seed phrases.
-                              </span>
-                            </li>
+                            </div>
+                          ))}
+                        </div>
+
+                        {load.data.checks.exposure1hop.notices?.length > 0 && (
+                          <div className="mt-3 text-xs text-muted-foreground">
+                            {load.data.checks.exposure1hop.notices.join(" ")}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {load.data.checks?.exposure1hop &&
+                      typeof load.data.checks.exposure1hop === "object" &&
+                      "ok" in load.data.checks.exposure1hop &&
+                      (load.data.checks.exposure1hop as { ok: boolean }).ok === false && (
+                        <div className="rounded-sm border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
+                          Exposure check unavailable: {(load.data.checks.exposure1hop as { error: string }).error}
+                        </div>
+                      )}
+
+                    {load.data.checks?.tracing2hop &&
+                      typeof load.data.checks.tracing2hop === "object" &&
+                      "ok" in load.data.checks.tracing2hop &&
+                      (load.data.checks.tracing2hop as { ok: boolean }).ok === false &&
+                      (load.data.checks.tracing2hop as { locked?: boolean }).locked && (
+                        <div className="rounded-sm border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
+                          2-hop tracing is locked. Sign in to unlock advanced AML checks.
+                        </div>
+                      )}
+
+                    {load.data.checks?.tracing2hop && load.data.checks.tracing2hop.ok && (
+                      <div className="rounded-sm border border-border bg-muted/50 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            2-hop tracing (sampled)
+                          </div>
+                          <Badge variant={load.data.checks.tracing2hop.anyFlagged ? "warning" : "success"}>
+                            {load.data.checks.tracing2hop.anyFlagged ? "Flagged proximity detected" : "No flagged proximity detected"}
+                          </Badge>
+                        </div>
+
+                        {load.data.checks.tracing2hop.anyFlagged && (
+                          <div className="mt-3 space-y-2">
+                            {load.data.checks.tracing2hop.paths
+                              .filter((p) => p.sources.length > 0)
+                              .slice(0, 5)
+                              .map((p) => (
+                                <div key={p.viaCounterparty} className="rounded-sm bg-background px-3 py-2">
+                                  <div className="text-xs font-medium text-muted-foreground">
+                                    via{" "}
+                                    <a
+                                      href={tronscanAddressUrl(p.viaCounterparty)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="font-mono underline decoration-border underline-offset-4 hover:decoration-primary"
+                                    >
+                                      {truncateAddress(p.viaCounterparty)}
+                                    </a>
+                                  </div>
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    {p.sources.slice(0, 5).map((s) => (
+                                      <Badge key={s.address} variant="outline">
+                                        {truncateAddress(s.address)}{s.flags.usdtBlacklisted ? " · USDT" : ""}{s.flags.sanctioned ? " · OFAC" : ""}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+
+                        {load.data.checks.tracing2hop.notices?.length > 0 && (
+                          <div className="mt-3 text-xs text-muted-foreground">
+                            {load.data.checks.tracing2hop.notices.join(" ")}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {load.data.checks?.heuristics &&
+                      typeof load.data.checks.heuristics === "object" &&
+                      "ok" in load.data.checks.heuristics &&
+                      (load.data.checks.heuristics as { ok: boolean }).ok === false &&
+                      (load.data.checks.heuristics as { locked?: boolean }).locked && (
+                        <div className="rounded-sm border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
+                          Flow heuristics are locked. Sign in to unlock advanced AML checks.
+                        </div>
+                      )}
+
+                    {load.data.checks?.heuristics && load.data.checks.heuristics.ok && (
+                      <div className="rounded-sm border border-border bg-muted/50 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            Flow heuristics (best-effort)
+                          </div>
+                          <Badge variant={load.data.checks.heuristics.findings.length ? "warning" : "success"}>
+                            Findings: {load.data.checks.heuristics.findings.length}
+                          </Badge>
+                        </div>
+                        {load.data.checks.heuristics.findings.length > 0 ? (
+                          <ul className="mt-3 space-y-2 text-sm">
+                            {load.data.checks.heuristics.findings.map((f, i) => (
+                              <li key={`${f.key}-${i}`} className="flex items-start justify-between gap-2 rounded-sm bg-background px-3 py-2">
+                                <span className="text-foreground">{f.label}</span>
+                                <Badge variant={f.severity === "danger" ? "danger" : f.severity === "warning" ? "warning" : "secondary"}>
+                                  {f.severity}
+                                </Badge>
+                              </li>
+                            ))}
                           </ul>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
+                        ) : (
+                          <div className="mt-3 text-sm text-muted-foreground">No suspicious flow patterns detected in the sampled window.</div>
+                        )}
+                      </div>
+                    )}
+                    </div>
+                    {/* End of exposure/tracing/heuristics 2-column grid */}
 
-                    <TabsContent value="faq" className="mt-4">
-                      <Card className="border-border/60 bg-card/80">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-base">Frequently Asked Questions</CardTitle>
-                          <CardDescription>Quick answers to common questions</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="meaning" className="border-border/60">
-                              <AccordionTrigger className="py-3 text-sm hover:no-underline">
-                                What does &quot;blacklisted&quot; mean?
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-4 text-sm text-muted-foreground">
-                                The USDT smart contract can restrict addresses. If blacklisted, USDT transfers
-                                from that address will likely revert on-chain.
-                              </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="moves" className="border-border/60">
-                              <AccordionTrigger className="py-3 text-sm hover:no-underline">
-                                What can and can&apos;t move?
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-4 text-sm text-muted-foreground">
-                                This check only applies to USDT (TRC20). Other tokens or TRX may still be
-                                transferable, depending on their contract rules.
-                              </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="privacy" className="border-b-0 border-border/60">
-                              <AccordionTrigger className="py-3 text-sm hover:no-underline">
-                                Do you store my address?
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-4 text-sm text-muted-foreground">
-                                No. This site doesn&apos;t log or store addresses by default, and it has no
-                                analytics.
-                              </AccordionContent>
-                            </AccordionItem>
-                          </Accordion>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                  </Tabs>
-                </motion.div>
+                    {load.data.notices?.length > 0 && (
+                      <div className="mt-4 rounded-sm bg-muted/50 p-4">
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          {load.data.notices.map((n, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
+                              {n}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
 
-        {/* Footer disclaimer */}
-        <div className="mx-auto mt-12 max-w-2xl border-t border-border/60 pt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Informational only; not legal advice. Never share seed phrases or private keys.
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Created by{" "}
-            <a
-              className="font-medium text-foreground underline decoration-muted-foreground/30 underline-offset-4 transition-colors hover:decoration-primary"
-              href="https://www.instagram.com/chikocryptocr/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Chikocorp
-            </a>
-          </p>
-        </div>
+              {/* Scam Warning (only for blacklisted) */}
+              {load.data.consensus.status === "blacklisted" && <ScamWarningAlert />}
+
+              {/* Evidence Cards */}
+              <div>
+                <SectionHeader>Verification Details</SectionHeader>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <MethodCard
+                    title="TronScan Index"
+                    description="Indexed blacklist data"
+                    result={load.data.checks.tronscan}
+                  />
+                  <MethodCard
+                    title="On-chain Read"
+                    description="Direct contract query"
+                    result={load.data.checks.onchain}
+                  />
+                </div>
+              </div>
+
+              {/* Guidance / FAQ */}
+              <motion.div {...fadeInUp} transition={{ duration: 0.15 }}>
+                <SectionHeader>Learn More</SectionHeader>
+                <Tabs defaultValue="guidance" className="mt-4">
+                  <TabsList className="w-full justify-start">
+                    <TabsTrigger value="guidance">
+                      Guidance
+                    </TabsTrigger>
+                    <TabsTrigger value="faq">
+                      FAQ
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="guidance" className="mt-4">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle>What should I do next?</CardTitle>
+                        <CardDescription>Practical steps without panic</CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ul className="space-y-3 text-sm text-muted-foreground">
+                          <li className="flex items-start gap-3">
+                            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">
+                              1
+                            </div>
+                            <span>
+                              If this is an exchange address, contact the exchange&apos;s official support.
+                            </span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">
+                              2
+                            </div>
+                            <span>
+                              Only the issuer (Tether) can address blacklist decisions.
+                            </span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">
+                              3
+                            </div>
+                            <span>
+                              Don&apos;t pay &quot;recovery&quot; services. Never share seed phrases.
+                            </span>
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="faq" className="mt-4">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle>Frequently Asked Questions</CardTitle>
+                        <CardDescription>Quick answers to common questions</CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value="meaning">
+                            <AccordionTrigger className="py-3 text-sm">
+                              What does &quot;blacklisted&quot; mean?
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-4 text-sm">
+                              The USDT smart contract can restrict addresses. If blacklisted, USDT transfers
+                              from that address will likely revert on-chain.
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="moves">
+                            <AccordionTrigger className="py-3 text-sm">
+                              What can and can&apos;t move?
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-4 text-sm">
+                              This check only applies to USDT (TRC20). Other tokens or TRX may still be
+                              transferable, depending on their contract rules.
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="privacy" className="border-b-0">
+                            <AccordionTrigger className="py-3 text-sm">
+                              Do you store my address?
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-4 text-sm">
+                              No. This site doesn&apos;t log or store addresses by default, and it has no
+                              analytics.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+
+      {/* Footer disclaimer */}
+      <div className="mx-auto mt-12 max-w-2xl border-t border-border pt-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Informational only; not legal advice. Never share seed phrases or private keys.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Created by{" "}
+          <a
+            className="font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-primary"
+            href="https://www.instagram.com/chikocryptocr/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Chikocorp
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

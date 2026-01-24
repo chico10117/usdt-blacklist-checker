@@ -13,6 +13,9 @@ import { classifyEntityFromTagsAndTransfers } from "@/lib/entity";
 
 export const runtime = "nodejs";
 
+const SECONDARY_TRONSCAN_OPTS = { timeoutMs: 2_500, maxRetries: 1 } as const;
+const SECONDARY_TRANSFERS_OPTS = { timeoutMs: 4_000, maxRetries: 1 } as const;
+
 type Evidence = {
   contractAddress: string;
   txHash?: string;
@@ -257,7 +260,7 @@ export async function POST(request: Request) {
       fetchUsdtTrc20Transfers(address, {
         lookbackDays: 90,
         pageSize: 50,
-        maxPages: authenticated ? 20 : 10,
+        maxPages: authenticated ? 10 : 5,
         timeoutMs: 8_000,
       }),
       fetchTronScanAccountTag(address),
@@ -320,11 +323,11 @@ export async function POST(request: Request) {
       const topOutbound = [...byTo.entries()]
         .map(([to, v]) => ({ to, ...v }))
         .sort((a, b) => (a.amount === b.amount ? b.count - a.count : b.amount > a.amount ? 1 : -1))
-        .slice(0, 10)
+        .slice(0, 5)
         .map((x) => x.to);
 
       const destTagPairs = await mapLimit(topOutbound, 5, async (to) => {
-        const res = await fetchTronScanAccountTag(to);
+        const res = await fetchTronScanAccountTag(to, SECONDARY_TRONSCAN_OPTS);
         return { to, res };
       });
       const destTags = new Map(destTagPairs.map((p) => [p.to, (p.res.ok ? p.res.tag : undefined)]));
@@ -335,7 +338,7 @@ export async function POST(request: Request) {
         subjectTag: subjectTagRes.ok ? subjectTagRes.tag : undefined,
         outboundTransfers: transfers.transfers,
         outboundDestTags: destTags,
-        topOutboundN: 10,
+        topOutboundN: 5,
       });
 
       entity = {
@@ -398,12 +401,12 @@ export async function POST(request: Request) {
 
     let exposure1hop: AnalyzeResponse["checks"]["exposure1hop"] = { ok: false, error: "Unavailable." };
     if (transfers.ok) {
-      const inbound = computeTopInboundCounterparties(transfers.transfers, address, { lookbackDays: 90, topN: 10, nowMs: transfers.window.toTsMs });
+      const inbound = computeTopInboundCounterparties(transfers.transfers, address, { lookbackDays: 90, topN: 5, nowMs: transfers.window.toTsMs });
       const toCheck = inbound.top.map((c) => c.address);
 
       const checked = await mapLimit(toCheck, 5, async (counterparty) => {
         const sanctionsRes = checkOfacSanctions(counterparty);
-        const blackRes = await checkTronScanUsdtBlacklist(counterparty);
+        const blackRes = await checkTronScanUsdtBlacklist(counterparty, SECONDARY_TRONSCAN_OPTS);
         return {
           address: counterparty,
           sanctioned: sanctionsRes.ok && sanctionsRes.matched,
@@ -460,19 +463,25 @@ export async function POST(request: Request) {
 
     let tracing2hop: AnalyzeResponse["checks"]["tracing2hop"] = { ok: false, error: "Sign in required.", locked: true };
     if (authenticated && transfers.ok) {
-      const inbound = computeTopInboundCounterparties(transfers.transfers, address, { lookbackDays: 90, topN: 10, nowMs: transfers.window.toTsMs });
+      const inbound = computeTopInboundCounterparties(transfers.transfers, address, { lookbackDays: 90, topN: 5, nowMs: transfers.window.toTsMs });
       const via = inbound.top.map((c) => c.address);
-      const topN = 10;
-      const sampleK = 5;
+      const topN = 5;
+      const sampleK = 3;
 
       const paths = await mapLimit(via.slice(0, topN), 2, async (viaCounterparty) => {
-        const viaTransfers = await fetchUsdtTrc20Transfers(viaCounterparty, { lookbackDays: 90, pageSize: 50, maxPages: 5, timeoutMs: 8_000 });
+        const viaTransfers = await fetchUsdtTrc20Transfers(viaCounterparty, {
+          lookbackDays: 90,
+          pageSize: 50,
+          maxPages: 2,
+          timeoutMs: SECONDARY_TRANSFERS_OPTS.timeoutMs,
+          maxRetries: SECONDARY_TRANSFERS_OPTS.maxRetries,
+        });
         if (!viaTransfers.ok) return { viaCounterparty, sources: [] as Array<{ address: string; flags: { sanctioned: boolean; usdtBlacklisted: boolean } }> };
         const sources = computeTopInboundCounterparties(viaTransfers.transfers, viaCounterparty, { lookbackDays: 90, topN: sampleK, nowMs: viaTransfers.window.toTsMs }).top;
 
         const checkedSources = await mapLimit(sources.map((s) => s.address), 5, async (sourceAddr) => {
           const s1 = checkOfacSanctions(sourceAddr);
-          const b1 = await checkTronScanUsdtBlacklist(sourceAddr);
+          const b1 = await checkTronScanUsdtBlacklist(sourceAddr, SECONDARY_TRONSCAN_OPTS);
           return { address: sourceAddr, flags: { sanctioned: s1.ok && s1.matched, usdtBlacklisted: b1.ok && b1.blacklisted } };
         });
 

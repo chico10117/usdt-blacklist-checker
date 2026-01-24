@@ -36,15 +36,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     : "Account";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
-      {/* Subtle gradient orb decoration */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-[40%] left-1/2 h-[80%] w-[80%] -translate-x-1/2 rounded-full bg-gradient-to-br from-primary/5 via-transparent to-transparent blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-background">
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col md:flex-row">
         {/* Sidebar */}
-        <aside className="w-full shrink-0 border-b border-border/60 bg-card/60 md:w-56 md:border-b-0 md:border-r lg:w-64">
+        <aside className="w-full shrink-0 border-b border-border bg-card md:w-56 md:border-b-0 md:border-r lg:w-64">
           <div className="flex h-full flex-col">
             {/* Logo */}
             <div className="flex items-center gap-3 px-4 py-4">
@@ -55,20 +50,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     alt="USDT Checker"
                     width={40}
                     height={40}
-                    className="h-10 w-10 rounded-lg object-contain"
+                    className="h-10 w-10 rounded-sm object-contain"
                     priority
                   />
-                  <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-card bg-emerald-500" />
+                  <div className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-card bg-success" />
                 </div>
                 <div className="hidden sm:block md:hidden lg:block">
                   <div className="text-sm font-semibold tracking-tight text-foreground">USDT Checker</div>
-                  <div className="text-[10px] text-muted-foreground">TRON Security</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">TRON Security</div>
                 </div>
               </Link>
             </div>
 
             {/* Navigation */}
-            <nav className="flex flex-row gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:pb-4">
+            <nav className="flex flex-row gap-0.5 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:pb-4">
               {NAV_ITEMS.map((item) => {
                 const active = isActivePath(pathname, item.href);
                 const Icon = item.icon;
@@ -78,13 +73,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors",
-                      "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                      active && "bg-muted/70 text-foreground",
+                      "relative inline-flex items-center gap-2 whitespace-nowrap rounded-sm px-3 py-2 text-sm font-medium transition-colors duration-150",
+                      "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      active && "bg-muted text-foreground",
                     )}
                   >
+                    {/* Active indicator bar */}
+                    {active && (
+                      <span className="absolute left-0 top-1 bottom-1 hidden w-0.5 bg-primary md:block" />
+                    )}
                     <Icon className="h-4 w-4" />
-                    {item.label}
+                    <span className="uppercase tracking-wide">{item.label}</span>
                   </Link>
                 );
               })}
@@ -98,8 +97,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Main content area */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
-          <header className="flex items-center justify-between gap-3 border-b border-border/60 bg-card/40 px-4 py-3 backdrop-blur-sm sm:px-6">
-            <div className="text-sm font-medium text-muted-foreground md:hidden">
+          <header className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3 sm:px-6">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:hidden">
               {NAV_ITEMS.find((item) => isActivePath(pathname, item.href))?.label ?? ""}
             </div>
             <div className="hidden md:block" />

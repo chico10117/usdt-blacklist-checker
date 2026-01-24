@@ -14,6 +14,9 @@ vi.mock("@/lib/db/watchlist", () => ({ listWatchlistItems, listWatchlistItemsFor
 const ensureUserSettingsExists = vi.fn();
 vi.mock("@/lib/db/user-settings", () => ({ ensureUserSettingsExists }));
 
+const fetchUsdtBalance = vi.fn();
+vi.mock("@/lib/tronscan", () => ({ fetchUsdtBalance }));
+
 const VALID_ADDRESS = "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb";
 
 async function callGet(url = "http://localhost/api/watchlist?limit=200") {
@@ -42,6 +45,13 @@ beforeEach(() => {
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_test_123";
   process.env.CLERK_SECRET_KEY = "sk_test_123";
   process.env.ADDRESS_HASH_KEY = "test_hash_key";
+
+  fetchUsdtBalance.mockResolvedValue({
+    ok: true,
+    balance: "0",
+    balanceBaseUnits: "0",
+    decimals: 6,
+  });
 });
 
 describe("/api/watchlist", () => {
@@ -129,13 +139,14 @@ describe("/api/watchlist", () => {
       address: VALID_ADDRESS,
       addressHash: "hash",
       label: "Merchant A",
+      usdtBalance: "0",
       createdAt: new Date("2026-01-23T00:00:00.000Z"),
     });
 
     const { res, json } = await callPost({ address: VALID_ADDRESS, label: " Merchant A " });
     expect(res.status).toBe(200);
     expect(ensureUserSettingsExists).toHaveBeenCalledWith({}, "user_123");
-    expect(createWatchlistItem).toHaveBeenCalledWith({}, "user_123", { address: VALID_ADDRESS, label: "Merchant A" });
+    expect(createWatchlistItem).toHaveBeenCalledWith({}, "user_123", { address: VALID_ADDRESS, label: "Merchant A", usdtBalance: "0" });
     expect(json?.item?.address).toBe(VALID_ADDRESS);
     expect(json?.item?.label).toBe("Merchant A");
     expect(json?.item?.createdAt).toBe("2026-01-23T00:00:00.000Z");

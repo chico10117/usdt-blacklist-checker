@@ -6,10 +6,12 @@ vi.mock("@clerk/nextjs/server", () => ({ auth }));
 const checkTronScanUsdtBlacklist = vi.fn();
 const fetchUsdtTrc20Transfers = vi.fn();
 const fetchTronScanAccountTag = vi.fn();
+const fetchUsdtBalance = vi.fn();
 vi.mock("@/lib/tronscan", () => ({
   checkTronScanUsdtBlacklist,
   fetchUsdtTrc20Transfers,
   fetchTronScanAccountTag,
+  fetchUsdtBalance,
 }));
 
 const readUsdtBlacklistStatusOnChain = vi.fn();
@@ -81,6 +83,13 @@ beforeEach(() => {
     ok: true,
     tag: { publicTag: "" },
     evidenceUrl: "mock",
+  });
+
+  fetchUsdtBalance.mockResolvedValue({
+    ok: true,
+    balance: "0",
+    balanceBaseUnits: "0",
+    decimals: 6,
   });
 });
 

@@ -12,6 +12,12 @@ export type TronScanBlacklistResult =
   | { ok: true; blacklisted: boolean; evidence?: TronScanEvidence }
   | { ok: false; blacklisted: false; error: string };
 
+export type TronScanFetchOptions = {
+  timeoutMs?: number;
+  maxRetries?: number;
+  cacheTtlMs?: number;
+};
+
 function withFetchTimeout(timeoutMs: number) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -34,10 +40,15 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function fetchTronScanJson(url: string, timeoutMs = 8_000): Promise<unknown> {
+export async function fetchTronScanJson(url: string, timeoutOrOptions: number | TronScanFetchOptions = 8_000): Promise<unknown> {
+  const options: TronScanFetchOptions =
+    typeof timeoutOrOptions === "number" ? { timeoutMs: timeoutOrOptions } : timeoutOrOptions;
+  const timeoutMs = options.timeoutMs ?? 8_000;
+  const maxRetries = options.maxRetries ?? 3;
+  const cacheTtlMs = options.cacheTtlMs ?? 30_000;
+
   const cacheKey = sha256Key(["tronscan_json", url]);
-  return await getOrSetCache(cacheKey, 30_000, async () => {
-    const maxRetries = 3;
+  return await getOrSetCache(cacheKey, cacheTtlMs, async () => {
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -92,12 +103,12 @@ export type TronScanAccountTagResult =
   | { ok: true; tag: TronScanAccountTag; evidenceUrl: string }
   | { ok: false; error: string };
 
-export async function fetchTronScanAccountTag(address: string): Promise<TronScanAccountTagResult> {
+export async function fetchTronScanAccountTag(address: string, options?: { timeoutMs?: number; maxRetries?: number }): Promise<TronScanAccountTagResult> {
   const cacheKey = sha256Key(["tronscan_account_tag", address]);
   return await getOrSetCache(cacheKey, 6 * 60 * 60 * 1000, async () => {
     const evidenceUrl = `https://apilist.tronscanapi.com/api/account/tag?address=${encodeURIComponent(address)}`;
     try {
-      const raw = await fetchTronScanJson(evidenceUrl, 8_000);
+      const raw = await fetchTronScanJson(evidenceUrl, { timeoutMs: options?.timeoutMs ?? 8_000, maxRetries: options?.maxRetries ?? 3 });
       const parsed = TronScanAccountTagResponseSchema.safeParse(raw);
       if (!parsed.success) return { ok: false, error: "Unexpected TronScan account tag response." };
       return { ok: true, tag: parsed.data, evidenceUrl };
@@ -126,14 +137,14 @@ const TronScanBlacklistResponseSchema = z.object({
   data: z.array(TronScanRowSchema).optional(),
 });
 
-export async function checkTronScanUsdtBlacklist(address: string): Promise<TronScanBlacklistResult> {
+export async function checkTronScanUsdtBlacklist(address: string, options?: { timeoutMs?: number; maxRetries?: number }): Promise<TronScanBlacklistResult> {
   const cacheKey = sha256Key(["tronscan_blacklist", address]);
   return await getOrSetCache(cacheKey, 60_000, async () => {
     const url = `https://apilist.tronscanapi.com/api/stableCoin/blackList?blackAddress=${encodeURIComponent(
       address,
     )}`;
     try {
-      const raw = await fetchTronScanJson(url, 8_000);
+      const raw = await fetchTronScanJson(url, { timeoutMs: options?.timeoutMs ?? 8_000, maxRetries: options?.maxRetries ?? 3 });
       const parsed = TronScanBlacklistResponseSchema.safeParse(raw);
       if (!parsed.success) return { ok: false, blacklisted: false, error: "Unexpected TronScan response." };
 
@@ -201,12 +212,12 @@ export type UsdtBalanceResult =
   | { ok: true; balance: string; balanceBaseUnits: string; decimals: number }
   | { ok: false; error: string };
 
-export async function fetchUsdtBalance(address: string): Promise<UsdtBalanceResult> {
+export async function fetchUsdtBalance(address: string, options?: { timeoutMs?: number; maxRetries?: number }): Promise<UsdtBalanceResult> {
   const cacheKey = sha256Key(["tronscan_usdt_balance_v2", address]);
   return await getOrSetCache(cacheKey, 30_000, async () => {
     const url = `https://apilist.tronscanapi.com/api/account?address=${encodeURIComponent(address)}`;
     try {
-      const raw = await fetchTronScanJson(url, 8_000);
+      const raw = await fetchTronScanJson(url, { timeoutMs: options?.timeoutMs ?? 8_000, maxRetries: options?.maxRetries ?? 3 });
       const parsed = TronScanAccountResponseSchema.safeParse(raw);
       if (!parsed.success) return { ok: false, error: "Unexpected TronScan account response." };
 
@@ -299,6 +310,7 @@ export async function fetchUsdtTrc20Transfers(
     pageSize?: number;
     maxPages?: number;
     timeoutMs?: number;
+    maxRetries?: number;
   },
 ): Promise<TransfersFetchResult> {
   const cacheKey = sha256Key([
@@ -309,66 +321,67 @@ export async function fetchUsdtTrc20Transfers(
     options?.maxPages ?? 20,
   ]);
   return await getOrSetCache(cacheKey, 30_000, async () => {
-  const lookbackDays = options?.lookbackDays ?? 90;
-  const pageSize = Math.min(Math.max(options?.pageSize ?? 50, 10), 100);
-  const maxPages = Math.min(Math.max(options?.maxPages ?? 20, 1), 200);
-  const timeoutMs = options?.timeoutMs ?? 8_000;
+    const lookbackDays = options?.lookbackDays ?? 90;
+    const pageSize = Math.min(Math.max(options?.pageSize ?? 50, 10), 100);
+    const maxPages = Math.min(Math.max(options?.maxPages ?? 20, 1), 200);
+    const timeoutMs = options?.timeoutMs ?? 8_000;
+    const maxRetries = options?.maxRetries ?? 3;
 
-  const now = Date.now();
-  const cutoff = now - lookbackDays * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const cutoff = now - lookbackDays * 24 * 60 * 60 * 1000;
 
-  const transfers: NormalizedUsdtTransfer[] = [];
-  const notices: string[] = [];
+    const transfers: NormalizedUsdtTransfer[] = [];
+    const notices: string[] = [];
 
-  try {
-    for (let page = 0; page < maxPages; page += 1) {
-      const start = page * pageSize;
-      const url = `https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=${pageSize}&start=${start}&sort=-timestamp&count=true&relatedAddress=${encodeURIComponent(
-        address,
-      )}&contract_address=${USDT_TRC20_CONTRACT}`;
+    try {
+      for (let page = 0; page < maxPages; page += 1) {
+        const start = page * pageSize;
+        const url = `https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=${pageSize}&start=${start}&sort=-timestamp&count=true&relatedAddress=${encodeURIComponent(
+          address,
+        )}&contract_address=${USDT_TRC20_CONTRACT}`;
 
-      const raw = await fetchTronScanJson(url, timeoutMs);
-      const parsed = TronScanTransfersResponseSchema.safeParse(raw);
-      if (!parsed.success) return { ok: false, transfers: [], error: "Unexpected TronScan transfers response." };
+        const raw = await fetchTronScanJson(url, { timeoutMs, maxRetries });
+        const parsed = TronScanTransfersResponseSchema.safeParse(raw);
+        if (!parsed.success) return { ok: false, transfers: [], error: "Unexpected TronScan transfers response." };
 
-      const rows = parsed.data.token_transfers ?? [];
-      if (rows.length === 0) break;
+        const rows = parsed.data.token_transfers ?? [];
+        if (rows.length === 0) break;
 
-      for (const row of rows) {
-        if (row.block_ts < cutoff) return { ok: true, transfers, window: { fromTsMs: cutoff, toTsMs: now }, notices };
-        const quant = row.quant ?? "0";
-        let amountBaseUnits: bigint;
-        try {
-          amountBaseUnits = BigInt(quant);
-        } catch {
-          amountBaseUnits = BigInt(0);
+        for (const row of rows) {
+          if (row.block_ts < cutoff) return { ok: true, transfers, window: { fromTsMs: cutoff, toTsMs: now }, notices };
+          const quant = row.quant ?? "0";
+          let amountBaseUnits: bigint;
+          try {
+            amountBaseUnits = BigInt(quant);
+          } catch {
+            amountBaseUnits = BigInt(0);
+          }
+
+          transfers.push({
+            txHash: row.transaction_id,
+            timestampMs: row.block_ts,
+            from: row.from_address,
+            to: row.to_address,
+            amountBaseUnits,
+          });
         }
 
-        transfers.push({
-          txHash: row.transaction_id,
-          timestampMs: row.block_ts,
-          from: row.from_address,
-          to: row.to_address,
-          amountBaseUnits,
-        });
+        if (rows.length < pageSize) break;
       }
 
-      if (rows.length < pageSize) break;
-    }
+      if (transfers.length > 0 && transfers[transfers.length - 1]!.timestampMs >= cutoff) {
+        notices.push("Transfer history may be incomplete due to pagination limits.");
+      }
 
-    if (transfers.length > 0 && transfers[transfers.length - 1]!.timestampMs >= cutoff) {
-      notices.push("Transfer history may be incomplete due to pagination limits.");
+      return { ok: true, transfers, window: { fromTsMs: cutoff, toTsMs: now }, notices };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.name === "AbortError"
+            ? "TronScan timed out."
+            : error.message
+          : "Unknown TronScan error.";
+      return { ok: false, transfers: [], error: message };
     }
-
-    return { ok: true, transfers, window: { fromTsMs: cutoff, toTsMs: now }, notices };
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.name === "AbortError"
-          ? "TronScan timed out."
-          : error.message
-        : "Unknown TronScan error.";
-    return { ok: false, transfers: [], error: message };
-  }
   });
 }
