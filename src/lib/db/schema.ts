@@ -41,9 +41,35 @@ export const watchlistItems = pgTable(
     label: text("label"),
     usdtBalance: text("usdt_balance"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    alertsEnabled: boolean("alerts_enabled").notNull().default(false),
+    alertsTokenContract: text("alerts_token_contract"),
+    alertsMinAmountBase: text("alerts_min_amount_base"),
+    alertsCursorTsMs: text("alerts_cursor_ts_ms"),
+    alertsCursorTx: text("alerts_cursor_tx"),
+    alertsUpdatedAt: timestamp("alerts_updated_at", { withTimezone: true }),
   },
   (t) => ({
     userAddressCreatedAt: index("watchlist_user_address_created_at_idx").on(t.userId, t.addressHash, t.createdAt),
     userCreatedAt: index("watchlist_user_created_at_idx").on(t.userId, t.createdAt),
+  }),
+);
+
+export const watchlistEvents = pgTable(
+  "watchlist_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    watchlistItemId: uuid("watchlist_item_id")
+      .notNull()
+      .references(() => watchlistItems.id, { onDelete: "cascade" }),
+    txHash: text("tx_hash").notNull(),
+    tokenContract: text("token_contract").notNull(),
+    amountBase: text("amount_base").notNull(),
+    fromAddress: text("from_address").notNull(),
+    toAddress: text("to_address").notNull(),
+    blockTsMs: text("block_ts_ms").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    itemTxUnique: index("watchlist_events_item_tx_unique_idx").on(t.watchlistItemId, t.txHash),
   }),
 );
