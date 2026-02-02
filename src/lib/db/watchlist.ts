@@ -79,3 +79,41 @@ export async function deleteWatchlistItemById(db: DbClient, userId: string, item
 
   return rows[0] ?? null;
 }
+
+export type WatchlistItemAlertsUpdateInput = {
+  enabled: boolean;
+  minAmountBase?: string | null;
+};
+
+export async function updateWatchlistItemAlerts(
+  db: DbClient,
+  userId: string,
+  itemId: string,
+  input: WatchlistItemAlertsUpdateInput,
+) {
+  const now = new Date();
+  const updateData: Partial<typeof schema.watchlistItems.$inferInsert> = {
+    alertsEnabled: input.enabled,
+    alertsTokenContract: input.enabled ? "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" : null, // USDT contract on TRON
+    alertsMinAmountBase: input.enabled ? (input.minAmountBase ?? null) : null,
+    alertsUpdatedAt: now,
+  };
+
+  if (input.enabled) {
+    // Set cursor to current timestamp to avoid backfill
+    updateData.alertsCursorTsMs = String(Date.now());
+    updateData.alertsCursorTx = null;
+  } else {
+    updateData.alertsCursorTsMs = null;
+    updateData.alertsCursorTx = null;
+  }
+
+  const rows = await db
+    .update(schema.watchlistItems)
+    .set(updateData)
+    .where(and(eq(schema.watchlistItems.userId, userId), eq(schema.watchlistItems.id, itemId)))
+    .returning()
+    .execute();
+
+  return rows[0] ?? null;
+}
