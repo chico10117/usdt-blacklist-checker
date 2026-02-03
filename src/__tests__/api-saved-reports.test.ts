@@ -20,7 +20,11 @@ async function callPost(body: unknown) {
   const { POST } = await import("@/app/api/saved-reports/route");
   const req = new Request("http://localhost/api/saved-reports", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      origin: "http://localhost",
+      "x-forwarded-host": "localhost",
+    },
     body: JSON.stringify(body),
   });
   const res = await POST(req);

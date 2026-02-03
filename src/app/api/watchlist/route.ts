@@ -8,6 +8,7 @@ import { createWatchlistItem, listWatchlistItems, listWatchlistItemsForAddress }
 import { ensureUserSettingsExists } from "@/lib/db/user-settings";
 import { TronAddressSchema } from "@/lib/validators";
 import { fetchUsdtBalance } from "@/lib/tronscan";
+import { validateSameOrigin } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -45,6 +46,13 @@ export async function GET(request: Request) {
   const limitRaw = url.searchParams.get("limit");
   const limit = clampInt(limitRaw ? Number(limitRaw) : 200, 1, 200);
   const refreshBalances = url.searchParams.get("refreshBalances") === "true";
+
+  if (refreshBalances) {
+    const origin = validateSameOrigin(request);
+    if (!origin.ok) {
+      return NextResponse.json({ error: origin.error }, { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+  }
 
   const items = await listWatchlistItems(db, userId, limit);
 
@@ -90,6 +98,11 @@ export async function POST(request: Request) {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const origin = validateSameOrigin(request);
+  if (!origin.ok) {
+    return NextResponse.json({ error: origin.error }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
 
   if (!process.env.ADDRESS_HASH_KEY) {

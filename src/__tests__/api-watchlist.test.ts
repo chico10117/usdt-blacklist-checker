@@ -31,7 +31,11 @@ async function callPost(body: unknown) {
   const { POST } = await import("@/app/api/watchlist/route");
   const req = new Request("http://localhost/api/watchlist", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      origin: "http://localhost",
+      "x-forwarded-host": "localhost",
+    },
     body: JSON.stringify(body),
   });
   const res = await POST(req);
@@ -154,4 +158,3 @@ describe("/api/watchlist", () => {
     expect(json?.item?.userId).toBeUndefined();
   });
 });
-

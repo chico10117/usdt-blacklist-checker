@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 import { createSavedReport, deleteAllSavedReportsForUser, listSavedReportsSummary } from "@/lib/db/saved-reports";
 import { getUserSettings } from "@/lib/db/user-settings";
 import { TronAddressSchema } from "@/lib/validators";
+import { validateSameOrigin } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -95,6 +96,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
   }
 
+  const origin = validateSameOrigin(request);
+  if (!origin.ok) {
+    return NextResponse.json({ error: origin.error }, { status: 403, headers: { "Cache-Control": "no-store" } });
+  }
+
   if (!process.env.ADDRESS_HASH_KEY) {
     return NextResponse.json({ error: "Persistence is disabled." }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
@@ -156,10 +162,15 @@ export async function POST(request: Request) {
   );
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const origin = validateSameOrigin(request);
+  if (!origin.ok) {
+    return NextResponse.json({ error: origin.error }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
 
   const db = getDb();

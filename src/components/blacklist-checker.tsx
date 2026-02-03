@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { SignedIn, useAuth } from "@clerk/nextjs";
@@ -258,15 +259,6 @@ function InlineCopyButton({ value, size = "sm" }: { value: string; size?: "sm" |
   );
 }
 
-function TrustBadge({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
-  return (
-    <div className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground transition-colors hover:text-foreground">
-      <Icon className="h-3.5 w-3.5" />
-      <span>{children}</span>
-    </div>
-  );
-}
-
 function SectionHeader({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`mb-4 flex items-center gap-3 ${className ?? ""}`}>
@@ -303,7 +295,7 @@ function DataRow({
           <a
             href={href}
             target="_blank"
-            rel="noreferrer"
+            rel="noreferrer noopener"
             className={`${textClasses} inline-flex items-center gap-1.5 break-all text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-primary`}
           >
             {displayValue}
@@ -748,11 +740,7 @@ export function BlacklistChecker() {
       <section className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl">
         {/* Background Image */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <img
-            src="/hero-image.webp"
-            alt=""
-            className="h-full w-full object-cover"
-          />
+          <Image src="/hero-image.webp" alt="" fill priority sizes="100vw" className="object-cover" />
         </div>
 
         {/* Content */}
@@ -947,7 +935,7 @@ export function BlacklistChecker() {
                 <a
                   href={tronscanContractUrl(USDT_TRC20_CONTRACT)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noreferrer noopener"
                   className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
                 >
                   {USDT_TRC20_CONTRACT}
@@ -958,7 +946,7 @@ export function BlacklistChecker() {
               <a
                 href="https://tronscan.org/#/blockchain/contracts"
                 target="_blank"
-                rel="noreferrer"
+                rel="noreferrer noopener"
                 className="inline-flex items-center gap-1 text-xs text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-primary"
               >
                 Open TronScan
@@ -1226,7 +1214,7 @@ export function BlacklistChecker() {
                             <a
                               href={tronscanAddressUrl(load.data.address)}
                               target="_blank"
-                              rel="noreferrer"
+                              rel="noreferrer noopener"
                               className="underline decoration-border underline-offset-4 hover:decoration-primary"
                             >
                               {load.data.checks.entity.subjectTag.publicTag}
@@ -1253,7 +1241,7 @@ export function BlacklistChecker() {
                                     <a
                                       href={tronscanAddressUrl(t.address)}
                                       target="_blank"
-                                      rel="noreferrer"
+                                      rel="noreferrer noopener"
                                       className="font-mono text-[13px] text-foreground underline decoration-border underline-offset-4 hover:decoration-primary"
                                     >
                                       {truncateAddress(t.address)}
@@ -1376,7 +1364,7 @@ export function BlacklistChecker() {
                                 <a
                                   href={tronscanAddressUrl(c.address)}
                                   target="_blank"
-                                  rel="noreferrer"
+                                  rel="noreferrer noopener"
                                   className="truncate font-mono text-[13px] text-foreground underline decoration-border underline-offset-4 hover:decoration-primary"
                                 >
                                   {truncateAddress(c.address)}
@@ -1394,7 +1382,7 @@ export function BlacklistChecker() {
                                     <a
                                       href={tronscanTxUrl(c.sampleTxHash)}
                                       target="_blank"
-                                      rel="noreferrer"
+                                      rel="noreferrer noopener"
                                       className="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:decoration-primary"
                                     >
                                       tx
@@ -1457,7 +1445,7 @@ export function BlacklistChecker() {
                                     <a
                                       href={tronscanAddressUrl(p.viaCounterparty)}
                                       target="_blank"
-                                      rel="noreferrer"
+                                      rel="noreferrer noopener"
                                       className="font-mono underline decoration-border underline-offset-4 hover:decoration-primary"
                                     >
                                       {truncateAddress(p.viaCounterparty)}
@@ -1665,7 +1653,7 @@ export function BlacklistChecker() {
             className="font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-primary"
             href="https://www.instagram.com/chikocryptocr/"
             target="_blank"
-            rel="noreferrer"
+            rel="noreferrer noopener"
           >
             Chikocorp
           </a>

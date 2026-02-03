@@ -20,7 +20,11 @@ async function callGet(url = "http://localhost/api/saved-reports?limit=50") {
 
 async function callDelete() {
   const { DELETE } = await import("@/app/api/saved-reports/route");
-  const res = await DELETE();
+  const req = new Request("http://localhost/api/saved-reports", {
+    method: "DELETE",
+    headers: { origin: "http://localhost", "x-forwarded-host": "localhost" },
+  });
+  const res = await DELETE(req);
   const json = await res.json().catch(() => null);
   return { res, json };
 }
@@ -92,4 +96,3 @@ describe("/api/saved-reports management", () => {
     expect(json?.deletedCount).toBe(7);
   });
 });
-

@@ -21,7 +21,11 @@ async function callPatch(body: unknown) {
   const { PATCH } = await import("@/app/api/user-settings/route");
   const req = new Request("http://localhost/api/user-settings", {
     method: "PATCH",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      origin: "http://localhost",
+      "x-forwarded-host": "localhost",
+    },
     body: JSON.stringify(body),
   });
   const res = await PATCH(req);
@@ -79,4 +83,3 @@ describe("/api/user-settings", () => {
     expect(upsertUserSettings).toHaveBeenCalledWith({}, "user_123", true);
   });
 });
-

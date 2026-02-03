@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { getDb } from "@/lib/db";
 import { deleteWatchlistItemById } from "@/lib/db/watchlist";
+import { validateSameOrigin } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -26,6 +27,11 @@ export async function DELETE(_request: NextRequest, ctx: { params: Promise<{ id:
     return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
   }
 
+  const origin = validateSameOrigin(_request);
+  if (!origin.ok) {
+    return NextResponse.json({ error: origin.error }, { status: 403, headers: { "Cache-Control": "no-store" } });
+  }
+
   const params = await ctx.params;
   const parsedId = WatchlistItemIdSchema.safeParse(params.id);
   if (!parsedId.success) {
@@ -44,4 +50,3 @@ export async function DELETE(_request: NextRequest, ctx: { params: Promise<{ id:
 
   return NextResponse.json({ deleted: true }, { status: 200, headers: { "Cache-Control": "no-store" } });
 }
-

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { fetchTrc20TransfersSince, NormalizedTrc20Transfer } from "./transfers";
+import { fetchTrc20TransfersSince } from "./transfers";
 
 // Mock the tronscan module
 vi.mock("@/lib/tronscan", () => ({

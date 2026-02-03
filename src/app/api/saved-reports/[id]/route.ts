@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { getDb } from "@/lib/db";
 import { deleteSavedReportById, getSavedReportById } from "@/lib/db/saved-reports";
+import { validateSameOrigin } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -55,6 +56,11 @@ export async function DELETE(_request: NextRequest, ctx: { params: Promise<{ id:
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const origin = validateSameOrigin(_request);
+  if (!origin.ok) {
+    return NextResponse.json({ error: origin.error }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
 
   const params = await ctx.params;

@@ -21,7 +21,10 @@ async function callGet(id: string) {
 
 async function callDelete(id: string) {
   const { DELETE } = await import("@/app/api/saved-reports/[id]/route");
-  const req = new Request(`http://localhost/api/saved-reports/${id}`, { method: "DELETE" });
+  const req = new Request(`http://localhost/api/saved-reports/${id}`, {
+    method: "DELETE",
+    headers: { origin: "http://localhost", "x-forwarded-host": "localhost" },
+  });
   const res = await DELETE(req as unknown as NextRequest, { params: Promise.resolve({ id }) });
   const json = await res.json().catch(() => null);
   return { res, json };

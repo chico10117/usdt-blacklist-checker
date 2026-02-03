@@ -18,6 +18,17 @@ export type TronScanFetchOptions = {
   cacheTtlMs?: number;
 };
 
+function assertTronScanUrl(url: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error("Invalid TronScan URL.");
+  }
+  if (parsed.protocol !== "https:") throw new Error("Invalid TronScan URL protocol.");
+  if (parsed.host !== "apilist.tronscanapi.com") throw new Error("Invalid TronScan URL host.");
+}
+
 function withFetchTimeout(timeoutMs: number) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -41,6 +52,7 @@ async function sleep(ms: number): Promise<void> {
 }
 
 export async function fetchTronScanJson(url: string, timeoutOrOptions: number | TronScanFetchOptions = 8_000): Promise<unknown> {
+  assertTronScanUrl(url);
   const options: TronScanFetchOptions =
     typeof timeoutOrOptions === "number" ? { timeoutMs: timeoutOrOptions } : timeoutOrOptions;
   const timeoutMs = options.timeoutMs ?? 8_000;

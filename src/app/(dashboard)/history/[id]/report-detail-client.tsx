@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { safeExternalHref } from "@/lib/security";
 
 type SavedReportDetail = {
   id: string;
@@ -50,11 +51,17 @@ function tierVariant(tier: SavedReportDetail["riskTier"]): React.ComponentProps<
 }
 
 function DataRow({ label, value, href }: { label: string; value: string; href?: string }) {
+  const safeHref = href ? safeExternalHref(href) : null;
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 py-2">
       <div className="text-xs font-medium text-muted-foreground">{label}</div>
-      {href ? (
-        <a href={href} target="_blank" rel="noreferrer" className="break-all text-sm text-foreground underline underline-offset-4">
+      {safeHref ? (
+        <a
+          href={safeHref}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="break-all text-sm text-foreground underline underline-offset-4"
+        >
           {value}
         </a>
       ) : (
@@ -90,9 +97,14 @@ function extractEvidenceLinks(reportJson: unknown): Array<{ label: string; href:
     const txHash = extractString(evidence.txHash);
     const address = extractString(json.address);
     const contractAddress = extractString(evidence.contractAddress);
-    if (address) out.push({ label: "Address (TronScan)", href: tronscanAddressUrl(address) });
-    if (contractAddress) out.push({ label: "Contract (TronScan)", href: tronscanContractUrl(contractAddress) });
-    if (txHash) out.push({ label: "Transaction (TronScan)", href: tronscanTxUrl(txHash) });
+    const addrHref = address ? safeExternalHref(tronscanAddressUrl(address)) : null;
+    if (addrHref) out.push({ label: "Address (TronScan)", href: addrHref });
+
+    const contractHref = contractAddress ? safeExternalHref(tronscanContractUrl(contractAddress)) : null;
+    if (contractHref) out.push({ label: "Contract (TronScan)", href: contractHref });
+
+    const txHref = txHash ? safeExternalHref(tronscanTxUrl(txHash)) : null;
+    if (txHref) out.push({ label: "Transaction (TronScan)", href: txHref });
   }
 
   const sanctions = asRecord(checks.sanctions);
@@ -106,7 +118,8 @@ function extractEvidenceLinks(reportJson: unknown): Array<{ label: string; href:
         const s = asRecord(source);
         const url = s ? extractString(s.url) : null;
         const name = s ? extractString(s.name) : null;
-        if (url) out.push({ label: name ? `Sanctions source: ${name}` : "Sanctions source", href: url });
+        const safeHref = url ? safeExternalHref(url) : null;
+        if (safeHref) out.push({ label: name ? `Sanctions source: ${name}` : "Sanctions source", href: safeHref });
       }
     }
   }
@@ -275,7 +288,12 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
                 <ul className="space-y-2">
                   {state.evidence.map((e) => (
                     <li key={e.href}>
-                      <a href={e.href} target="_blank" rel="noreferrer" className="text-sm text-foreground underline underline-offset-4">
+                      <a
+                        href={e.href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-sm text-foreground underline underline-offset-4"
+                      >
                         {e.label}
                       </a>
                     </li>
@@ -300,4 +318,3 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
     </div>
   );
 }
-
