@@ -1,0 +1,20 @@
+name: E2E Tests (Vercel Preview)
+
+on:
+  deployment_status:
+
+jobs:
+  e2e:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment_url != ''
+    uses: jarvis-chiko-bot/playwright-e2e-gate/.github/workflows/e2e-gate.yml@main
+    with:
+      baseUrl: ${{ github.event.deployment_status.environment_url }}
+      nodeVersion: 20
+      workdir: '.'
+      e2eDir: 'e2e'
+      browsers: 'chromium'
+      shards: 1
+      commentOnPr: true
+    secrets:
+      E2E_STORAGE_STATE_B64: ${{ secrets.E2E_STORAGE_STATE_B64 }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

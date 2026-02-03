@@ -1,5 +1,6 @@
 packages:
   - .
+  - e2e
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver

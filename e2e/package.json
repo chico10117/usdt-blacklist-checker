@@ -1,0 +1,19 @@
+{
+  "name": "e2e-tests",
+  "version": "1.0.0",
+  "description": "Playwright E2E test starter kit",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --headed",
+    "install:browsers": "playwright install",
+    "auth:generate-storage-state": "node scripts/auth/generate-storage-state.js",
+    "auth:encode-storage-state": "node scripts/auth/encode-storage-state.js",
+    "auth:set-secret": "bash scripts/auth/set-e2e-storage-state-secret.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0"
+  }
+}
