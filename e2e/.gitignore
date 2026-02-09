@@ -1,0 +1,9 @@
+# Playwright
+playwright-report/
+test-results/
+
+# Auth
+.auth/
+
+# Dependencies
+node_modules/
