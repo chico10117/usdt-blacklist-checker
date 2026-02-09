@@ -4,18 +4,46 @@ import { fileURLToPath } from "node:url";
 const isProd = process.env.NODE_ENV === "production";
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
+function getClerkProxyOrigin() {
+  // When Clerk is configured with a custom domain, clerk.js is served from
+  // `https://clerk.<your-site-host>`. We derive this from NEXT_PUBLIC_SITE_URL
+  // (with a sane default) so CSP stays correct across environments.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://usdt.chikocorp.com";
+  try {
+    const url = new URL(siteUrl);
+    return `https://clerk.${url.hostname}`;
+  } catch {
+    return null;
+  }
+}
+
+const clerkProxyOrigin = getClerkProxyOrigin();
+
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  `script-src 'self' 'unsafe-inline' https://*.clerk.accounts.dev${isProd ? "" : " 'unsafe-eval'"}`,
+  [
+    "script-src",
+    "'self'",
+    "'unsafe-inline'",
+    "https://*.clerk.accounts.dev",
+    // Clerk custom domain (optional)
+    clerkProxyOrigin,
+    // Needed for local dev tooling; keep out of prod CSP.
+    isProd ? null : "'unsafe-eval'",
+  ]
+    .filter(Boolean)
+    .join(" "),
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.clerk.accounts.dev https://api.clerk.com",
-  "frame-src 'self' https://*.clerk.accounts.dev",
+  ["connect-src", "'self'", "https://*.clerk.accounts.dev", "https://api.clerk.com", clerkProxyOrigin]
+    .filter(Boolean)
+    .join(" "),
+  ["frame-src", "'self'", "https://*.clerk.accounts.dev", clerkProxyOrigin].filter(Boolean).join(" "),
   "worker-src 'self' blob:",
 ].join("; ");
 
