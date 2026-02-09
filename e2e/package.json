@@ -2,6 +2,7 @@
   "name": "e2e-tests",
   "version": "1.0.0",
   "description": "Playwright E2E test starter kit",
+  "type": "module",
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",

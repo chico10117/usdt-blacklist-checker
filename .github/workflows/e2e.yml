@@ -6,7 +6,7 @@ on:
 jobs:
   e2e:
     if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment_url != ''
-    uses: jarvis-chiko-bot/playwright-e2e-gate/.github/workflows/e2e-gate.yml@main
+    uses: jarvis-chiko-bot/playwright-e2e-gate/.github/workflows/e2e-gate.yml@344c0d309dd0533efc0962b76ee8e2aa828183b0
     with:
       baseUrl: ${{ github.event.deployment_status.environment_url }}
       nodeVersion: 20

@@ -5,8 +5,8 @@
  *   node scripts/auth/encode-storage-state.js [path/to/storageState.json]
  */
 
-const fs = require('node:fs');
-const path = require('node:path');
+import fs from "node:fs";
+import path from "node:path";
 
 const defaultPath = path.resolve(process.cwd(), '.auth', 'storageState.json');
 const filePath = process.argv[2] ? path.resolve(process.cwd(), process.argv[2]) : defaultPath;

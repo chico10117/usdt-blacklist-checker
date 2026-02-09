@@ -8,10 +8,10 @@
  *  - Press ENTER in the terminal to save storageState
  */
 
-const path = require('node:path');
-const fs = require('node:fs');
-const readline = require('node:readline');
-const { chromium } = require('@playwright/test');
+import path from "node:path";
+import fs from "node:fs";
+import readline from "node:readline";
+import { chromium } from "@playwright/test";
 
 function promptEnter(message) {
   return new Promise((resolve) => {
